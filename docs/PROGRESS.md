@@ -7,7 +7,7 @@ Last updated: 2026-09-26
 | # | Milestone | Status |
 |---|---|---|
 | P0 | First actions: specs/papers moved to `docs/`, CLAUDE.md, PROGRESS.md, ADR 0001 | done |
-| P1 | Repo scaffold + tooling + placeholders | planned, awaiting OK |
+| P1 | Repo scaffold + tooling + placeholders | done — uv workspace (Py 3.11.13, pinned deps), ruff/mypy/pytest green, host g++ test runner, Arduino sketch compiles for ESP32-S3 (ADR 0002) |
 | P2 | `shared/`: CPCB AQI + ≥50 vectors, IST bucketing + fixture, feature_schema + loader + hash, JSON Schemas [S16.2]–[S16.7], C-header codegen | todo |
 | P3 | Data downloaders (OpenAQ v3, Open-Meteo archive + historical-forecast) + base table + data card | todo |
 | P4 | Simulator with researched parameters + unit tests + virtual-node shards | todo |
@@ -16,7 +16,7 @@ Last updated: 2026-09-26
 | P7 | GDC-CNN A/B per [S13.3]/[S13.4] + TFLite FP32 export + 1-block TFLM op check | todo |
 | P8 | teacher_store + interim LightGBM teacher + OOF + out_KD/full_KD + precondition check | todo |
 | P9 | ZenML pipelines wiring P3–P8 | todo |
-| P10 | Firmware components + host tests against shared fixtures + mock_cloud | todo |
+| P10 | Firmware (Arduino sketch, ADR 0002) components + host tests against shared fixtures + mock_cloud | todo |
 
 ## Spec acceptance checklist ([S22]) → phase-1 milestone
 
@@ -46,7 +46,8 @@ Last updated: 2026-09-26
 
 ## Environment notes
 
-- Host: Windows 11, uv 0.8.6, system Python 3.10 (uv will fetch 3.11), git 2.50.
-- Missing: CMake, ESP-IDF, Docker. gcc is MinGW 6.3 (old). See P1 plan.
+- Host: Windows 11, uv 0.8.6 (Python 3.11.13 managed by uv), git 2.50, g++/mingw32-make (MinGW 6.3, C++14 OK for host tests).
+- Firmware toolchain: arduino-cli 1.5.1, core esp32:esp32 3.3.3 (latest 3.3.11 — update before P10), libraries already installed: TensorFlowLite_ESP32, Chirale_TensorFlowLite, ClosedCube HDC1080, Adafruit BMP280, RTClib, PubSubClient, ArduinoJson.
+- Not installed / not needed in phase 1: ESP-IDF (replaced by Arduino, ADR 0002), CMake (host tests use plain g++), Docker (`infra/docker-compose.yml` written, not run; ZenML uses the local stack).
 - `papers/Datasheet/` still holds two MQ manuals locked by a PDF viewer; copies are in `docs/papers/Datasheet/`. Delete `papers/` after closing the viewer.
 - Removed duplicate `Improving_Air_Quality_Zoning... (1).pdf` (byte-identical, same sha256).

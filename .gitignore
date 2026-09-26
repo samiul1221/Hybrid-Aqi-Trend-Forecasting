@@ -1,0 +1,28 @@
+# python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+
+# data and run outputs (never commit)
+data/
+mlruns/
+mlartifacts/
+.zenml/
+
+# builds
+build/
+edge/firmware/aqi_node/build/
+
+# secrets
+.env
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

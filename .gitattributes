@@ -1,0 +1,6 @@
+# LF everywhere so fixture and schema bytes are identical on Windows and Linux
+* text=auto eol=lf
+*.pdf binary
+*.png binary
+*.tflite binary
+*.bin binary

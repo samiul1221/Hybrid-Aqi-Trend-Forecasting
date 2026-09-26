@@ -32,7 +32,8 @@ B.Tech research project: edge–cloud hybrid AQI forecasting for 5–10 sensor n
 ```
 shared/     aqi_shared: CPCB AQI, IST time utils, schema loader; schema/feature_schema.yaml;
             contracts/*.schema.json; fixtures/ (aqi_vectors, ist_bucket, feature_golden); codegen/ → C headers
-edge/       firmware/ (ESP-IDF v5.x: main/, components/, test_host/ host-compiled C tests); tools/ (replay, parity, mock_cloud)
+edge/       firmware/aqi_node/ (Arduino sketch: aqi_node.ino + src/<component>/ per [S05]); firmware/test_host/ (host g++ tests);
+            tools/ (replay, parity, mock_cloud)
 ml/         aqi_ml library: data/ sim/ features/ models/{edge,teacher}/ distill/ export/ eval/;
             pipelines/ (ZenML, thin wrappers over aqi_ml only); configs/ (yaml); tests/
 cloud/ frontend/   phase-2 placeholders
@@ -62,17 +63,18 @@ Rules: no logic duplicated across folders; anything used by more than one compon
 
 ## Commands
 
-Tooling: Python 3.11 via uv (uv workspace: `shared`, `ml`), ruff, mypy (strict on `shared/`), pytest. Firmware: ESP-IDF v5.x. These become valid once milestone P1 lands.
+Tooling: Python 3.11 via uv (workspace members `shared`, `ml`; deps pinned exactly with `uv add --bounds exact`), ruff, mypy (strict on `aqi_shared`), pytest. Firmware is an **Arduino sketch** (arduino-esp32 core 3.x via `arduino-cli`), not ESP-IDF — see `docs/decisions/0002-arduino-firmware.md`. Scripts are bash (Git Bash on Windows).
 
 ```bash
 uv sync --all-packages                       # setup (installs Python 3.11 if missing)
-uv run pytest                                # all Python tests
-uv run pytest ml/tests/test_x.py::test_y     # single test
-uv run ruff check . && uv run ruff format --check .
-uv run mypy shared/src                       # strict
-idf.py -C edge/firmware build                # firmware (needs ESP-IDF env)
-cmake -S edge/firmware/test_host -B build/test_host && cmake --build build/test_host && ctest --test-dir build/test_host   # host C tests
+bash scripts/test-all.sh                     # pytest + host C++ firmware tests
+uv run pytest ml/tests/test_x.py::test_y     # single Python test
+bash edge/firmware/test_host/run.sh          # host C++ tests only (g++, assert-based test_*.cpp)
+bash scripts/lint.sh                         # ruff check + ruff format --check + mypy
+bash scripts/build-firmware.sh               # arduino-cli compile, FQBN esp32:esp32:esp32s3:PSRAM=opi,FlashSize=16M
 ```
+
+Firmware pure-logic code in `edge/firmware/aqi_node/src/{pipeline,aqi,features,models,decision}/` must not include Arduino headers, so host tests can compile it.
 
 ## Working rules
 
