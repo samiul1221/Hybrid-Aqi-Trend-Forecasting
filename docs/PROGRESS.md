@@ -8,7 +8,7 @@ Last updated: 2026-09-26
 |---|---|---|
 | P0 | First actions: specs/papers moved to `docs/`, CLAUDE.md, PROGRESS.md, ADR 0001 | done |
 | P1 | Repo scaffold + tooling + placeholders | done — uv workspace (Py 3.11.13, pinned deps), ruff/mypy/pytest green, host g++ test runner, Arduino sketch compiles for ESP32-S3 (ADR 0002) |
-| P2 | `shared/`: CPCB AQI + ≥50 vectors, IST bucketing + fixture, feature_schema + loader + hash, JSON Schemas [S16.2]–[S16.7], C-header codegen | todo |
+| P2 | `shared/`: CPCB AQI + ≥50 vectors, IST bucketing + fixture, feature_schema + loader + hash, JSON Schemas [S16.2]–[S16.7], C-header codegen | done — 61 AQI vectors, 409-row IST fixture (vs zoneinfo), schema hash `sha256:49657c55…`, 9 contract schemas + examples, 2 generated headers; 53 pytest + host C++ test green (ADR 0003, 0004) |
 | P3 | Data downloaders (OpenAQ v3, Open-Meteo archive + historical-forecast) + base table + data card | todo |
 | P4 | Simulator with researched parameters + unit tests + virtual-node shards | todo |
 | P5 | Python feature builder (golden fixtures) + target builder + Model B PM-dropout builder | todo |
@@ -23,7 +23,7 @@ Last updated: 2026-09-26
 - [ ] M1 hardware — I2C scan 0x23,0x40,0x59,0x68,0x76; SPS30 streaming; MQ-7 heater cycle verified with meter; 24 h stable run (**needs hardware**, after P10)
 - [ ] M2 pipeline — minute/hour aggregates + flags; κ correction + dust flag; AQI passes vectors; Python vs firmware AQI diff < 0.5; IST fixture passes (P2, P10)
 - [ ] M3 logging/comms — records match [S16.2]; store-and-forward survives 24 h outage + reboot; RTC offline; forecast poll + stub server; MQTT push + LWT; event POST idempotent + queued offline (P10; outage/reboot parts need hardware)
-- [ ] M4 data/simulator — base table [S09]; simulator [S10] with unit tests; feature_schema final + hash; virtual-node shards (P2–P4)
+- [ ] M4 data/simulator — base table [S09]; simulator [S10] with unit tests; ~~feature_schema final + hash~~ (P2 done; final once P5/P7 confirm); virtual-node shards (P3–P4)
 - [ ] M5 RF no-KD — A and B trained; beat persistence on synthetic test; exported; parity < 1e-4; size < 400 KB (P6)
 - [ ] M6 CNN no-KD — toy op-check on device; A and B trained; FP32 parity < 1e-4; latency + arena measured (P7; on-device parts need hardware)
 - [ ] M7 distillation — interim teacher + OOF in teacher_store; precondition checked (E3); out_KD RF + CNN; full_KD when graph teacher exists (P8; full_KD real run is phase 2)
@@ -39,10 +39,13 @@ Last updated: 2026-09-26
 
 ## Open questions for the owner
 
-1. [S06.6] PM2.5 Very Poor band ends at 250 and Severe starts at 250 (overlap). Treat 250.0 as Very Poor (upper-inclusive) until the official CPCB table is verified?
-2. SGP41 `kn_u` range: move to datasheet-based U(1400,2900) per e-fold, or keep the spec value? (Proposed: datasheet value + ADR in P4.)
-3. Which MQ-7 module do you have (Hanwei 1.4 V or Winsen 1.5 V low phase), and is its heater hard-wired to 5 V?
-4. Delhi fog/monsoon RH regularly exceeds SGP41's 90 % limit: add an SGP41 `high_humidity` flag bit usage for RH > 90 %? (Spec flags at 95 %.)
+1. **AQI gap rule** (ADR 0003): the spec's literal rule ("previous band's B_hi as B_lo") gives up to ≈3.3 AQI points more than the official CPCB calculator just above a band start (PM2.5 61 → 104.3 vs 101). Implemented literally. Keep, or switch to the official integer breakpoints? (One-line change + fixture regen.)
+2. Resolved by default: PM2.5 = 250 → Very Poor (upper-inclusive); Severe upper limits 380 / 510; all breakpoints TODO_VERIFY against the official CPCB NAQI document.
+3. SGP41 `kn_u` range: move to datasheet-based U(1400,2900) per e-fold, or keep the spec value? (Proposed: datasheet value + ADR in P4.)
+4. Which MQ-7 module do you have (Hanwei 1.4 V or Winsen 1.5 V low phase), and is its heater hard-wired to 5 V?
+5. Delhi fog/monsoon RH regularly exceeds SGP41's 90 % limit: flag SGP41 readings `high_humidity` above 90 % RH? (Spec flags at 95 %.)
+6. (P7) How should the 5 scalar Model B extras [S08.2] enter the GDC-CNN? Proposal: broadcast as 5 constant channels over the 24 h window (17 + 5 = 22 channels).
+7. arduino-esp32 core 3.3.3 installed, 3.3.11 latest: update before P10?
 
 ## Environment notes
 

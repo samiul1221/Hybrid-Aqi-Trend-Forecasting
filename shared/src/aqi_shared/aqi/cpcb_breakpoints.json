@@ -1,0 +1,13 @@
+{
+  "_doc": "CPCB NAQI PM breakpoints, 24 h means, ug/m3 [S06.6]. Single source for Python and generated C header. Rules: docs/decisions/0003-cpcb-aqi-rules.md",
+  "_todo_verify": "All breakpoints and the Severe upper limits (pm25 380, pm10 510) must be checked against the official CPCB NAQI document / AQI calculator before release.",
+  "verified": false,
+  "categories": ["Good", "Satisfactory", "Moderate", "Poor", "Very_Poor", "Severe"],
+  "aqi_bands": [[0, 50], [51, 100], [101, 200], [201, 300], [301, 400], [401, 500]],
+  "pm25": [[0, 30], [31, 60], [61, 90], [91, 120], [121, 250], [250, 380]],
+  "pm10": [[0, 50], [51, 100], [101, 250], [251, 350], [351, 430], [430, 510]],
+  "aqi_cap": 500,
+  "validity_min_measured_hours": 16,
+  "window_hours": 24,
+  "trend_threshold": 5
+}

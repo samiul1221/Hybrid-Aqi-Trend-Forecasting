@@ -23,6 +23,7 @@ dev = [
     "ruff==0.16.9",
     "types-jsonschema==4.26.0.20260518",
     "types-pyyaml==6.0.12.20260906",
+    "tzdata==2026.4",
 ]
 
 [tool.ruff]
@@ -31,6 +32,10 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "NPY", "RUF"]
+ignore = ["E501"]  # ruff format owns line length
+
+[tool.ruff.lint.isort]
+known-first-party = ["aqi_shared", "aqi_ml"]
 
 [tool.mypy]
 python_version = "3.11"

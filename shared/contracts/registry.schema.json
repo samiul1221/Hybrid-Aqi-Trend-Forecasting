@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aqi-hybrid.dev/v1/registry.schema.json",
+  "title": "Node registry entry (onboarding; cloud-owned, edge supplies facts) [S16.5]",
+  "description": "Sensor fields are enums: the sensor pool is fixed (no MiCS-6814, no LDR).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["node_id", "lat", "lon", "height_agl_m", "site_notes", "sensors", "wind_quality", "install_date", "burn_in_until", "calibration_version", "token_id"],
+  "properties": {
+    "node_id": {"$ref": "common.schema.json#/$defs/node_id"},
+    "lat": {"type": "number", "minimum": -90, "maximum": 90},
+    "lon": {"type": "number", "minimum": -180, "maximum": 180},
+    "height_agl_m": {"type": "number", "minimum": 0},
+    "site_notes": {"type": "string"},
+    "sensors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pm", "th", "baro", "wind", "rain", "lux", "gas"],
+      "properties": {
+        "pm": {"const": "SPS30"},
+        "th": {"const": "HDC1080"},
+        "baro": {"const": "BMP280"},
+        "wind": {"type": "string", "description": "cup anemometer + vane kit model"},
+        "rain": {"type": "string", "description": "rain board model"},
+        "lux": {"const": "BH1750"},
+        "gas": {"type": "array", "uniqueItems": true, "items": {"enum": ["MQ-7", "MQ-135", "SGP41"]}},
+        "rtc": {"const": "DS3231"}
+      }
+    },
+    "wind_quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sheltering_factor_est", "trusted_for_graph_edges"],
+      "properties": {
+        "sheltering_factor_est": {"type": "number", "minimum": 0, "maximum": 1},
+        "trusted_for_graph_edges": {"type": "boolean"}
+      }
+    },
+    "install_date": {"$ref": "common.schema.json#/$defs/date"},
+    "burn_in_until": {"$ref": "common.schema.json#/$defs/date"},
+    "calibration_version": {"type": "string"},
+    "token_id": {"type": "string"}
+  }
+}

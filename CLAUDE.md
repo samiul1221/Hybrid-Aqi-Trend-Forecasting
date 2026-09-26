@@ -72,7 +72,11 @@ uv run pytest ml/tests/test_x.py::test_y     # single Python test
 bash edge/firmware/test_host/run.sh          # host C++ tests only (g++, assert-based test_*.cpp)
 bash scripts/lint.sh                         # ruff check + ruff format --check + mypy
 bash scripts/build-firmware.sh               # arduino-cli compile, FQBN esp32:esp32:esp32s3:PSRAM=opi,FlashSize=16M
+uv run python shared/codegen/gen_c_headers.py        # regenerate firmware headers after editing feature_schema.yaml or cpcb_breakpoints.json
+uv run python shared/fixtures/make_fixtures.py       # regenerate AQI/IST fixtures; review the JSON diff (a changed value = behaviour change)
 ```
+
+Single sources: CPCB table `shared/src/aqi_shared/aqi/cpcb_breakpoints.json`; features `shared/schema/feature_schema.yaml` (hash = canonical JSON of parsed YAML); contracts `shared/contracts/*.schema.json` with golden payloads in `shared/fixtures/contract_examples.json`. Generated `*.gen.h` files are committed; a test fails if they are stale.
 
 Firmware pure-logic code in `edge/firmware/aqi_node/src/{pipeline,aqi,features,models,decision}/` must not include Arduino headers, so host tests can compile it.
 

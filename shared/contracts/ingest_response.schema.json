@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.aqi-hybrid.dev/v1/ingest_response.schema.json",
+  "title": "POST /api/v1/ingest 200 response [S16.2]; edge marks only 'accepted' ts as uploaded",
+  "type": "object",
+  "required": ["accepted", "rejected"],
+  "properties": {
+    "accepted": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/ts_bucket"}},
+    "rejected": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ts", "reason"],
+        "properties": {"ts": {"type": "string"}, "reason": {"type": "string"}}
+      }
+    }
+  }
+}

@@ -1,0 +1,3686 @@
+{
+ "_doc": "IST clock-hour buckets (I02). Expected from zoneinfo Asia/Kolkata. dow 0=Monday; doy 1-based; ist_* describe the input instant.",
+ "rows": [
+  {
+   "utc": "2024-02-28T12:00:00Z",
+   "epoch": 1709121600,
+   "bucket_ts": "2024-02-28T11:30:00Z",
+   "bucket_epoch": 1709119800,
+   "ist_hour": 17,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T12:07:13Z",
+   "epoch": 1709122033,
+   "bucket_ts": "2024-02-28T11:30:00Z",
+   "bucket_epoch": 1709119800,
+   "ist_hour": 17,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T12:14:26Z",
+   "epoch": 1709122466,
+   "bucket_ts": "2024-02-28T11:30:00Z",
+   "bucket_epoch": 1709119800,
+   "ist_hour": 17,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T12:21:39Z",
+   "epoch": 1709122899,
+   "bucket_ts": "2024-02-28T11:30:00Z",
+   "bucket_epoch": 1709119800,
+   "ist_hour": 17,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T12:28:52Z",
+   "epoch": 1709123332,
+   "bucket_ts": "2024-02-28T11:30:00Z",
+   "bucket_epoch": 1709119800,
+   "ist_hour": 17,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T12:36:05Z",
+   "epoch": 1709123765,
+   "bucket_ts": "2024-02-28T12:30:00Z",
+   "bucket_epoch": 1709123400,
+   "ist_hour": 18,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T12:43:18Z",
+   "epoch": 1709124198,
+   "bucket_ts": "2024-02-28T12:30:00Z",
+   "bucket_epoch": 1709123400,
+   "ist_hour": 18,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T12:50:31Z",
+   "epoch": 1709124631,
+   "bucket_ts": "2024-02-28T12:30:00Z",
+   "bucket_epoch": 1709123400,
+   "ist_hour": 18,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T12:57:44Z",
+   "epoch": 1709125064,
+   "bucket_ts": "2024-02-28T12:30:00Z",
+   "bucket_epoch": 1709123400,
+   "ist_hour": 18,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T13:04:57Z",
+   "epoch": 1709125497,
+   "bucket_ts": "2024-02-28T12:30:00Z",
+   "bucket_epoch": 1709123400,
+   "ist_hour": 18,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T13:12:10Z",
+   "epoch": 1709125930,
+   "bucket_ts": "2024-02-28T12:30:00Z",
+   "bucket_epoch": 1709123400,
+   "ist_hour": 18,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T13:19:23Z",
+   "epoch": 1709126363,
+   "bucket_ts": "2024-02-28T12:30:00Z",
+   "bucket_epoch": 1709123400,
+   "ist_hour": 18,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T13:26:36Z",
+   "epoch": 1709126796,
+   "bucket_ts": "2024-02-28T12:30:00Z",
+   "bucket_epoch": 1709123400,
+   "ist_hour": 18,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T13:33:49Z",
+   "epoch": 1709127229,
+   "bucket_ts": "2024-02-28T13:30:00Z",
+   "bucket_epoch": 1709127000,
+   "ist_hour": 19,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T13:41:02Z",
+   "epoch": 1709127662,
+   "bucket_ts": "2024-02-28T13:30:00Z",
+   "bucket_epoch": 1709127000,
+   "ist_hour": 19,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T13:48:15Z",
+   "epoch": 1709128095,
+   "bucket_ts": "2024-02-28T13:30:00Z",
+   "bucket_epoch": 1709127000,
+   "ist_hour": 19,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T13:55:28Z",
+   "epoch": 1709128528,
+   "bucket_ts": "2024-02-28T13:30:00Z",
+   "bucket_epoch": 1709127000,
+   "ist_hour": 19,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T14:02:41Z",
+   "epoch": 1709128961,
+   "bucket_ts": "2024-02-28T13:30:00Z",
+   "bucket_epoch": 1709127000,
+   "ist_hour": 19,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T14:09:54Z",
+   "epoch": 1709129394,
+   "bucket_ts": "2024-02-28T13:30:00Z",
+   "bucket_epoch": 1709127000,
+   "ist_hour": 19,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T14:17:07Z",
+   "epoch": 1709129827,
+   "bucket_ts": "2024-02-28T13:30:00Z",
+   "bucket_epoch": 1709127000,
+   "ist_hour": 19,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T14:24:20Z",
+   "epoch": 1709130260,
+   "bucket_ts": "2024-02-28T13:30:00Z",
+   "bucket_epoch": 1709127000,
+   "ist_hour": 19,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T14:31:33Z",
+   "epoch": 1709130693,
+   "bucket_ts": "2024-02-28T14:30:00Z",
+   "bucket_epoch": 1709130600,
+   "ist_hour": 20,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T14:38:46Z",
+   "epoch": 1709131126,
+   "bucket_ts": "2024-02-28T14:30:00Z",
+   "bucket_epoch": 1709130600,
+   "ist_hour": 20,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T14:45:59Z",
+   "epoch": 1709131559,
+   "bucket_ts": "2024-02-28T14:30:00Z",
+   "bucket_epoch": 1709130600,
+   "ist_hour": 20,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T14:53:12Z",
+   "epoch": 1709131992,
+   "bucket_ts": "2024-02-28T14:30:00Z",
+   "bucket_epoch": 1709130600,
+   "ist_hour": 20,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T15:00:25Z",
+   "epoch": 1709132425,
+   "bucket_ts": "2024-02-28T14:30:00Z",
+   "bucket_epoch": 1709130600,
+   "ist_hour": 20,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T15:07:38Z",
+   "epoch": 1709132858,
+   "bucket_ts": "2024-02-28T14:30:00Z",
+   "bucket_epoch": 1709130600,
+   "ist_hour": 20,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T15:14:51Z",
+   "epoch": 1709133291,
+   "bucket_ts": "2024-02-28T14:30:00Z",
+   "bucket_epoch": 1709130600,
+   "ist_hour": 20,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T15:22:04Z",
+   "epoch": 1709133724,
+   "bucket_ts": "2024-02-28T14:30:00Z",
+   "bucket_epoch": 1709130600,
+   "ist_hour": 20,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T15:29:17Z",
+   "epoch": 1709134157,
+   "bucket_ts": "2024-02-28T14:30:00Z",
+   "bucket_epoch": 1709130600,
+   "ist_hour": 20,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T15:36:30Z",
+   "epoch": 1709134590,
+   "bucket_ts": "2024-02-28T15:30:00Z",
+   "bucket_epoch": 1709134200,
+   "ist_hour": 21,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T15:43:43Z",
+   "epoch": 1709135023,
+   "bucket_ts": "2024-02-28T15:30:00Z",
+   "bucket_epoch": 1709134200,
+   "ist_hour": 21,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T15:50:56Z",
+   "epoch": 1709135456,
+   "bucket_ts": "2024-02-28T15:30:00Z",
+   "bucket_epoch": 1709134200,
+   "ist_hour": 21,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T15:58:09Z",
+   "epoch": 1709135889,
+   "bucket_ts": "2024-02-28T15:30:00Z",
+   "bucket_epoch": 1709134200,
+   "ist_hour": 21,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T16:05:22Z",
+   "epoch": 1709136322,
+   "bucket_ts": "2024-02-28T15:30:00Z",
+   "bucket_epoch": 1709134200,
+   "ist_hour": 21,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T16:12:35Z",
+   "epoch": 1709136755,
+   "bucket_ts": "2024-02-28T15:30:00Z",
+   "bucket_epoch": 1709134200,
+   "ist_hour": 21,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T16:19:48Z",
+   "epoch": 1709137188,
+   "bucket_ts": "2024-02-28T15:30:00Z",
+   "bucket_epoch": 1709134200,
+   "ist_hour": 21,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T16:27:01Z",
+   "epoch": 1709137621,
+   "bucket_ts": "2024-02-28T15:30:00Z",
+   "bucket_epoch": 1709134200,
+   "ist_hour": 21,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T16:34:14Z",
+   "epoch": 1709138054,
+   "bucket_ts": "2024-02-28T16:30:00Z",
+   "bucket_epoch": 1709137800,
+   "ist_hour": 22,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T16:41:27Z",
+   "epoch": 1709138487,
+   "bucket_ts": "2024-02-28T16:30:00Z",
+   "bucket_epoch": 1709137800,
+   "ist_hour": 22,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T16:48:40Z",
+   "epoch": 1709138920,
+   "bucket_ts": "2024-02-28T16:30:00Z",
+   "bucket_epoch": 1709137800,
+   "ist_hour": 22,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T16:55:53Z",
+   "epoch": 1709139353,
+   "bucket_ts": "2024-02-28T16:30:00Z",
+   "bucket_epoch": 1709137800,
+   "ist_hour": 22,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T17:03:06Z",
+   "epoch": 1709139786,
+   "bucket_ts": "2024-02-28T16:30:00Z",
+   "bucket_epoch": 1709137800,
+   "ist_hour": 22,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T17:10:19Z",
+   "epoch": 1709140219,
+   "bucket_ts": "2024-02-28T16:30:00Z",
+   "bucket_epoch": 1709137800,
+   "ist_hour": 22,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T17:17:32Z",
+   "epoch": 1709140652,
+   "bucket_ts": "2024-02-28T16:30:00Z",
+   "bucket_epoch": 1709137800,
+   "ist_hour": 22,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T17:24:45Z",
+   "epoch": 1709141085,
+   "bucket_ts": "2024-02-28T16:30:00Z",
+   "bucket_epoch": 1709137800,
+   "ist_hour": 22,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T17:31:58Z",
+   "epoch": 1709141518,
+   "bucket_ts": "2024-02-28T17:30:00Z",
+   "bucket_epoch": 1709141400,
+   "ist_hour": 23,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T17:39:11Z",
+   "epoch": 1709141951,
+   "bucket_ts": "2024-02-28T17:30:00Z",
+   "bucket_epoch": 1709141400,
+   "ist_hour": 23,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T17:46:24Z",
+   "epoch": 1709142384,
+   "bucket_ts": "2024-02-28T17:30:00Z",
+   "bucket_epoch": 1709141400,
+   "ist_hour": 23,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T17:53:37Z",
+   "epoch": 1709142817,
+   "bucket_ts": "2024-02-28T17:30:00Z",
+   "bucket_epoch": 1709141400,
+   "ist_hour": 23,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T18:00:50Z",
+   "epoch": 1709143250,
+   "bucket_ts": "2024-02-28T17:30:00Z",
+   "bucket_epoch": 1709141400,
+   "ist_hour": 23,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T18:08:03Z",
+   "epoch": 1709143683,
+   "bucket_ts": "2024-02-28T17:30:00Z",
+   "bucket_epoch": 1709141400,
+   "ist_hour": 23,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T18:15:16Z",
+   "epoch": 1709144116,
+   "bucket_ts": "2024-02-28T17:30:00Z",
+   "bucket_epoch": 1709141400,
+   "ist_hour": 23,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T18:22:29Z",
+   "epoch": 1709144549,
+   "bucket_ts": "2024-02-28T17:30:00Z",
+   "bucket_epoch": 1709141400,
+   "ist_hour": 23,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T18:29:42Z",
+   "epoch": 1709144982,
+   "bucket_ts": "2024-02-28T17:30:00Z",
+   "bucket_epoch": 1709141400,
+   "ist_hour": 23,
+   "ist_dow": 2,
+   "ist_doy": 59
+  },
+  {
+   "utc": "2024-02-28T18:36:55Z",
+   "epoch": 1709145415,
+   "bucket_ts": "2024-02-28T18:30:00Z",
+   "bucket_epoch": 1709145000,
+   "ist_hour": 0,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T18:44:08Z",
+   "epoch": 1709145848,
+   "bucket_ts": "2024-02-28T18:30:00Z",
+   "bucket_epoch": 1709145000,
+   "ist_hour": 0,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T18:51:21Z",
+   "epoch": 1709146281,
+   "bucket_ts": "2024-02-28T18:30:00Z",
+   "bucket_epoch": 1709145000,
+   "ist_hour": 0,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T18:58:34Z",
+   "epoch": 1709146714,
+   "bucket_ts": "2024-02-28T18:30:00Z",
+   "bucket_epoch": 1709145000,
+   "ist_hour": 0,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T19:05:47Z",
+   "epoch": 1709147147,
+   "bucket_ts": "2024-02-28T18:30:00Z",
+   "bucket_epoch": 1709145000,
+   "ist_hour": 0,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T19:13:00Z",
+   "epoch": 1709147580,
+   "bucket_ts": "2024-02-28T18:30:00Z",
+   "bucket_epoch": 1709145000,
+   "ist_hour": 0,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T19:20:13Z",
+   "epoch": 1709148013,
+   "bucket_ts": "2024-02-28T18:30:00Z",
+   "bucket_epoch": 1709145000,
+   "ist_hour": 0,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T19:27:26Z",
+   "epoch": 1709148446,
+   "bucket_ts": "2024-02-28T18:30:00Z",
+   "bucket_epoch": 1709145000,
+   "ist_hour": 0,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T19:34:39Z",
+   "epoch": 1709148879,
+   "bucket_ts": "2024-02-28T19:30:00Z",
+   "bucket_epoch": 1709148600,
+   "ist_hour": 1,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T19:41:52Z",
+   "epoch": 1709149312,
+   "bucket_ts": "2024-02-28T19:30:00Z",
+   "bucket_epoch": 1709148600,
+   "ist_hour": 1,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T19:49:05Z",
+   "epoch": 1709149745,
+   "bucket_ts": "2024-02-28T19:30:00Z",
+   "bucket_epoch": 1709148600,
+   "ist_hour": 1,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T19:56:18Z",
+   "epoch": 1709150178,
+   "bucket_ts": "2024-02-28T19:30:00Z",
+   "bucket_epoch": 1709148600,
+   "ist_hour": 1,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T20:03:31Z",
+   "epoch": 1709150611,
+   "bucket_ts": "2024-02-28T19:30:00Z",
+   "bucket_epoch": 1709148600,
+   "ist_hour": 1,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T20:10:44Z",
+   "epoch": 1709151044,
+   "bucket_ts": "2024-02-28T19:30:00Z",
+   "bucket_epoch": 1709148600,
+   "ist_hour": 1,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T20:17:57Z",
+   "epoch": 1709151477,
+   "bucket_ts": "2024-02-28T19:30:00Z",
+   "bucket_epoch": 1709148600,
+   "ist_hour": 1,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T20:25:10Z",
+   "epoch": 1709151910,
+   "bucket_ts": "2024-02-28T19:30:00Z",
+   "bucket_epoch": 1709148600,
+   "ist_hour": 1,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T20:32:23Z",
+   "epoch": 1709152343,
+   "bucket_ts": "2024-02-28T20:30:00Z",
+   "bucket_epoch": 1709152200,
+   "ist_hour": 2,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T20:39:36Z",
+   "epoch": 1709152776,
+   "bucket_ts": "2024-02-28T20:30:00Z",
+   "bucket_epoch": 1709152200,
+   "ist_hour": 2,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T20:46:49Z",
+   "epoch": 1709153209,
+   "bucket_ts": "2024-02-28T20:30:00Z",
+   "bucket_epoch": 1709152200,
+   "ist_hour": 2,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T20:54:02Z",
+   "epoch": 1709153642,
+   "bucket_ts": "2024-02-28T20:30:00Z",
+   "bucket_epoch": 1709152200,
+   "ist_hour": 2,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T21:01:15Z",
+   "epoch": 1709154075,
+   "bucket_ts": "2024-02-28T20:30:00Z",
+   "bucket_epoch": 1709152200,
+   "ist_hour": 2,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T21:08:28Z",
+   "epoch": 1709154508,
+   "bucket_ts": "2024-02-28T20:30:00Z",
+   "bucket_epoch": 1709152200,
+   "ist_hour": 2,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T21:15:41Z",
+   "epoch": 1709154941,
+   "bucket_ts": "2024-02-28T20:30:00Z",
+   "bucket_epoch": 1709152200,
+   "ist_hour": 2,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T21:22:54Z",
+   "epoch": 1709155374,
+   "bucket_ts": "2024-02-28T20:30:00Z",
+   "bucket_epoch": 1709152200,
+   "ist_hour": 2,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T21:30:07Z",
+   "epoch": 1709155807,
+   "bucket_ts": "2024-02-28T21:30:00Z",
+   "bucket_epoch": 1709155800,
+   "ist_hour": 3,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T21:37:20Z",
+   "epoch": 1709156240,
+   "bucket_ts": "2024-02-28T21:30:00Z",
+   "bucket_epoch": 1709155800,
+   "ist_hour": 3,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T21:44:33Z",
+   "epoch": 1709156673,
+   "bucket_ts": "2024-02-28T21:30:00Z",
+   "bucket_epoch": 1709155800,
+   "ist_hour": 3,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T21:51:46Z",
+   "epoch": 1709157106,
+   "bucket_ts": "2024-02-28T21:30:00Z",
+   "bucket_epoch": 1709155800,
+   "ist_hour": 3,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T21:58:59Z",
+   "epoch": 1709157539,
+   "bucket_ts": "2024-02-28T21:30:00Z",
+   "bucket_epoch": 1709155800,
+   "ist_hour": 3,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T22:06:12Z",
+   "epoch": 1709157972,
+   "bucket_ts": "2024-02-28T21:30:00Z",
+   "bucket_epoch": 1709155800,
+   "ist_hour": 3,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T22:13:25Z",
+   "epoch": 1709158405,
+   "bucket_ts": "2024-02-28T21:30:00Z",
+   "bucket_epoch": 1709155800,
+   "ist_hour": 3,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T22:20:38Z",
+   "epoch": 1709158838,
+   "bucket_ts": "2024-02-28T21:30:00Z",
+   "bucket_epoch": 1709155800,
+   "ist_hour": 3,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T22:27:51Z",
+   "epoch": 1709159271,
+   "bucket_ts": "2024-02-28T21:30:00Z",
+   "bucket_epoch": 1709155800,
+   "ist_hour": 3,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T22:35:04Z",
+   "epoch": 1709159704,
+   "bucket_ts": "2024-02-28T22:30:00Z",
+   "bucket_epoch": 1709159400,
+   "ist_hour": 4,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T22:42:17Z",
+   "epoch": 1709160137,
+   "bucket_ts": "2024-02-28T22:30:00Z",
+   "bucket_epoch": 1709159400,
+   "ist_hour": 4,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T22:49:30Z",
+   "epoch": 1709160570,
+   "bucket_ts": "2024-02-28T22:30:00Z",
+   "bucket_epoch": 1709159400,
+   "ist_hour": 4,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T22:56:43Z",
+   "epoch": 1709161003,
+   "bucket_ts": "2024-02-28T22:30:00Z",
+   "bucket_epoch": 1709159400,
+   "ist_hour": 4,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T23:03:56Z",
+   "epoch": 1709161436,
+   "bucket_ts": "2024-02-28T22:30:00Z",
+   "bucket_epoch": 1709159400,
+   "ist_hour": 4,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T23:11:09Z",
+   "epoch": 1709161869,
+   "bucket_ts": "2024-02-28T22:30:00Z",
+   "bucket_epoch": 1709159400,
+   "ist_hour": 4,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T23:18:22Z",
+   "epoch": 1709162302,
+   "bucket_ts": "2024-02-28T22:30:00Z",
+   "bucket_epoch": 1709159400,
+   "ist_hour": 4,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T23:25:35Z",
+   "epoch": 1709162735,
+   "bucket_ts": "2024-02-28T22:30:00Z",
+   "bucket_epoch": 1709159400,
+   "ist_hour": 4,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T23:32:48Z",
+   "epoch": 1709163168,
+   "bucket_ts": "2024-02-28T23:30:00Z",
+   "bucket_epoch": 1709163000,
+   "ist_hour": 5,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T23:40:01Z",
+   "epoch": 1709163601,
+   "bucket_ts": "2024-02-28T23:30:00Z",
+   "bucket_epoch": 1709163000,
+   "ist_hour": 5,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T23:47:14Z",
+   "epoch": 1709164034,
+   "bucket_ts": "2024-02-28T23:30:00Z",
+   "bucket_epoch": 1709163000,
+   "ist_hour": 5,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-28T23:54:27Z",
+   "epoch": 1709164467,
+   "bucket_ts": "2024-02-28T23:30:00Z",
+   "bucket_epoch": 1709163000,
+   "ist_hour": 5,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T00:01:40Z",
+   "epoch": 1709164900,
+   "bucket_ts": "2024-02-28T23:30:00Z",
+   "bucket_epoch": 1709163000,
+   "ist_hour": 5,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T00:08:53Z",
+   "epoch": 1709165333,
+   "bucket_ts": "2024-02-28T23:30:00Z",
+   "bucket_epoch": 1709163000,
+   "ist_hour": 5,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T00:16:06Z",
+   "epoch": 1709165766,
+   "bucket_ts": "2024-02-28T23:30:00Z",
+   "bucket_epoch": 1709163000,
+   "ist_hour": 5,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T00:23:19Z",
+   "epoch": 1709166199,
+   "bucket_ts": "2024-02-28T23:30:00Z",
+   "bucket_epoch": 1709163000,
+   "ist_hour": 5,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T00:30:32Z",
+   "epoch": 1709166632,
+   "bucket_ts": "2024-02-29T00:30:00Z",
+   "bucket_epoch": 1709166600,
+   "ist_hour": 6,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T00:37:45Z",
+   "epoch": 1709167065,
+   "bucket_ts": "2024-02-29T00:30:00Z",
+   "bucket_epoch": 1709166600,
+   "ist_hour": 6,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T00:44:58Z",
+   "epoch": 1709167498,
+   "bucket_ts": "2024-02-29T00:30:00Z",
+   "bucket_epoch": 1709166600,
+   "ist_hour": 6,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T00:52:11Z",
+   "epoch": 1709167931,
+   "bucket_ts": "2024-02-29T00:30:00Z",
+   "bucket_epoch": 1709166600,
+   "ist_hour": 6,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T00:59:24Z",
+   "epoch": 1709168364,
+   "bucket_ts": "2024-02-29T00:30:00Z",
+   "bucket_epoch": 1709166600,
+   "ist_hour": 6,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T01:06:37Z",
+   "epoch": 1709168797,
+   "bucket_ts": "2024-02-29T00:30:00Z",
+   "bucket_epoch": 1709166600,
+   "ist_hour": 6,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T01:13:50Z",
+   "epoch": 1709169230,
+   "bucket_ts": "2024-02-29T00:30:00Z",
+   "bucket_epoch": 1709166600,
+   "ist_hour": 6,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T01:21:03Z",
+   "epoch": 1709169663,
+   "bucket_ts": "2024-02-29T00:30:00Z",
+   "bucket_epoch": 1709166600,
+   "ist_hour": 6,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T01:28:16Z",
+   "epoch": 1709170096,
+   "bucket_ts": "2024-02-29T00:30:00Z",
+   "bucket_epoch": 1709166600,
+   "ist_hour": 6,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T01:35:29Z",
+   "epoch": 1709170529,
+   "bucket_ts": "2024-02-29T01:30:00Z",
+   "bucket_epoch": 1709170200,
+   "ist_hour": 7,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T01:42:42Z",
+   "epoch": 1709170962,
+   "bucket_ts": "2024-02-29T01:30:00Z",
+   "bucket_epoch": 1709170200,
+   "ist_hour": 7,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T01:49:55Z",
+   "epoch": 1709171395,
+   "bucket_ts": "2024-02-29T01:30:00Z",
+   "bucket_epoch": 1709170200,
+   "ist_hour": 7,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T01:57:08Z",
+   "epoch": 1709171828,
+   "bucket_ts": "2024-02-29T01:30:00Z",
+   "bucket_epoch": 1709170200,
+   "ist_hour": 7,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T02:04:21Z",
+   "epoch": 1709172261,
+   "bucket_ts": "2024-02-29T01:30:00Z",
+   "bucket_epoch": 1709170200,
+   "ist_hour": 7,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T02:11:34Z",
+   "epoch": 1709172694,
+   "bucket_ts": "2024-02-29T01:30:00Z",
+   "bucket_epoch": 1709170200,
+   "ist_hour": 7,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T02:18:47Z",
+   "epoch": 1709173127,
+   "bucket_ts": "2024-02-29T01:30:00Z",
+   "bucket_epoch": 1709170200,
+   "ist_hour": 7,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T02:26:00Z",
+   "epoch": 1709173560,
+   "bucket_ts": "2024-02-29T01:30:00Z",
+   "bucket_epoch": 1709170200,
+   "ist_hour": 7,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T02:33:13Z",
+   "epoch": 1709173993,
+   "bucket_ts": "2024-02-29T02:30:00Z",
+   "bucket_epoch": 1709173800,
+   "ist_hour": 8,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T02:40:26Z",
+   "epoch": 1709174426,
+   "bucket_ts": "2024-02-29T02:30:00Z",
+   "bucket_epoch": 1709173800,
+   "ist_hour": 8,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T02:47:39Z",
+   "epoch": 1709174859,
+   "bucket_ts": "2024-02-29T02:30:00Z",
+   "bucket_epoch": 1709173800,
+   "ist_hour": 8,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T02:54:52Z",
+   "epoch": 1709175292,
+   "bucket_ts": "2024-02-29T02:30:00Z",
+   "bucket_epoch": 1709173800,
+   "ist_hour": 8,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T03:02:05Z",
+   "epoch": 1709175725,
+   "bucket_ts": "2024-02-29T02:30:00Z",
+   "bucket_epoch": 1709173800,
+   "ist_hour": 8,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T03:09:18Z",
+   "epoch": 1709176158,
+   "bucket_ts": "2024-02-29T02:30:00Z",
+   "bucket_epoch": 1709173800,
+   "ist_hour": 8,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T03:16:31Z",
+   "epoch": 1709176591,
+   "bucket_ts": "2024-02-29T02:30:00Z",
+   "bucket_epoch": 1709173800,
+   "ist_hour": 8,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T03:23:44Z",
+   "epoch": 1709177024,
+   "bucket_ts": "2024-02-29T02:30:00Z",
+   "bucket_epoch": 1709173800,
+   "ist_hour": 8,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T03:30:57Z",
+   "epoch": 1709177457,
+   "bucket_ts": "2024-02-29T03:30:00Z",
+   "bucket_epoch": 1709177400,
+   "ist_hour": 9,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T03:38:10Z",
+   "epoch": 1709177890,
+   "bucket_ts": "2024-02-29T03:30:00Z",
+   "bucket_epoch": 1709177400,
+   "ist_hour": 9,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T03:45:23Z",
+   "epoch": 1709178323,
+   "bucket_ts": "2024-02-29T03:30:00Z",
+   "bucket_epoch": 1709177400,
+   "ist_hour": 9,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T03:52:36Z",
+   "epoch": 1709178756,
+   "bucket_ts": "2024-02-29T03:30:00Z",
+   "bucket_epoch": 1709177400,
+   "ist_hour": 9,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T03:59:49Z",
+   "epoch": 1709179189,
+   "bucket_ts": "2024-02-29T03:30:00Z",
+   "bucket_epoch": 1709177400,
+   "ist_hour": 9,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T04:07:02Z",
+   "epoch": 1709179622,
+   "bucket_ts": "2024-02-29T03:30:00Z",
+   "bucket_epoch": 1709177400,
+   "ist_hour": 9,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T04:14:15Z",
+   "epoch": 1709180055,
+   "bucket_ts": "2024-02-29T03:30:00Z",
+   "bucket_epoch": 1709177400,
+   "ist_hour": 9,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T04:21:28Z",
+   "epoch": 1709180488,
+   "bucket_ts": "2024-02-29T03:30:00Z",
+   "bucket_epoch": 1709177400,
+   "ist_hour": 9,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T04:28:41Z",
+   "epoch": 1709180921,
+   "bucket_ts": "2024-02-29T03:30:00Z",
+   "bucket_epoch": 1709177400,
+   "ist_hour": 9,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T04:35:54Z",
+   "epoch": 1709181354,
+   "bucket_ts": "2024-02-29T04:30:00Z",
+   "bucket_epoch": 1709181000,
+   "ist_hour": 10,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T04:43:07Z",
+   "epoch": 1709181787,
+   "bucket_ts": "2024-02-29T04:30:00Z",
+   "bucket_epoch": 1709181000,
+   "ist_hour": 10,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T04:50:20Z",
+   "epoch": 1709182220,
+   "bucket_ts": "2024-02-29T04:30:00Z",
+   "bucket_epoch": 1709181000,
+   "ist_hour": 10,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T04:57:33Z",
+   "epoch": 1709182653,
+   "bucket_ts": "2024-02-29T04:30:00Z",
+   "bucket_epoch": 1709181000,
+   "ist_hour": 10,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T05:04:46Z",
+   "epoch": 1709183086,
+   "bucket_ts": "2024-02-29T04:30:00Z",
+   "bucket_epoch": 1709181000,
+   "ist_hour": 10,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T05:11:59Z",
+   "epoch": 1709183519,
+   "bucket_ts": "2024-02-29T04:30:00Z",
+   "bucket_epoch": 1709181000,
+   "ist_hour": 10,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T05:19:12Z",
+   "epoch": 1709183952,
+   "bucket_ts": "2024-02-29T04:30:00Z",
+   "bucket_epoch": 1709181000,
+   "ist_hour": 10,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T05:26:25Z",
+   "epoch": 1709184385,
+   "bucket_ts": "2024-02-29T04:30:00Z",
+   "bucket_epoch": 1709181000,
+   "ist_hour": 10,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T05:33:38Z",
+   "epoch": 1709184818,
+   "bucket_ts": "2024-02-29T05:30:00Z",
+   "bucket_epoch": 1709184600,
+   "ist_hour": 11,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T05:40:51Z",
+   "epoch": 1709185251,
+   "bucket_ts": "2024-02-29T05:30:00Z",
+   "bucket_epoch": 1709184600,
+   "ist_hour": 11,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T05:48:04Z",
+   "epoch": 1709185684,
+   "bucket_ts": "2024-02-29T05:30:00Z",
+   "bucket_epoch": 1709184600,
+   "ist_hour": 11,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T05:55:17Z",
+   "epoch": 1709186117,
+   "bucket_ts": "2024-02-29T05:30:00Z",
+   "bucket_epoch": 1709184600,
+   "ist_hour": 11,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T06:02:30Z",
+   "epoch": 1709186550,
+   "bucket_ts": "2024-02-29T05:30:00Z",
+   "bucket_epoch": 1709184600,
+   "ist_hour": 11,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T06:09:43Z",
+   "epoch": 1709186983,
+   "bucket_ts": "2024-02-29T05:30:00Z",
+   "bucket_epoch": 1709184600,
+   "ist_hour": 11,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T06:16:56Z",
+   "epoch": 1709187416,
+   "bucket_ts": "2024-02-29T05:30:00Z",
+   "bucket_epoch": 1709184600,
+   "ist_hour": 11,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T06:24:09Z",
+   "epoch": 1709187849,
+   "bucket_ts": "2024-02-29T05:30:00Z",
+   "bucket_epoch": 1709184600,
+   "ist_hour": 11,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T06:31:22Z",
+   "epoch": 1709188282,
+   "bucket_ts": "2024-02-29T06:30:00Z",
+   "bucket_epoch": 1709188200,
+   "ist_hour": 12,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T06:38:35Z",
+   "epoch": 1709188715,
+   "bucket_ts": "2024-02-29T06:30:00Z",
+   "bucket_epoch": 1709188200,
+   "ist_hour": 12,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T06:45:48Z",
+   "epoch": 1709189148,
+   "bucket_ts": "2024-02-29T06:30:00Z",
+   "bucket_epoch": 1709188200,
+   "ist_hour": 12,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T06:53:01Z",
+   "epoch": 1709189581,
+   "bucket_ts": "2024-02-29T06:30:00Z",
+   "bucket_epoch": 1709188200,
+   "ist_hour": 12,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T07:00:14Z",
+   "epoch": 1709190014,
+   "bucket_ts": "2024-02-29T06:30:00Z",
+   "bucket_epoch": 1709188200,
+   "ist_hour": 12,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T07:07:27Z",
+   "epoch": 1709190447,
+   "bucket_ts": "2024-02-29T06:30:00Z",
+   "bucket_epoch": 1709188200,
+   "ist_hour": 12,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T07:14:40Z",
+   "epoch": 1709190880,
+   "bucket_ts": "2024-02-29T06:30:00Z",
+   "bucket_epoch": 1709188200,
+   "ist_hour": 12,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T07:21:53Z",
+   "epoch": 1709191313,
+   "bucket_ts": "2024-02-29T06:30:00Z",
+   "bucket_epoch": 1709188200,
+   "ist_hour": 12,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T07:29:06Z",
+   "epoch": 1709191746,
+   "bucket_ts": "2024-02-29T06:30:00Z",
+   "bucket_epoch": 1709188200,
+   "ist_hour": 12,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T07:36:19Z",
+   "epoch": 1709192179,
+   "bucket_ts": "2024-02-29T07:30:00Z",
+   "bucket_epoch": 1709191800,
+   "ist_hour": 13,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T07:43:32Z",
+   "epoch": 1709192612,
+   "bucket_ts": "2024-02-29T07:30:00Z",
+   "bucket_epoch": 1709191800,
+   "ist_hour": 13,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T07:50:45Z",
+   "epoch": 1709193045,
+   "bucket_ts": "2024-02-29T07:30:00Z",
+   "bucket_epoch": 1709191800,
+   "ist_hour": 13,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T07:57:58Z",
+   "epoch": 1709193478,
+   "bucket_ts": "2024-02-29T07:30:00Z",
+   "bucket_epoch": 1709191800,
+   "ist_hour": 13,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T08:05:11Z",
+   "epoch": 1709193911,
+   "bucket_ts": "2024-02-29T07:30:00Z",
+   "bucket_epoch": 1709191800,
+   "ist_hour": 13,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T08:12:24Z",
+   "epoch": 1709194344,
+   "bucket_ts": "2024-02-29T07:30:00Z",
+   "bucket_epoch": 1709191800,
+   "ist_hour": 13,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T08:19:37Z",
+   "epoch": 1709194777,
+   "bucket_ts": "2024-02-29T07:30:00Z",
+   "bucket_epoch": 1709191800,
+   "ist_hour": 13,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T08:26:50Z",
+   "epoch": 1709195210,
+   "bucket_ts": "2024-02-29T07:30:00Z",
+   "bucket_epoch": 1709191800,
+   "ist_hour": 13,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T08:34:03Z",
+   "epoch": 1709195643,
+   "bucket_ts": "2024-02-29T08:30:00Z",
+   "bucket_epoch": 1709195400,
+   "ist_hour": 14,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T08:41:16Z",
+   "epoch": 1709196076,
+   "bucket_ts": "2024-02-29T08:30:00Z",
+   "bucket_epoch": 1709195400,
+   "ist_hour": 14,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T08:48:29Z",
+   "epoch": 1709196509,
+   "bucket_ts": "2024-02-29T08:30:00Z",
+   "bucket_epoch": 1709195400,
+   "ist_hour": 14,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T08:55:42Z",
+   "epoch": 1709196942,
+   "bucket_ts": "2024-02-29T08:30:00Z",
+   "bucket_epoch": 1709195400,
+   "ist_hour": 14,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T09:02:55Z",
+   "epoch": 1709197375,
+   "bucket_ts": "2024-02-29T08:30:00Z",
+   "bucket_epoch": 1709195400,
+   "ist_hour": 14,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T09:10:08Z",
+   "epoch": 1709197808,
+   "bucket_ts": "2024-02-29T08:30:00Z",
+   "bucket_epoch": 1709195400,
+   "ist_hour": 14,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T09:17:21Z",
+   "epoch": 1709198241,
+   "bucket_ts": "2024-02-29T08:30:00Z",
+   "bucket_epoch": 1709195400,
+   "ist_hour": 14,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T09:24:34Z",
+   "epoch": 1709198674,
+   "bucket_ts": "2024-02-29T08:30:00Z",
+   "bucket_epoch": 1709195400,
+   "ist_hour": 14,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T09:31:47Z",
+   "epoch": 1709199107,
+   "bucket_ts": "2024-02-29T09:30:00Z",
+   "bucket_epoch": 1709199000,
+   "ist_hour": 15,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T09:39:00Z",
+   "epoch": 1709199540,
+   "bucket_ts": "2024-02-29T09:30:00Z",
+   "bucket_epoch": 1709199000,
+   "ist_hour": 15,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T09:46:13Z",
+   "epoch": 1709199973,
+   "bucket_ts": "2024-02-29T09:30:00Z",
+   "bucket_epoch": 1709199000,
+   "ist_hour": 15,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T09:53:26Z",
+   "epoch": 1709200406,
+   "bucket_ts": "2024-02-29T09:30:00Z",
+   "bucket_epoch": 1709199000,
+   "ist_hour": 15,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T10:00:39Z",
+   "epoch": 1709200839,
+   "bucket_ts": "2024-02-29T09:30:00Z",
+   "bucket_epoch": 1709199000,
+   "ist_hour": 15,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T10:07:52Z",
+   "epoch": 1709201272,
+   "bucket_ts": "2024-02-29T09:30:00Z",
+   "bucket_epoch": 1709199000,
+   "ist_hour": 15,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T10:15:05Z",
+   "epoch": 1709201705,
+   "bucket_ts": "2024-02-29T09:30:00Z",
+   "bucket_epoch": 1709199000,
+   "ist_hour": 15,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T10:22:18Z",
+   "epoch": 1709202138,
+   "bucket_ts": "2024-02-29T09:30:00Z",
+   "bucket_epoch": 1709199000,
+   "ist_hour": 15,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T10:29:31Z",
+   "epoch": 1709202571,
+   "bucket_ts": "2024-02-29T09:30:00Z",
+   "bucket_epoch": 1709199000,
+   "ist_hour": 15,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T10:36:44Z",
+   "epoch": 1709203004,
+   "bucket_ts": "2024-02-29T10:30:00Z",
+   "bucket_epoch": 1709202600,
+   "ist_hour": 16,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T10:43:57Z",
+   "epoch": 1709203437,
+   "bucket_ts": "2024-02-29T10:30:00Z",
+   "bucket_epoch": 1709202600,
+   "ist_hour": 16,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T10:51:10Z",
+   "epoch": 1709203870,
+   "bucket_ts": "2024-02-29T10:30:00Z",
+   "bucket_epoch": 1709202600,
+   "ist_hour": 16,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T10:58:23Z",
+   "epoch": 1709204303,
+   "bucket_ts": "2024-02-29T10:30:00Z",
+   "bucket_epoch": 1709202600,
+   "ist_hour": 16,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T11:05:36Z",
+   "epoch": 1709204736,
+   "bucket_ts": "2024-02-29T10:30:00Z",
+   "bucket_epoch": 1709202600,
+   "ist_hour": 16,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T11:12:49Z",
+   "epoch": 1709205169,
+   "bucket_ts": "2024-02-29T10:30:00Z",
+   "bucket_epoch": 1709202600,
+   "ist_hour": 16,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T11:20:02Z",
+   "epoch": 1709205602,
+   "bucket_ts": "2024-02-29T10:30:00Z",
+   "bucket_epoch": 1709202600,
+   "ist_hour": 16,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T11:27:15Z",
+   "epoch": 1709206035,
+   "bucket_ts": "2024-02-29T10:30:00Z",
+   "bucket_epoch": 1709202600,
+   "ist_hour": 16,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T11:34:28Z",
+   "epoch": 1709206468,
+   "bucket_ts": "2024-02-29T11:30:00Z",
+   "bucket_epoch": 1709206200,
+   "ist_hour": 17,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T11:41:41Z",
+   "epoch": 1709206901,
+   "bucket_ts": "2024-02-29T11:30:00Z",
+   "bucket_epoch": 1709206200,
+   "ist_hour": 17,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T11:48:54Z",
+   "epoch": 1709207334,
+   "bucket_ts": "2024-02-29T11:30:00Z",
+   "bucket_epoch": 1709206200,
+   "ist_hour": 17,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T11:56:07Z",
+   "epoch": 1709207767,
+   "bucket_ts": "2024-02-29T11:30:00Z",
+   "bucket_epoch": 1709206200,
+   "ist_hour": 17,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T12:03:20Z",
+   "epoch": 1709208200,
+   "bucket_ts": "2024-02-29T11:30:00Z",
+   "bucket_epoch": 1709206200,
+   "ist_hour": 17,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T12:10:33Z",
+   "epoch": 1709208633,
+   "bucket_ts": "2024-02-29T11:30:00Z",
+   "bucket_epoch": 1709206200,
+   "ist_hour": 17,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T12:17:46Z",
+   "epoch": 1709209066,
+   "bucket_ts": "2024-02-29T11:30:00Z",
+   "bucket_epoch": 1709206200,
+   "ist_hour": 17,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T12:24:59Z",
+   "epoch": 1709209499,
+   "bucket_ts": "2024-02-29T11:30:00Z",
+   "bucket_epoch": 1709206200,
+   "ist_hour": 17,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T12:32:12Z",
+   "epoch": 1709209932,
+   "bucket_ts": "2024-02-29T12:30:00Z",
+   "bucket_epoch": 1709209800,
+   "ist_hour": 18,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T12:39:25Z",
+   "epoch": 1709210365,
+   "bucket_ts": "2024-02-29T12:30:00Z",
+   "bucket_epoch": 1709209800,
+   "ist_hour": 18,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T12:46:38Z",
+   "epoch": 1709210798,
+   "bucket_ts": "2024-02-29T12:30:00Z",
+   "bucket_epoch": 1709209800,
+   "ist_hour": 18,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T12:53:51Z",
+   "epoch": 1709211231,
+   "bucket_ts": "2024-02-29T12:30:00Z",
+   "bucket_epoch": 1709209800,
+   "ist_hour": 18,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T13:01:04Z",
+   "epoch": 1709211664,
+   "bucket_ts": "2024-02-29T12:30:00Z",
+   "bucket_epoch": 1709209800,
+   "ist_hour": 18,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T13:08:17Z",
+   "epoch": 1709212097,
+   "bucket_ts": "2024-02-29T12:30:00Z",
+   "bucket_epoch": 1709209800,
+   "ist_hour": 18,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T13:15:30Z",
+   "epoch": 1709212530,
+   "bucket_ts": "2024-02-29T12:30:00Z",
+   "bucket_epoch": 1709209800,
+   "ist_hour": 18,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T13:22:43Z",
+   "epoch": 1709212963,
+   "bucket_ts": "2024-02-29T12:30:00Z",
+   "bucket_epoch": 1709209800,
+   "ist_hour": 18,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T13:29:56Z",
+   "epoch": 1709213396,
+   "bucket_ts": "2024-02-29T12:30:00Z",
+   "bucket_epoch": 1709209800,
+   "ist_hour": 18,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T13:37:09Z",
+   "epoch": 1709213829,
+   "bucket_ts": "2024-02-29T13:30:00Z",
+   "bucket_epoch": 1709213400,
+   "ist_hour": 19,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T13:44:22Z",
+   "epoch": 1709214262,
+   "bucket_ts": "2024-02-29T13:30:00Z",
+   "bucket_epoch": 1709213400,
+   "ist_hour": 19,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T13:51:35Z",
+   "epoch": 1709214695,
+   "bucket_ts": "2024-02-29T13:30:00Z",
+   "bucket_epoch": 1709213400,
+   "ist_hour": 19,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T13:58:48Z",
+   "epoch": 1709215128,
+   "bucket_ts": "2024-02-29T13:30:00Z",
+   "bucket_epoch": 1709213400,
+   "ist_hour": 19,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T14:06:01Z",
+   "epoch": 1709215561,
+   "bucket_ts": "2024-02-29T13:30:00Z",
+   "bucket_epoch": 1709213400,
+   "ist_hour": 19,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T14:13:14Z",
+   "epoch": 1709215994,
+   "bucket_ts": "2024-02-29T13:30:00Z",
+   "bucket_epoch": 1709213400,
+   "ist_hour": 19,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T14:20:27Z",
+   "epoch": 1709216427,
+   "bucket_ts": "2024-02-29T13:30:00Z",
+   "bucket_epoch": 1709213400,
+   "ist_hour": 19,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T14:27:40Z",
+   "epoch": 1709216860,
+   "bucket_ts": "2024-02-29T13:30:00Z",
+   "bucket_epoch": 1709213400,
+   "ist_hour": 19,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T14:34:53Z",
+   "epoch": 1709217293,
+   "bucket_ts": "2024-02-29T14:30:00Z",
+   "bucket_epoch": 1709217000,
+   "ist_hour": 20,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T14:42:06Z",
+   "epoch": 1709217726,
+   "bucket_ts": "2024-02-29T14:30:00Z",
+   "bucket_epoch": 1709217000,
+   "ist_hour": 20,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T14:49:19Z",
+   "epoch": 1709218159,
+   "bucket_ts": "2024-02-29T14:30:00Z",
+   "bucket_epoch": 1709217000,
+   "ist_hour": 20,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T14:56:32Z",
+   "epoch": 1709218592,
+   "bucket_ts": "2024-02-29T14:30:00Z",
+   "bucket_epoch": 1709217000,
+   "ist_hour": 20,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T15:03:45Z",
+   "epoch": 1709219025,
+   "bucket_ts": "2024-02-29T14:30:00Z",
+   "bucket_epoch": 1709217000,
+   "ist_hour": 20,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T15:10:58Z",
+   "epoch": 1709219458,
+   "bucket_ts": "2024-02-29T14:30:00Z",
+   "bucket_epoch": 1709217000,
+   "ist_hour": 20,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T15:18:11Z",
+   "epoch": 1709219891,
+   "bucket_ts": "2024-02-29T14:30:00Z",
+   "bucket_epoch": 1709217000,
+   "ist_hour": 20,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T15:25:24Z",
+   "epoch": 1709220324,
+   "bucket_ts": "2024-02-29T14:30:00Z",
+   "bucket_epoch": 1709217000,
+   "ist_hour": 20,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T15:32:37Z",
+   "epoch": 1709220757,
+   "bucket_ts": "2024-02-29T15:30:00Z",
+   "bucket_epoch": 1709220600,
+   "ist_hour": 21,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T15:39:50Z",
+   "epoch": 1709221190,
+   "bucket_ts": "2024-02-29T15:30:00Z",
+   "bucket_epoch": 1709220600,
+   "ist_hour": 21,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T15:47:03Z",
+   "epoch": 1709221623,
+   "bucket_ts": "2024-02-29T15:30:00Z",
+   "bucket_epoch": 1709220600,
+   "ist_hour": 21,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T15:54:16Z",
+   "epoch": 1709222056,
+   "bucket_ts": "2024-02-29T15:30:00Z",
+   "bucket_epoch": 1709220600,
+   "ist_hour": 21,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T16:01:29Z",
+   "epoch": 1709222489,
+   "bucket_ts": "2024-02-29T15:30:00Z",
+   "bucket_epoch": 1709220600,
+   "ist_hour": 21,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T16:08:42Z",
+   "epoch": 1709222922,
+   "bucket_ts": "2024-02-29T15:30:00Z",
+   "bucket_epoch": 1709220600,
+   "ist_hour": 21,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T16:15:55Z",
+   "epoch": 1709223355,
+   "bucket_ts": "2024-02-29T15:30:00Z",
+   "bucket_epoch": 1709220600,
+   "ist_hour": 21,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T16:23:08Z",
+   "epoch": 1709223788,
+   "bucket_ts": "2024-02-29T15:30:00Z",
+   "bucket_epoch": 1709220600,
+   "ist_hour": 21,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T16:30:21Z",
+   "epoch": 1709224221,
+   "bucket_ts": "2024-02-29T16:30:00Z",
+   "bucket_epoch": 1709224200,
+   "ist_hour": 22,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T16:37:34Z",
+   "epoch": 1709224654,
+   "bucket_ts": "2024-02-29T16:30:00Z",
+   "bucket_epoch": 1709224200,
+   "ist_hour": 22,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T16:44:47Z",
+   "epoch": 1709225087,
+   "bucket_ts": "2024-02-29T16:30:00Z",
+   "bucket_epoch": 1709224200,
+   "ist_hour": 22,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T16:52:00Z",
+   "epoch": 1709225520,
+   "bucket_ts": "2024-02-29T16:30:00Z",
+   "bucket_epoch": 1709224200,
+   "ist_hour": 22,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T16:59:13Z",
+   "epoch": 1709225953,
+   "bucket_ts": "2024-02-29T16:30:00Z",
+   "bucket_epoch": 1709224200,
+   "ist_hour": 22,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T17:06:26Z",
+   "epoch": 1709226386,
+   "bucket_ts": "2024-02-29T16:30:00Z",
+   "bucket_epoch": 1709224200,
+   "ist_hour": 22,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T17:13:39Z",
+   "epoch": 1709226819,
+   "bucket_ts": "2024-02-29T16:30:00Z",
+   "bucket_epoch": 1709224200,
+   "ist_hour": 22,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T17:20:52Z",
+   "epoch": 1709227252,
+   "bucket_ts": "2024-02-29T16:30:00Z",
+   "bucket_epoch": 1709224200,
+   "ist_hour": 22,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T17:28:05Z",
+   "epoch": 1709227685,
+   "bucket_ts": "2024-02-29T16:30:00Z",
+   "bucket_epoch": 1709224200,
+   "ist_hour": 22,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T17:35:18Z",
+   "epoch": 1709228118,
+   "bucket_ts": "2024-02-29T17:30:00Z",
+   "bucket_epoch": 1709227800,
+   "ist_hour": 23,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T17:42:31Z",
+   "epoch": 1709228551,
+   "bucket_ts": "2024-02-29T17:30:00Z",
+   "bucket_epoch": 1709227800,
+   "ist_hour": 23,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T17:49:44Z",
+   "epoch": 1709228984,
+   "bucket_ts": "2024-02-29T17:30:00Z",
+   "bucket_epoch": 1709227800,
+   "ist_hour": 23,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T17:56:57Z",
+   "epoch": 1709229417,
+   "bucket_ts": "2024-02-29T17:30:00Z",
+   "bucket_epoch": 1709227800,
+   "ist_hour": 23,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T18:04:10Z",
+   "epoch": 1709229850,
+   "bucket_ts": "2024-02-29T17:30:00Z",
+   "bucket_epoch": 1709227800,
+   "ist_hour": 23,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T18:11:23Z",
+   "epoch": 1709230283,
+   "bucket_ts": "2024-02-29T17:30:00Z",
+   "bucket_epoch": 1709227800,
+   "ist_hour": 23,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T18:18:36Z",
+   "epoch": 1709230716,
+   "bucket_ts": "2024-02-29T17:30:00Z",
+   "bucket_epoch": 1709227800,
+   "ist_hour": 23,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T18:25:49Z",
+   "epoch": 1709231149,
+   "bucket_ts": "2024-02-29T17:30:00Z",
+   "bucket_epoch": 1709227800,
+   "ist_hour": 23,
+   "ist_dow": 3,
+   "ist_doy": 60
+  },
+  {
+   "utc": "2024-02-29T18:33:02Z",
+   "epoch": 1709231582,
+   "bucket_ts": "2024-02-29T18:30:00Z",
+   "bucket_epoch": 1709231400,
+   "ist_hour": 0,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T18:40:15Z",
+   "epoch": 1709232015,
+   "bucket_ts": "2024-02-29T18:30:00Z",
+   "bucket_epoch": 1709231400,
+   "ist_hour": 0,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T18:47:28Z",
+   "epoch": 1709232448,
+   "bucket_ts": "2024-02-29T18:30:00Z",
+   "bucket_epoch": 1709231400,
+   "ist_hour": 0,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T18:54:41Z",
+   "epoch": 1709232881,
+   "bucket_ts": "2024-02-29T18:30:00Z",
+   "bucket_epoch": 1709231400,
+   "ist_hour": 0,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T19:01:54Z",
+   "epoch": 1709233314,
+   "bucket_ts": "2024-02-29T18:30:00Z",
+   "bucket_epoch": 1709231400,
+   "ist_hour": 0,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T19:09:07Z",
+   "epoch": 1709233747,
+   "bucket_ts": "2024-02-29T18:30:00Z",
+   "bucket_epoch": 1709231400,
+   "ist_hour": 0,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T19:16:20Z",
+   "epoch": 1709234180,
+   "bucket_ts": "2024-02-29T18:30:00Z",
+   "bucket_epoch": 1709231400,
+   "ist_hour": 0,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T19:23:33Z",
+   "epoch": 1709234613,
+   "bucket_ts": "2024-02-29T18:30:00Z",
+   "bucket_epoch": 1709231400,
+   "ist_hour": 0,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T19:30:46Z",
+   "epoch": 1709235046,
+   "bucket_ts": "2024-02-29T19:30:00Z",
+   "bucket_epoch": 1709235000,
+   "ist_hour": 1,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T19:37:59Z",
+   "epoch": 1709235479,
+   "bucket_ts": "2024-02-29T19:30:00Z",
+   "bucket_epoch": 1709235000,
+   "ist_hour": 1,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T19:45:12Z",
+   "epoch": 1709235912,
+   "bucket_ts": "2024-02-29T19:30:00Z",
+   "bucket_epoch": 1709235000,
+   "ist_hour": 1,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T19:52:25Z",
+   "epoch": 1709236345,
+   "bucket_ts": "2024-02-29T19:30:00Z",
+   "bucket_epoch": 1709235000,
+   "ist_hour": 1,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T19:59:38Z",
+   "epoch": 1709236778,
+   "bucket_ts": "2024-02-29T19:30:00Z",
+   "bucket_epoch": 1709235000,
+   "ist_hour": 1,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T20:06:51Z",
+   "epoch": 1709237211,
+   "bucket_ts": "2024-02-29T19:30:00Z",
+   "bucket_epoch": 1709235000,
+   "ist_hour": 1,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T20:14:04Z",
+   "epoch": 1709237644,
+   "bucket_ts": "2024-02-29T19:30:00Z",
+   "bucket_epoch": 1709235000,
+   "ist_hour": 1,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T20:21:17Z",
+   "epoch": 1709238077,
+   "bucket_ts": "2024-02-29T19:30:00Z",
+   "bucket_epoch": 1709235000,
+   "ist_hour": 1,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T20:28:30Z",
+   "epoch": 1709238510,
+   "bucket_ts": "2024-02-29T19:30:00Z",
+   "bucket_epoch": 1709235000,
+   "ist_hour": 1,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T20:35:43Z",
+   "epoch": 1709238943,
+   "bucket_ts": "2024-02-29T20:30:00Z",
+   "bucket_epoch": 1709238600,
+   "ist_hour": 2,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T20:42:56Z",
+   "epoch": 1709239376,
+   "bucket_ts": "2024-02-29T20:30:00Z",
+   "bucket_epoch": 1709238600,
+   "ist_hour": 2,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T20:50:09Z",
+   "epoch": 1709239809,
+   "bucket_ts": "2024-02-29T20:30:00Z",
+   "bucket_epoch": 1709238600,
+   "ist_hour": 2,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T20:57:22Z",
+   "epoch": 1709240242,
+   "bucket_ts": "2024-02-29T20:30:00Z",
+   "bucket_epoch": 1709238600,
+   "ist_hour": 2,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T21:04:35Z",
+   "epoch": 1709240675,
+   "bucket_ts": "2024-02-29T20:30:00Z",
+   "bucket_epoch": 1709238600,
+   "ist_hour": 2,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T21:11:48Z",
+   "epoch": 1709241108,
+   "bucket_ts": "2024-02-29T20:30:00Z",
+   "bucket_epoch": 1709238600,
+   "ist_hour": 2,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T21:19:01Z",
+   "epoch": 1709241541,
+   "bucket_ts": "2024-02-29T20:30:00Z",
+   "bucket_epoch": 1709238600,
+   "ist_hour": 2,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T21:26:14Z",
+   "epoch": 1709241974,
+   "bucket_ts": "2024-02-29T20:30:00Z",
+   "bucket_epoch": 1709238600,
+   "ist_hour": 2,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T21:33:27Z",
+   "epoch": 1709242407,
+   "bucket_ts": "2024-02-29T21:30:00Z",
+   "bucket_epoch": 1709242200,
+   "ist_hour": 3,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T21:40:40Z",
+   "epoch": 1709242840,
+   "bucket_ts": "2024-02-29T21:30:00Z",
+   "bucket_epoch": 1709242200,
+   "ist_hour": 3,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T21:47:53Z",
+   "epoch": 1709243273,
+   "bucket_ts": "2024-02-29T21:30:00Z",
+   "bucket_epoch": 1709242200,
+   "ist_hour": 3,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T21:55:06Z",
+   "epoch": 1709243706,
+   "bucket_ts": "2024-02-29T21:30:00Z",
+   "bucket_epoch": 1709242200,
+   "ist_hour": 3,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T22:02:19Z",
+   "epoch": 1709244139,
+   "bucket_ts": "2024-02-29T21:30:00Z",
+   "bucket_epoch": 1709242200,
+   "ist_hour": 3,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T22:09:32Z",
+   "epoch": 1709244572,
+   "bucket_ts": "2024-02-29T21:30:00Z",
+   "bucket_epoch": 1709242200,
+   "ist_hour": 3,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T22:16:45Z",
+   "epoch": 1709245005,
+   "bucket_ts": "2024-02-29T21:30:00Z",
+   "bucket_epoch": 1709242200,
+   "ist_hour": 3,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T22:23:58Z",
+   "epoch": 1709245438,
+   "bucket_ts": "2024-02-29T21:30:00Z",
+   "bucket_epoch": 1709242200,
+   "ist_hour": 3,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T22:31:11Z",
+   "epoch": 1709245871,
+   "bucket_ts": "2024-02-29T22:30:00Z",
+   "bucket_epoch": 1709245800,
+   "ist_hour": 4,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T22:38:24Z",
+   "epoch": 1709246304,
+   "bucket_ts": "2024-02-29T22:30:00Z",
+   "bucket_epoch": 1709245800,
+   "ist_hour": 4,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T22:45:37Z",
+   "epoch": 1709246737,
+   "bucket_ts": "2024-02-29T22:30:00Z",
+   "bucket_epoch": 1709245800,
+   "ist_hour": 4,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T22:52:50Z",
+   "epoch": 1709247170,
+   "bucket_ts": "2024-02-29T22:30:00Z",
+   "bucket_epoch": 1709245800,
+   "ist_hour": 4,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T23:00:03Z",
+   "epoch": 1709247603,
+   "bucket_ts": "2024-02-29T22:30:00Z",
+   "bucket_epoch": 1709245800,
+   "ist_hour": 4,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T23:07:16Z",
+   "epoch": 1709248036,
+   "bucket_ts": "2024-02-29T22:30:00Z",
+   "bucket_epoch": 1709245800,
+   "ist_hour": 4,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T23:14:29Z",
+   "epoch": 1709248469,
+   "bucket_ts": "2024-02-29T22:30:00Z",
+   "bucket_epoch": 1709245800,
+   "ist_hour": 4,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T23:21:42Z",
+   "epoch": 1709248902,
+   "bucket_ts": "2024-02-29T22:30:00Z",
+   "bucket_epoch": 1709245800,
+   "ist_hour": 4,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T23:28:55Z",
+   "epoch": 1709249335,
+   "bucket_ts": "2024-02-29T22:30:00Z",
+   "bucket_epoch": 1709245800,
+   "ist_hour": 4,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T23:36:08Z",
+   "epoch": 1709249768,
+   "bucket_ts": "2024-02-29T23:30:00Z",
+   "bucket_epoch": 1709249400,
+   "ist_hour": 5,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T23:43:21Z",
+   "epoch": 1709250201,
+   "bucket_ts": "2024-02-29T23:30:00Z",
+   "bucket_epoch": 1709249400,
+   "ist_hour": 5,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T23:50:34Z",
+   "epoch": 1709250634,
+   "bucket_ts": "2024-02-29T23:30:00Z",
+   "bucket_epoch": 1709249400,
+   "ist_hour": 5,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-02-29T23:57:47Z",
+   "epoch": 1709251067,
+   "bucket_ts": "2024-02-29T23:30:00Z",
+   "bucket_epoch": 1709249400,
+   "ist_hour": 5,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T00:05:00Z",
+   "epoch": 1709251500,
+   "bucket_ts": "2024-02-29T23:30:00Z",
+   "bucket_epoch": 1709249400,
+   "ist_hour": 5,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T00:12:13Z",
+   "epoch": 1709251933,
+   "bucket_ts": "2024-02-29T23:30:00Z",
+   "bucket_epoch": 1709249400,
+   "ist_hour": 5,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T00:19:26Z",
+   "epoch": 1709252366,
+   "bucket_ts": "2024-02-29T23:30:00Z",
+   "bucket_epoch": 1709249400,
+   "ist_hour": 5,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T00:26:39Z",
+   "epoch": 1709252799,
+   "bucket_ts": "2024-02-29T23:30:00Z",
+   "bucket_epoch": 1709249400,
+   "ist_hour": 5,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T00:33:52Z",
+   "epoch": 1709253232,
+   "bucket_ts": "2024-03-01T00:30:00Z",
+   "bucket_epoch": 1709253000,
+   "ist_hour": 6,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T00:41:05Z",
+   "epoch": 1709253665,
+   "bucket_ts": "2024-03-01T00:30:00Z",
+   "bucket_epoch": 1709253000,
+   "ist_hour": 6,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T00:48:18Z",
+   "epoch": 1709254098,
+   "bucket_ts": "2024-03-01T00:30:00Z",
+   "bucket_epoch": 1709253000,
+   "ist_hour": 6,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T00:55:31Z",
+   "epoch": 1709254531,
+   "bucket_ts": "2024-03-01T00:30:00Z",
+   "bucket_epoch": 1709253000,
+   "ist_hour": 6,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T01:02:44Z",
+   "epoch": 1709254964,
+   "bucket_ts": "2024-03-01T00:30:00Z",
+   "bucket_epoch": 1709253000,
+   "ist_hour": 6,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T01:09:57Z",
+   "epoch": 1709255397,
+   "bucket_ts": "2024-03-01T00:30:00Z",
+   "bucket_epoch": 1709253000,
+   "ist_hour": 6,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T01:17:10Z",
+   "epoch": 1709255830,
+   "bucket_ts": "2024-03-01T00:30:00Z",
+   "bucket_epoch": 1709253000,
+   "ist_hour": 6,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T01:24:23Z",
+   "epoch": 1709256263,
+   "bucket_ts": "2024-03-01T00:30:00Z",
+   "bucket_epoch": 1709253000,
+   "ist_hour": 6,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T01:31:36Z",
+   "epoch": 1709256696,
+   "bucket_ts": "2024-03-01T01:30:00Z",
+   "bucket_epoch": 1709256600,
+   "ist_hour": 7,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T01:38:49Z",
+   "epoch": 1709257129,
+   "bucket_ts": "2024-03-01T01:30:00Z",
+   "bucket_epoch": 1709256600,
+   "ist_hour": 7,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T01:46:02Z",
+   "epoch": 1709257562,
+   "bucket_ts": "2024-03-01T01:30:00Z",
+   "bucket_epoch": 1709256600,
+   "ist_hour": 7,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T01:53:15Z",
+   "epoch": 1709257995,
+   "bucket_ts": "2024-03-01T01:30:00Z",
+   "bucket_epoch": 1709256600,
+   "ist_hour": 7,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T02:00:28Z",
+   "epoch": 1709258428,
+   "bucket_ts": "2024-03-01T01:30:00Z",
+   "bucket_epoch": 1709256600,
+   "ist_hour": 7,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T02:07:41Z",
+   "epoch": 1709258861,
+   "bucket_ts": "2024-03-01T01:30:00Z",
+   "bucket_epoch": 1709256600,
+   "ist_hour": 7,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T02:14:54Z",
+   "epoch": 1709259294,
+   "bucket_ts": "2024-03-01T01:30:00Z",
+   "bucket_epoch": 1709256600,
+   "ist_hour": 7,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T02:22:07Z",
+   "epoch": 1709259727,
+   "bucket_ts": "2024-03-01T01:30:00Z",
+   "bucket_epoch": 1709256600,
+   "ist_hour": 7,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T02:29:20Z",
+   "epoch": 1709260160,
+   "bucket_ts": "2024-03-01T01:30:00Z",
+   "bucket_epoch": 1709256600,
+   "ist_hour": 7,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T02:36:33Z",
+   "epoch": 1709260593,
+   "bucket_ts": "2024-03-01T02:30:00Z",
+   "bucket_epoch": 1709260200,
+   "ist_hour": 8,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T02:43:46Z",
+   "epoch": 1709261026,
+   "bucket_ts": "2024-03-01T02:30:00Z",
+   "bucket_epoch": 1709260200,
+   "ist_hour": 8,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T02:50:59Z",
+   "epoch": 1709261459,
+   "bucket_ts": "2024-03-01T02:30:00Z",
+   "bucket_epoch": 1709260200,
+   "ist_hour": 8,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T02:58:12Z",
+   "epoch": 1709261892,
+   "bucket_ts": "2024-03-01T02:30:00Z",
+   "bucket_epoch": 1709260200,
+   "ist_hour": 8,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T03:05:25Z",
+   "epoch": 1709262325,
+   "bucket_ts": "2024-03-01T02:30:00Z",
+   "bucket_epoch": 1709260200,
+   "ist_hour": 8,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T03:12:38Z",
+   "epoch": 1709262758,
+   "bucket_ts": "2024-03-01T02:30:00Z",
+   "bucket_epoch": 1709260200,
+   "ist_hour": 8,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T03:19:51Z",
+   "epoch": 1709263191,
+   "bucket_ts": "2024-03-01T02:30:00Z",
+   "bucket_epoch": 1709260200,
+   "ist_hour": 8,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T03:27:04Z",
+   "epoch": 1709263624,
+   "bucket_ts": "2024-03-01T02:30:00Z",
+   "bucket_epoch": 1709260200,
+   "ist_hour": 8,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T03:34:17Z",
+   "epoch": 1709264057,
+   "bucket_ts": "2024-03-01T03:30:00Z",
+   "bucket_epoch": 1709263800,
+   "ist_hour": 9,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T03:41:30Z",
+   "epoch": 1709264490,
+   "bucket_ts": "2024-03-01T03:30:00Z",
+   "bucket_epoch": 1709263800,
+   "ist_hour": 9,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T03:48:43Z",
+   "epoch": 1709264923,
+   "bucket_ts": "2024-03-01T03:30:00Z",
+   "bucket_epoch": 1709263800,
+   "ist_hour": 9,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T03:55:56Z",
+   "epoch": 1709265356,
+   "bucket_ts": "2024-03-01T03:30:00Z",
+   "bucket_epoch": 1709263800,
+   "ist_hour": 9,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T04:03:09Z",
+   "epoch": 1709265789,
+   "bucket_ts": "2024-03-01T03:30:00Z",
+   "bucket_epoch": 1709263800,
+   "ist_hour": 9,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T04:10:22Z",
+   "epoch": 1709266222,
+   "bucket_ts": "2024-03-01T03:30:00Z",
+   "bucket_epoch": 1709263800,
+   "ist_hour": 9,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T04:17:35Z",
+   "epoch": 1709266655,
+   "bucket_ts": "2024-03-01T03:30:00Z",
+   "bucket_epoch": 1709263800,
+   "ist_hour": 9,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T04:24:48Z",
+   "epoch": 1709267088,
+   "bucket_ts": "2024-03-01T03:30:00Z",
+   "bucket_epoch": 1709263800,
+   "ist_hour": 9,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T04:32:01Z",
+   "epoch": 1709267521,
+   "bucket_ts": "2024-03-01T04:30:00Z",
+   "bucket_epoch": 1709267400,
+   "ist_hour": 10,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T04:39:14Z",
+   "epoch": 1709267954,
+   "bucket_ts": "2024-03-01T04:30:00Z",
+   "bucket_epoch": 1709267400,
+   "ist_hour": 10,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T04:46:27Z",
+   "epoch": 1709268387,
+   "bucket_ts": "2024-03-01T04:30:00Z",
+   "bucket_epoch": 1709267400,
+   "ist_hour": 10,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T04:53:40Z",
+   "epoch": 1709268820,
+   "bucket_ts": "2024-03-01T04:30:00Z",
+   "bucket_epoch": 1709267400,
+   "ist_hour": 10,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T05:00:53Z",
+   "epoch": 1709269253,
+   "bucket_ts": "2024-03-01T04:30:00Z",
+   "bucket_epoch": 1709267400,
+   "ist_hour": 10,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T05:08:06Z",
+   "epoch": 1709269686,
+   "bucket_ts": "2024-03-01T04:30:00Z",
+   "bucket_epoch": 1709267400,
+   "ist_hour": 10,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T05:15:19Z",
+   "epoch": 1709270119,
+   "bucket_ts": "2024-03-01T04:30:00Z",
+   "bucket_epoch": 1709267400,
+   "ist_hour": 10,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T05:22:32Z",
+   "epoch": 1709270552,
+   "bucket_ts": "2024-03-01T04:30:00Z",
+   "bucket_epoch": 1709267400,
+   "ist_hour": 10,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T05:29:45Z",
+   "epoch": 1709270985,
+   "bucket_ts": "2024-03-01T04:30:00Z",
+   "bucket_epoch": 1709267400,
+   "ist_hour": 10,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T05:36:58Z",
+   "epoch": 1709271418,
+   "bucket_ts": "2024-03-01T05:30:00Z",
+   "bucket_epoch": 1709271000,
+   "ist_hour": 11,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T05:44:11Z",
+   "epoch": 1709271851,
+   "bucket_ts": "2024-03-01T05:30:00Z",
+   "bucket_epoch": 1709271000,
+   "ist_hour": 11,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T05:51:24Z",
+   "epoch": 1709272284,
+   "bucket_ts": "2024-03-01T05:30:00Z",
+   "bucket_epoch": 1709271000,
+   "ist_hour": 11,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T05:58:37Z",
+   "epoch": 1709272717,
+   "bucket_ts": "2024-03-01T05:30:00Z",
+   "bucket_epoch": 1709271000,
+   "ist_hour": 11,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T06:05:50Z",
+   "epoch": 1709273150,
+   "bucket_ts": "2024-03-01T05:30:00Z",
+   "bucket_epoch": 1709271000,
+   "ist_hour": 11,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T06:13:03Z",
+   "epoch": 1709273583,
+   "bucket_ts": "2024-03-01T05:30:00Z",
+   "bucket_epoch": 1709271000,
+   "ist_hour": 11,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T06:20:16Z",
+   "epoch": 1709274016,
+   "bucket_ts": "2024-03-01T05:30:00Z",
+   "bucket_epoch": 1709271000,
+   "ist_hour": 11,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T06:27:29Z",
+   "epoch": 1709274449,
+   "bucket_ts": "2024-03-01T05:30:00Z",
+   "bucket_epoch": 1709271000,
+   "ist_hour": 11,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T06:34:42Z",
+   "epoch": 1709274882,
+   "bucket_ts": "2024-03-01T06:30:00Z",
+   "bucket_epoch": 1709274600,
+   "ist_hour": 12,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T06:41:55Z",
+   "epoch": 1709275315,
+   "bucket_ts": "2024-03-01T06:30:00Z",
+   "bucket_epoch": 1709274600,
+   "ist_hour": 12,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T06:49:08Z",
+   "epoch": 1709275748,
+   "bucket_ts": "2024-03-01T06:30:00Z",
+   "bucket_epoch": 1709274600,
+   "ist_hour": 12,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T06:56:21Z",
+   "epoch": 1709276181,
+   "bucket_ts": "2024-03-01T06:30:00Z",
+   "bucket_epoch": 1709274600,
+   "ist_hour": 12,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T07:03:34Z",
+   "epoch": 1709276614,
+   "bucket_ts": "2024-03-01T06:30:00Z",
+   "bucket_epoch": 1709274600,
+   "ist_hour": 12,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T07:10:47Z",
+   "epoch": 1709277047,
+   "bucket_ts": "2024-03-01T06:30:00Z",
+   "bucket_epoch": 1709274600,
+   "ist_hour": 12,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T07:18:00Z",
+   "epoch": 1709277480,
+   "bucket_ts": "2024-03-01T06:30:00Z",
+   "bucket_epoch": 1709274600,
+   "ist_hour": 12,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T07:25:13Z",
+   "epoch": 1709277913,
+   "bucket_ts": "2024-03-01T06:30:00Z",
+   "bucket_epoch": 1709274600,
+   "ist_hour": 12,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T07:32:26Z",
+   "epoch": 1709278346,
+   "bucket_ts": "2024-03-01T07:30:00Z",
+   "bucket_epoch": 1709278200,
+   "ist_hour": 13,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T07:39:39Z",
+   "epoch": 1709278779,
+   "bucket_ts": "2024-03-01T07:30:00Z",
+   "bucket_epoch": 1709278200,
+   "ist_hour": 13,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T07:46:52Z",
+   "epoch": 1709279212,
+   "bucket_ts": "2024-03-01T07:30:00Z",
+   "bucket_epoch": 1709278200,
+   "ist_hour": 13,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T07:54:05Z",
+   "epoch": 1709279645,
+   "bucket_ts": "2024-03-01T07:30:00Z",
+   "bucket_epoch": 1709278200,
+   "ist_hour": 13,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T08:01:18Z",
+   "epoch": 1709280078,
+   "bucket_ts": "2024-03-01T07:30:00Z",
+   "bucket_epoch": 1709278200,
+   "ist_hour": 13,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T08:08:31Z",
+   "epoch": 1709280511,
+   "bucket_ts": "2024-03-01T07:30:00Z",
+   "bucket_epoch": 1709278200,
+   "ist_hour": 13,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T08:15:44Z",
+   "epoch": 1709280944,
+   "bucket_ts": "2024-03-01T07:30:00Z",
+   "bucket_epoch": 1709278200,
+   "ist_hour": 13,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T08:22:57Z",
+   "epoch": 1709281377,
+   "bucket_ts": "2024-03-01T07:30:00Z",
+   "bucket_epoch": 1709278200,
+   "ist_hour": 13,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T08:30:10Z",
+   "epoch": 1709281810,
+   "bucket_ts": "2024-03-01T08:30:00Z",
+   "bucket_epoch": 1709281800,
+   "ist_hour": 14,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T08:37:23Z",
+   "epoch": 1709282243,
+   "bucket_ts": "2024-03-01T08:30:00Z",
+   "bucket_epoch": 1709281800,
+   "ist_hour": 14,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T08:44:36Z",
+   "epoch": 1709282676,
+   "bucket_ts": "2024-03-01T08:30:00Z",
+   "bucket_epoch": 1709281800,
+   "ist_hour": 14,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T08:51:49Z",
+   "epoch": 1709283109,
+   "bucket_ts": "2024-03-01T08:30:00Z",
+   "bucket_epoch": 1709281800,
+   "ist_hour": 14,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T08:59:02Z",
+   "epoch": 1709283542,
+   "bucket_ts": "2024-03-01T08:30:00Z",
+   "bucket_epoch": 1709281800,
+   "ist_hour": 14,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T09:06:15Z",
+   "epoch": 1709283975,
+   "bucket_ts": "2024-03-01T08:30:00Z",
+   "bucket_epoch": 1709281800,
+   "ist_hour": 14,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T09:13:28Z",
+   "epoch": 1709284408,
+   "bucket_ts": "2024-03-01T08:30:00Z",
+   "bucket_epoch": 1709281800,
+   "ist_hour": 14,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T09:20:41Z",
+   "epoch": 1709284841,
+   "bucket_ts": "2024-03-01T08:30:00Z",
+   "bucket_epoch": 1709281800,
+   "ist_hour": 14,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T09:27:54Z",
+   "epoch": 1709285274,
+   "bucket_ts": "2024-03-01T08:30:00Z",
+   "bucket_epoch": 1709281800,
+   "ist_hour": 14,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T09:35:07Z",
+   "epoch": 1709285707,
+   "bucket_ts": "2024-03-01T09:30:00Z",
+   "bucket_epoch": 1709285400,
+   "ist_hour": 15,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T09:42:20Z",
+   "epoch": 1709286140,
+   "bucket_ts": "2024-03-01T09:30:00Z",
+   "bucket_epoch": 1709285400,
+   "ist_hour": 15,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T09:49:33Z",
+   "epoch": 1709286573,
+   "bucket_ts": "2024-03-01T09:30:00Z",
+   "bucket_epoch": 1709285400,
+   "ist_hour": 15,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T09:56:46Z",
+   "epoch": 1709287006,
+   "bucket_ts": "2024-03-01T09:30:00Z",
+   "bucket_epoch": 1709285400,
+   "ist_hour": 15,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T10:03:59Z",
+   "epoch": 1709287439,
+   "bucket_ts": "2024-03-01T09:30:00Z",
+   "bucket_epoch": 1709285400,
+   "ist_hour": 15,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T10:11:12Z",
+   "epoch": 1709287872,
+   "bucket_ts": "2024-03-01T09:30:00Z",
+   "bucket_epoch": 1709285400,
+   "ist_hour": 15,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T10:18:25Z",
+   "epoch": 1709288305,
+   "bucket_ts": "2024-03-01T09:30:00Z",
+   "bucket_epoch": 1709285400,
+   "ist_hour": 15,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T10:25:38Z",
+   "epoch": 1709288738,
+   "bucket_ts": "2024-03-01T09:30:00Z",
+   "bucket_epoch": 1709285400,
+   "ist_hour": 15,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T10:32:51Z",
+   "epoch": 1709289171,
+   "bucket_ts": "2024-03-01T10:30:00Z",
+   "bucket_epoch": 1709289000,
+   "ist_hour": 16,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T10:40:04Z",
+   "epoch": 1709289604,
+   "bucket_ts": "2024-03-01T10:30:00Z",
+   "bucket_epoch": 1709289000,
+   "ist_hour": 16,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T10:47:17Z",
+   "epoch": 1709290037,
+   "bucket_ts": "2024-03-01T10:30:00Z",
+   "bucket_epoch": 1709289000,
+   "ist_hour": 16,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T10:54:30Z",
+   "epoch": 1709290470,
+   "bucket_ts": "2024-03-01T10:30:00Z",
+   "bucket_epoch": 1709289000,
+   "ist_hour": 16,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T11:01:43Z",
+   "epoch": 1709290903,
+   "bucket_ts": "2024-03-01T10:30:00Z",
+   "bucket_epoch": 1709289000,
+   "ist_hour": 16,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T11:08:56Z",
+   "epoch": 1709291336,
+   "bucket_ts": "2024-03-01T10:30:00Z",
+   "bucket_epoch": 1709289000,
+   "ist_hour": 16,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T11:16:09Z",
+   "epoch": 1709291769,
+   "bucket_ts": "2024-03-01T10:30:00Z",
+   "bucket_epoch": 1709289000,
+   "ist_hour": 16,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T11:23:22Z",
+   "epoch": 1709292202,
+   "bucket_ts": "2024-03-01T10:30:00Z",
+   "bucket_epoch": 1709289000,
+   "ist_hour": 16,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T11:30:35Z",
+   "epoch": 1709292635,
+   "bucket_ts": "2024-03-01T11:30:00Z",
+   "bucket_epoch": 1709292600,
+   "ist_hour": 17,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T11:37:48Z",
+   "epoch": 1709293068,
+   "bucket_ts": "2024-03-01T11:30:00Z",
+   "bucket_epoch": 1709292600,
+   "ist_hour": 17,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T11:45:01Z",
+   "epoch": 1709293501,
+   "bucket_ts": "2024-03-01T11:30:00Z",
+   "bucket_epoch": 1709292600,
+   "ist_hour": 17,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T11:52:14Z",
+   "epoch": 1709293934,
+   "bucket_ts": "2024-03-01T11:30:00Z",
+   "bucket_epoch": 1709292600,
+   "ist_hour": 17,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T11:59:27Z",
+   "epoch": 1709294367,
+   "bucket_ts": "2024-03-01T11:30:00Z",
+   "bucket_epoch": 1709292600,
+   "ist_hour": 17,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2023-12-31T18:29:59Z",
+   "epoch": 1704047399,
+   "bucket_ts": "2023-12-31T17:30:00Z",
+   "bucket_epoch": 1704043800,
+   "ist_hour": 23,
+   "ist_dow": 6,
+   "ist_doy": 365
+  },
+  {
+   "utc": "2023-12-31T18:30:00Z",
+   "epoch": 1704047400,
+   "bucket_ts": "2023-12-31T18:30:00Z",
+   "bucket_epoch": 1704047400,
+   "ist_hour": 0,
+   "ist_dow": 0,
+   "ist_doy": 1
+  },
+  {
+   "utc": "2023-12-31T18:30:01Z",
+   "epoch": 1704047401,
+   "bucket_ts": "2023-12-31T18:30:00Z",
+   "bucket_epoch": 1704047400,
+   "ist_hour": 0,
+   "ist_dow": 0,
+   "ist_doy": 1
+  },
+  {
+   "utc": "2024-03-01T04:29:59Z",
+   "epoch": 1709267399,
+   "bucket_ts": "2024-03-01T03:30:00Z",
+   "bucket_epoch": 1709263800,
+   "ist_hour": 9,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2024-03-01T04:30:00Z",
+   "epoch": 1709267400,
+   "bucket_ts": "2024-03-01T04:30:00Z",
+   "bucket_epoch": 1709267400,
+   "ist_hour": 10,
+   "ist_dow": 4,
+   "ist_doy": 61
+  },
+  {
+   "utc": "2025-06-15T23:59:59Z",
+   "epoch": 1750031999,
+   "bucket_ts": "2025-06-15T23:30:00Z",
+   "bucket_epoch": 1750030200,
+   "ist_hour": 5,
+   "ist_dow": 0,
+   "ist_doy": 167
+  },
+  {
+   "utc": "2025-06-16T00:00:00Z",
+   "epoch": 1750032000,
+   "bucket_ts": "2025-06-15T23:30:00Z",
+   "bucket_epoch": 1750030200,
+   "ist_hour": 5,
+   "ist_dow": 0,
+   "ist_doy": 167
+  },
+  {
+   "utc": "2026-10-01T04:30:00Z",
+   "epoch": 1790829000,
+   "bucket_ts": "2026-10-01T04:30:00Z",
+   "bucket_epoch": 1790829000,
+   "ist_hour": 10,
+   "ist_dow": 3,
+   "ist_doy": 274
+  },
+  {
+   "utc": "2026-10-01T05:39:00Z",
+   "epoch": 1790833140,
+   "bucket_ts": "2026-10-01T05:30:00Z",
+   "bucket_epoch": 1790832600,
+   "ist_hour": 11,
+   "ist_dow": 3,
+   "ist_doy": 274
+  }
+ ]
+}
