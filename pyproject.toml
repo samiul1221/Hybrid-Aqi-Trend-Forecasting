@@ -19,6 +19,7 @@ aqi-ml = { workspace = true }
 dev = [
     "jsonschema==4.26.0",
     "mypy==2.3.1",
+    "pandas-stubs==3.0.5.260914",
     "pytest==9.1.1",
     "ruff==0.16.9",
     "types-jsonschema==4.26.0.20260518",

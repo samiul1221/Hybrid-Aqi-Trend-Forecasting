@@ -9,7 +9,7 @@ __pycache__/
 dist/
 
 # data and run outputs (never commit)
-data/
+/data/
 mlruns/
 mlartifacts/
 .zenml/
