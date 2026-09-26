@@ -124,9 +124,23 @@ def write_card(cfg: dict[str, Any]) -> None:
         "|---|---|",
     ]
     lines += [f"| {k} | {v} |" for k, v in sorted(tot.items()) if v]
+    repairs = _load_json(interim / "openaq" / "_unit_repairs.json")
+    if repairs:
+        rep = (
+            pd.DataFrame(repairs)
+            .groupby(["parameter", "label", "used"])
+            .agg(groups=("n", "size"), values=("n", "sum"), median_raw=("median_raw", "median"))
+        )
+        lines += [
+            "",
+            "## Unit-label repairs (ADR 0006)",
+            "",
+            _md(rep.reset_index().set_index("parameter")),
+        ]
     lines += ["", "## Known limitations", "",
               "- `blh` (boundary layer height) is not served by the Open-Meteo archive/historical-forecast for Delhi (verified 2026-09-26): almost always null (see coverage table).",
               "- No imputation in the base table; gaps stay NaN (feature builder applies the <=2 h rule).",
+              "- OpenAQ S3 archive has no Delhi data for 2023-2024; NOx not used (inconsistent with NO + NO2); no NH3/benzene (ADR 0006).",
               "- Historical-forecast (teacher covariates) is stitched from the first hours of successive runs, not forecasts as issued at base_ts (ADR 0005).",
               ""]  # fmt: skip
     Path(cfg["paths"]["data_card"]).write_text("\n".join(lines), encoding="utf-8", newline="\n")

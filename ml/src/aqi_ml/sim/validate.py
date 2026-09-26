@@ -55,7 +55,12 @@ def write_card(path: Path = CARD) -> dict[str, object]:
     root = sp.ROOT / "data" / "synthetic" / cfg["version"]
     man = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
     cal = pl.load_calibration()
-    r = pd.read_parquet(root / "records")
+    cols = ["node_id", "ts", "pm_state", "sim_gap", "sim_outage", "split", "dust", "rh", "t", "lux",
+            "pm25_corr", "pm10_corr", "p", "wind_speed", "aqi_pm", "mq7_rs", "mq135_rs", "sraw_voc",
+            "sraw_nox", "Rbase7", "Rbase135", "base_voc", "base_nox", "truth_pm25", "truth_t", "truth_rh",
+            "truth_swrad", "truth_co_ppm", "truth_co_ppm_src", "truth_voc_ppb", "truth_no2_ppb",
+            "truth_no2_ppb_src", "truth_o3_ppb"]  # fmt: skip
+    r = pd.read_parquet(root / "records", columns=cols)  # column subset keeps memory bounded
     r["month"] = r.ts.dt.tz_convert("Asia/Kolkata").dt.month
     ok = r[r.pm_state.eq("ok") & r.truth_pm25.notna()]
     fits = {u: winter_fit(g, cal) for u, g in ok[ok.month.isin(WINTER)].groupby("node_id")}
@@ -98,7 +103,7 @@ def write_card(path: Path = CARD) -> dict[str, object]:
         f"- corrected/true PM2.5 median by season: {(ok.pm25_corr / ok.truth_pm25).groupby(season).median().round(2).to_dict()}",
         f"- gas truth source share (CO; 0 meas, 1 interp, 2 station clim, 3 network clim): "
         f"{r.truth_co_ppm_src.value_counts(normalize=True).round(3).to_dict()}",
-        f"- AQI valid share: {r.aqi_pm_int.notna().mean():.3f}",
+        f"- AQI valid share: {r.aqi_pm.notna().mean():.3f}",
         "",
         "## Raw channel ranges (P1 / P50 / P99)",
         "",

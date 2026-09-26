@@ -17,6 +17,14 @@ import httpx
 RETRY_STATUS = {429, 500, 502, 503, 504}
 
 
+def _reason(r: httpx.Response) -> str:
+    try:
+        body = r.json()
+    except ValueError:
+        return r.text[:200]
+    return str(body.get("reason", "")) if isinstance(body, dict) else ""
+
+
 class CachedClient:
     def __init__(
         self,
@@ -24,12 +32,14 @@ class CachedClient:
         min_interval_s: float,
         headers: dict[str, str] | None = None,
         max_retries: int = 5,
+        max_limit_waits: int = 60,
         transport: httpx.BaseTransport | None = None,
         sleep: Any = time.sleep,
     ) -> None:
         self.cache_dir = cache_dir
         self.min_interval_s = min_interval_s
         self.max_retries = max_retries
+        self.max_limit_waits = max_limit_waits  # 429 waits (1 min each) before giving up
         self._sleep = sleep
         self._last = 0.0
         self.network_calls = 0
@@ -43,7 +53,10 @@ class CachedClient:
         path = self._path(url, params)
         if cache and path.exists():
             return json.loads(path.read_text(encoding="utf-8"))
-        for attempt in range(self.max_retries + 1):
+        limit_waits = 0
+        attempt = -1
+        while attempt < self.max_retries:
+            attempt += 1
             wait = self.min_interval_s - (time.monotonic() - self._last)
             if wait > 0:
                 self._sleep(wait)
@@ -62,9 +75,20 @@ class CachedClient:
                     path.parent.mkdir(parents=True, exist_ok=True)
                     path.write_text(json.dumps(data), encoding="utf-8")
                 return data
+            if r.status_code == 429:
+                reason = _reason(r)
+                if (
+                    "daily" in reason.lower()
+                ):  # Open-Meteo daily cap: stop; a rerun resumes from cache
+                    raise RuntimeError(f"daily API limit reached ({reason}); rerun later to resume")
+                if limit_waits < self.max_limit_waits:
+                    limit_waits += 1
+                    reset = r.headers.get("x-ratelimit-reset") or r.headers.get("retry-after")
+                    self._sleep(float(reset) if reset and reset.isdigit() else 60.0)
+                    attempt -= 1  # rate-limit waits do not use up error retries
+                    continue
             if r.status_code in RETRY_STATUS and attempt < self.max_retries:
-                reset = r.headers.get("x-ratelimit-reset") or r.headers.get("retry-after")
-                self._sleep(float(reset) if reset and reset.isdigit() else 2**attempt)
+                self._sleep(2**attempt)
                 continue
             r.raise_for_status()
         raise RuntimeError("unreachable")

@@ -36,7 +36,8 @@ open_meteo:
   archive_url: https://archive-api.open-meteo.com/v1/archive
   historical_forecast_url: https://historical-forecast-api.open-meteo.com/v1/forecast
   elevation_url: https://api.open-meteo.com/v1/elevation
-  min_interval_s: 0.5                   # free tier: 600/min, 5000/h, 10000/day
+  min_interval_s: 20                    # free tier 5000/h, 10000/day in WEIGHTED calls: a 1-year request
+                                        # counts ~26 (days/14), so >= ~19 s between year-chunks
   archive_model: era5                   # one consistent reanalysis for 2018+ (ADR 0005)
   chunk_days: 366
   # Verified 2026-09-26: names/units below; request timezone=GMT and align ourselves, because

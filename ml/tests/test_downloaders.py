@@ -43,6 +43,34 @@ def test_cache_retry_and_errors(tmp_path: Path) -> None:
     assert len(list(tmp_path.glob("*.json"))) == 1  # errors are never cached
 
 
+def test_rate_limit_waits_and_daily_stop(tmp_path: Path) -> None:
+    calls = {"n": 0}
+
+    def hourly(req: httpx.Request) -> httpx.Response:
+        calls["n"] += 1
+        if calls["n"] <= 12:  # more than max_retries: waits must not consume error retries
+            return httpx.Response(
+                429, json={"error": True, "reason": "Hourly API request limit exceeded"}
+            )
+        return httpx.Response(200, json={"ok": 1})
+
+    slept: list[float] = []
+    c = CachedClient(tmp_path, 0.0, transport=httpx.MockTransport(hourly), sleep=slept.append)
+    assert c.get_json("https://x/a", {"q": 1}) == {"ok": 1}
+    assert slept.count(60.0) == 12
+
+    def daily(req: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            429, json={"error": True, "reason": "Daily API request limit exceeded"}
+        )
+
+    d = CachedClient(
+        tmp_path / "d", 0.0, transport=httpx.MockTransport(daily), sleep=lambda s: None
+    )
+    with pytest.raises(RuntimeError, match="daily"):
+        d.get_json("https://x/a", {"q": 2})
+
+
 # ---- OpenAQ -------------------------------------------------------------------------------
 
 

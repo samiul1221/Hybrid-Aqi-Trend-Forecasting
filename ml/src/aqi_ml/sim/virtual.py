@@ -191,7 +191,9 @@ def _hash_dir(path: Path) -> str:
 def build(max_stations: int | None = None, cfg_path: Path = sp.SIM_PARAMS) -> Path:
     cfg = sp.load(cfg_path)
     cal = pl.load_calibration()
-    base = pd.read_parquet(BASE_TABLE)
+    base_cols = ["station_id", "ts", "ist_hour", "pm25", "pm10", *GASES, "t", "rh", "td", "p", "wind_u",
+                 "wind_v", "precip", "swrad"]  # fmt: skip
+    base = pd.read_parquet(BASE_TABLE, columns=base_cols)  # only what the simulator uses (memory)
     base["station_id"] = base.station_id.astype(str)
     network = gas_climatology(base)
     counts = base.groupby("station_id").pm25.count()

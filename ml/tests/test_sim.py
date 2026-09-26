@@ -147,10 +147,10 @@ def test_device_aqi_matches_shared_implementation() -> None:
     for i in range(23, n):
         w = slice(i - 23, i + 1)
         ref = aqi.aqi_pm_24h(pm25[w].tolist(), pm10[w].tolist(), m[w].tolist(), m[w].tolist())
-        assert ref.valid == (not np.isnan(got["aqi_pm"][i]))
+        assert ref.valid == (not np.isnan(got["aqi_pm_float"][i]))
         if ref.valid:
-            assert got["aqi_pm"][i] == pytest.approx(ref.aqi, abs=1e-9)
-            assert got["aqi_pm_int"][i] == ref.aqi_int
+            assert got["aqi_pm_float"][i] == pytest.approx(ref.aqi, abs=1e-9)
+            assert got["aqi_pm"][i] == ref.aqi_int
 
 
 def test_pm_state_machine() -> None:
@@ -195,7 +195,7 @@ def test_end_to_end_unit() -> None:
     assert (rec.pm_state.iloc[101:131] != "ok").all()
     ok = rec.pm_state == "ok"
     assert rec.loc[ok, "pm25_corr"].notna().all() and (rec.loc[ok, "flag_pm"] & pl.MEASURED).all()
-    assert rec.aqi_pm_int.dropna().between(0, 500).all()
+    assert rec.aqi_pm.dropna().between(0, 500).all()
     assert (
         rec.base_voc.dropna().gt(0).all() and rec.Rbase7.iloc[:24].isna().all()
     )  # causal baseline

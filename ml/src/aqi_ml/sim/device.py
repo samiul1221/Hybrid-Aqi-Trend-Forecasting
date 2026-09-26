@@ -56,7 +56,8 @@ def rolling_aqi(pm25: F, pm10: F, m25: B, m10: B) -> dict[str, npt.NDArray[Any]]
     if valid.any():
         val[valid] = np.maximum(sub("pm25", mean25[valid]), sub("pm10", mean10[valid]))
     aqi_int = np.where(valid, np.floor(val + 0.5), np.nan)
-    return {"aqi_pm": val, "aqi_pm_int": aqi_int, "aqi_valid_hours": n.astype(np.int64)}
+    # wire names [S16.2]: aqi_pm = integer AQI (NaN = not_ready); aqi_pm_float keeps full precision
+    return {"aqi_pm": aqi_int, "aqi_pm_float": val, "aqi_valid_hours": n.astype(np.int64)}
 
 
 def process(raw: pd.DataFrame, pm_measured: B, cal: dict[str, Any]) -> pd.DataFrame:

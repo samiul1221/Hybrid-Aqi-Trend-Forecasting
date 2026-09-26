@@ -1,0 +1,6 @@
+# Feature/target/window building [S07], [S08], [S11.1], [S14]. Schema itself: shared/schema/feature_schema.yaml.
+version: feat-v1
+source: sim-v1                  # data/synthetic/<source>/records -> data/datasets/<version>/
+seed: 20260927                  # Model B dropout k draws
+interpolate_max_gap_h: 2        # [S08.1] missing_input_policy
+min_measured_pm_hours: 20       # [S11.1] window_valid_model_a
