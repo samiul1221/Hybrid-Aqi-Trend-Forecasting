@@ -5,7 +5,7 @@ paths:
   base_table: data/processed/base_table # parquet, hive-partitioned by station_id
   data_card: docs/research_notes/data_card.md
 
-period: {start: "2018-01-01", end: "2025-12-31"}   # [S10.2] splits: train 2018-23, val 2024, test 2025+
+period: {start: "2018-01-01", end: "2026-08-31"}   # archive has no 2023-2024 (ADR 0006); splits in sim_params.yaml
 
 region:
   name: Delhi NCT
@@ -21,8 +21,16 @@ openaq:
   # CPCB stations are identified by provider name. TODO_VERIFY the exact provider name(s)
   # on the first live run (listed in the data card); AirNow (US Embassy) is excluded.
   provider_name_regex: "(?i)cpcb|caaqm|central pollution"
-  parameters: [pm25, pm10, pm1, no2, "no", nox, co, o3, so2, nh3, benzene,
+  parameters: [pm25, pm10, pm1, no2, "no", co, o3, so2, nh3, benzene,   # nox dropped: CPCB NOx < NO+NO2 in most hours (ADR 0006)
                temperature, relativehumidity, wind_speed, wind_direction, pressure]
+
+openaq_archive:                         # keyless S3 source (ADR 0006); used when no API key
+  mirror: data/raw/openaq_archive
+  workers: 8                            # 16 ran the PC out of memory on 2026-09-26
+  # OpenAQ location-id ranges that hold Delhi-NCR reference monitors (found via explore.openaq.org,
+  # verified by coordinates on 2026-09-26). Only ids inside region.bbox are kept.
+  candidate_ids: [[235, 235], [5530, 5640], [6920, 6970], [8460, 8480], [10480, 10495], [10820, 10835]]
+  merge_within_km: 1.0                  # same-name ids closer than this are one station
 
 open_meteo:
   archive_url: https://archive-api.open-meteo.com/v1/archive

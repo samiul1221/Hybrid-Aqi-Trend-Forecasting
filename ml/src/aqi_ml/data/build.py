@@ -10,19 +10,23 @@ ZenML (P9) will call the same functions.
 from __future__ import annotations
 
 import argparse
+import concurrent.futures as cf
 import json
 import os
+import re
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+import httpx
+import numpy as np
 import pandas as pd
 import yaml
-from aqi_shared.time_utils import ist_local_to_ts
 
-from aqi_ml.data import open_meteo, openaq
+from aqi_ml.data import open_meteo, openaq, openaq_archive
 from aqi_ml.data.base_table import POLLUTANTS, merge_station
 from aqi_ml.data.http import CachedClient
+from aqi_shared.time_utils import ist_local_to_ts
 
 ROOT = Path(__file__).resolve().parents[4]
 CONFIG = ROOT / "ml" / "configs" / "data.yaml"
@@ -51,7 +55,9 @@ def _bounds(cfg: dict[str, Any]) -> tuple[int, int]:
 def _openaq_client(cfg: dict[str, Any]) -> CachedClient:
     key = os.environ.get(cfg["openaq"]["api_key_env"]) or _dotenv(cfg["openaq"]["api_key_env"])
     if not key:
-        raise SystemExit(f"set {cfg['openaq']['api_key_env']} in .env (free key: explore.openaq.org)")
+        raise SystemExit(
+            f"set {cfg['openaq']['api_key_env']} in .env (free key: explore.openaq.org)"
+        )
     return CachedClient(cfg["paths"]["cache"] / "openaq", cfg["openaq"]["min_interval_s"],
                         headers={"X-API-Key": key})  # fmt: skip
 
@@ -93,6 +99,79 @@ def step_stations(cfg: dict[str, Any]) -> None:
     st.to_parquet(out / "stations.parquet", index=False)
     (out / "providers_seen.json").write_text(json.dumps(providers, indent=1), encoding="utf-8")
     print(f"{len(st)} stations (providers seen: {providers})")
+
+
+def _slug(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+
+
+def step_archive(cfg: dict[str, Any], max_stations: int | None, force: bool = False) -> None:
+    """Keyless alternative to stations+openaq: discover Delhi ids in the S3 archive and download."""
+    ac, oq = cfg["openaq_archive"], cfg["openaq"]
+    mirror = ROOT / ac["mirror"]
+    client = httpx.Client(timeout=60, limits=httpx.Limits(max_connections=ac["workers"]))
+    ids = [i for lo, hi in ac["candidate_ids"] for i in range(lo, hi + 1)]
+    with cf.ThreadPoolExecutor(ac["workers"]) as ex:
+        found = [r for r in ex.map(lambda i: openaq_archive.probe(client, i, mirror), ids) if r]
+    x0, y0, x1, y1 = cfg["region"]["bbox"]
+    found = [r for r in found if x0 <= r["lon"] <= x1 and y0 <= r["lat"] <= y1]
+    groups: list[list[dict[str, Any]]] = []
+    for r in sorted(found, key=lambda r: r["openaq_id"]):
+        for g in groups:
+            d_km = 111.0 * np.hypot(
+                g[0]["lat"] - r["lat"], (g[0]["lon"] - r["lon"]) * np.cos(np.deg2rad(r["lat"]))
+            )
+            if _slug(g[0]["name"]) == _slug(r["name"]) and d_km <= ac["merge_within_km"]:
+                g.append(r)
+                break
+        else:
+            groups.append([r])
+    st = pd.DataFrame([{
+        "station_id": _slug(g[0]["name"]), "name": g[0]["name"],
+        "openaq_ids": json.dumps([r["openaq_id"] for r in g]),
+        "lat": float(np.mean([r["lat"] for r in g])), "lon": float(np.mean([r["lon"] for r in g])),
+        "provider": g[0]["name"].rsplit("-", 1)[-1].strip(), "sensors": "[]",
+    } for g in groups])  # fmt: skip
+    om = cfg["open_meteo"]
+    st["elevation_m"] = open_meteo.elevations(_om_client(cfg), om["elevation_url"],
+                                              list(zip(st.lat, st.lon, strict=True)))  # fmt: skip
+    interim = cfg["paths"]["interim"]
+    (interim / "openaq").mkdir(parents=True, exist_ok=True)
+    st.to_parquet(interim / "stations.parquet", index=False)
+    print(f"{len(st)} stations from {len(found)} archive ids")
+    start, end = _dates(cfg)
+    prev_a, prev_r = (
+        interim / "openaq" / "_alignment.json",
+        interim / "openaq" / "_unit_repairs.json",
+    )
+    align_stats: dict[str, dict[str, float]] = (
+        json.loads(prev_a.read_text("utf-8")) if prev_a.exists() else {}
+    )
+    unit_repairs: list[dict[str, Any]] = (
+        json.loads(prev_r.read_text("utf-8")) if prev_r.exists() else []
+    )
+    for row in (st.head(max_stations) if max_stations else st).to_dict("records"):
+        if (interim / "openaq" / f"{row['station_id']}.parquet").exists() and not force:
+            print(f"{row['station_id']}: done (resume)")
+            continue
+        raw = pd.concat([openaq_archive.download_location(client, i, start, end, mirror, ac["workers"])
+                         for i in json.loads(row["openaq_ids"])], ignore_index=True)  # fmt: skip
+        reps: list[dict[str, Any]] = []
+        params = openaq_archive.to_canonical(raw, oq["parameters"], reps)
+        for r in reps:
+            r["station_id"] = row["station_id"]
+        unit_repairs = [r for r in unit_repairs if r["station_id"] != row["station_id"]] + reps
+        wide, aligned = openaq.station_to_ist(params, cfg["cleaning"]["min_bucket_coverage"])
+        wide.to_parquet(interim / "openaq" / f"{row['station_id']}.parquet", index=False)
+        align_stats[row["station_id"]] = aligned
+        print(f"{row['station_id']}: {len(raw)} raw rows -> {len(wide)} IST hours", flush=True)
+        del raw, params, wide
+    (interim / "openaq" / "_alignment.json").write_text(
+        json.dumps(align_stats, indent=1), encoding="utf-8"
+    )
+    (interim / "openaq" / "_unit_repairs.json").write_text(
+        json.dumps(unit_repairs, indent=1), encoding="utf-8"
+    )
 
 
 def step_openaq(cfg: dict[str, Any], max_stations: int | None) -> None:
@@ -162,22 +241,37 @@ def step_card(cfg: dict[str, Any]) -> None:
 
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(prog="aqi_ml.data.build")
-    ap.add_argument("step", choices=["stations", "openaq", "weather", "hforecast", "base", "card", "all"])
+    ap.add_argument(
+        "step",
+        choices=[
+            "stations",
+            "openaq",
+            "archive",
+            "weather",
+            "hforecast",
+            "base",
+            "card",
+            "all",
+            "all-archive",
+        ],
+    )
     ap.add_argument("--max-stations", type=int, default=None, help="limit for trial runs")
     ap.add_argument("--config", type=Path, default=CONFIG)
     a = ap.parse_args(argv)
     cfg = load_config(a.config)
+    if a.step in ("archive", "all-archive"):
+        step_archive(cfg, a.max_stations)
     if a.step in ("stations", "all"):
         step_stations(cfg)
     if a.step in ("openaq", "all"):
         step_openaq(cfg, a.max_stations)
-    if a.step in ("weather", "all"):
+    if a.step in ("weather", "all", "all-archive"):
         step_weather(cfg, a.max_stations, historical_forecast=False)
     if a.step == "hforecast":
         step_weather(cfg, a.max_stations, historical_forecast=True)
-    if a.step in ("base", "all"):
+    if a.step in ("base", "all", "all-archive"):
         step_base(cfg, a.max_stations)
-    if a.step in ("card", "all"):
+    if a.step in ("card", "all", "all-archive"):
         step_card(cfg)
 
 

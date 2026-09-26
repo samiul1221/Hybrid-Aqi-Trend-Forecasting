@@ -42,9 +42,23 @@ def summarise(base: pd.DataFrame) -> dict[str, pd.DataFrame]:
     cov = base[cols].notna().groupby(base.station_id).mean()
     span = base.dropna(subset=["pm25"]).groupby("station_id").ts.agg(["min", "max"])
     season = base.ts.dt.tz_convert("Asia/Kolkata").dt.month.map(SEASONS)
-    q = base.assign(season=season).groupby("season").pm25.quantile(np.array([0.05, 0.5, 0.95])).unstack()
-    src = {c: base[c].value_counts(normalize=True) for c in ("t_src", "rh_src", "p_src", "wind_src") if c in base}
-    return {"coverage": cov, "span": span, "pm25_season_q": q, "sources": pd.DataFrame(src).fillna(0)}
+    q = (
+        base.assign(season=season)
+        .groupby("season")
+        .pm25.quantile(np.array([0.05, 0.5, 0.95]))
+        .unstack()
+    )
+    src = {
+        c: base[c].value_counts(normalize=True)
+        for c in ("t_src", "rh_src", "p_src", "wind_src")
+        if c in base
+    }
+    return {
+        "coverage": cov,
+        "span": span,
+        "pm25_season_q": q,
+        "sources": pd.DataFrame(src).fillna(0),
+    }
 
 
 def write_card(cfg: dict[str, Any]) -> None:
@@ -103,7 +117,12 @@ def write_card(cfg: dict[str, Any]) -> None:
     for d in cleaning.values():
         for k, v in d.items():
             tot[k] = tot.get(k, 0) + v
-    lines += ["## Cleaning (values set to NaN, all stations) [S09]", "", "| rule | count |", "|---|---|"]
+    lines += [
+        "## Cleaning (values set to NaN, all stations) [S09]",
+        "",
+        "| rule | count |",
+        "|---|---|",
+    ]
     lines += [f"| {k} | {v} |" for k, v in sorted(tot.items()) if v]
     lines += ["", "## Known limitations", "",
               "- `blh` (boundary layer height) is not served by the Open-Meteo archive/historical-forecast for Delhi (verified 2026-09-26): almost always null (see coverage table).",

@@ -15,6 +15,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from aqi_ml.data.align import _bucket as _bucket_start
 from aqi_ml.data.align import intervals_to_ist, wind_speed_dir, wind_uv
 from aqi_ml.data.http import CachedClient
 
@@ -52,6 +53,7 @@ def convert(parameter: str, unit: str, values: np.ndarray) -> np.ndarray:
         ("ug/m3", "ppb"): None if mw is None else MOLAR_VOLUME / mw,
         ("mg/m3", "ppm"): None if mw is None else MOLAR_VOLUME / mw,
         ("ug/m3", "ppm"): None if mw is None else MOLAR_VOLUME / mw / 1000,
+        ("mg/m3", "ppb"): None if mw is None else MOLAR_VOLUME / mw * 1000,
         ("ppm", "ppb"): 1000.0,
         ("ppb", "ppm"): 0.001,
         ("mg/m3", "ug/m3"): 1000.0,
@@ -143,7 +145,8 @@ def station_to_ist(raw: dict[str, tuple[str, pd.DataFrame]], min_coverage: float
         if df.empty or param in ("wind_speed", "wind_direction"):
             continue
         s, e = df.s.to_numpy(np.int64), df.e.to_numpy(np.int64)
-        ist_aligned[param] = float(np.mean(((s + 19800) % 3600 == 0) & (e - s == 3600)))
+        # share of source periods that sit inside one IST hour (no splitting across buckets)
+        ist_aligned[param] = float(np.mean(_bucket_start(s) == _bucket_start(e - 1)))
         v = convert(param, unit, df.value.to_numpy(float))
         if param not in ("temperature",):
             v = np.where(v < 0, np.nan, v)  # [S09] drop negatives (not for temperature)

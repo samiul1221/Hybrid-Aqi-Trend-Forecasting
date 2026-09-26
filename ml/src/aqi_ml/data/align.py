@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+
 from aqi_shared.time_utils import HOUR_S, IST_OFFSET_S
 
 HALF_HOUR_S = HOUR_S // 2

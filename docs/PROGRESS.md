@@ -10,7 +10,7 @@ Last updated: 2026-09-26
 | P1 | Repo scaffold + tooling + placeholders | done — uv workspace (Py 3.11.13, pinned deps), ruff/mypy/pytest green, host g++ test runner, Arduino sketch compiles for ESP32-S3 (ADR 0002) |
 | P2 | `shared/`: CPCB AQI + ≥50 vectors, IST bucketing + fixture, feature_schema + loader + hash, JSON Schemas [S16.2]–[S16.7], C-header codegen | done — 61 AQI vectors, 409-row IST fixture (vs zoneinfo), schema hash `sha256:49657c55…`, 9 contract schemas + examples, 2 generated headers; 53 pytest + host C++ test green (ADR 0003, 0004) |
 | P3 | Data downloaders (OpenAQ v3, Open-Meteo archive + historical-forecast) + base table + data card | code done, 17 offline tests + live Open-Meteo smoke test (744/744 IST hours, Jan 2024). **Full data build blocked on an OpenAQ API key** → then `build all` generates `docs/research_notes/data_card.md` (ADR 0005) |
-| P4 | Simulator with researched parameters + unit tests + virtual-node shards | todo |
+| P4 | Simulator with researched parameters + unit tests + virtual-node shards | code + research done, 68 sim tests; keyless CPCB source (OpenAQ S3, 33 stations, ADR 0006); physics revised from datasheets + Delhi field data (ADR 0007); **calibrated to IIT-Delhi SPS30 vs BAM: 3/3 trial units slope 1.55–1.75 (target 1.46–1.86), R² 0.85–0.90**. Full dataset pending: data build stopped by OS at 16/33 stations (low memory) — resumable |
 | P5 | Python feature builder (golden fixtures) + target builder + Model B PM-dropout builder | todo |
 | P6 | Baselines + RF students A/B (no_KD) + [S21] metrics + emlearn export + host C parity < 1e-4 | todo |
 | P7 | GDC-CNN A/B per [S13.3]/[S13.4] + TFLite FP32 export + 1-block TFLM op check | todo |
@@ -39,6 +39,8 @@ Last updated: 2026-09-26
 
 ## Open questions for the owner
 
+- **P4 full build:** the background data download was stopped by the system for low memory at 16/33 stations. It now uses less memory and resumes; run `uv run python -m aqi_ml.data.build all-archive` then `uv run python -m aqi_ml.sim.virtual` then `uv run python -m aqi_ml.sim.validate` (or ask me to).
+- **PM2.5 scale in calibration.json:** before co-location the device's corrected PM is ≈ 0.6–0.8× true (SPS30 reads high, κ 0.4 over-corrects). Add a `pm25_scale` next to the spec's `pm10_scale` so co-location can fit it? (ADR 0007)
 0. **OpenAQ API key needed** (free: explore.openaq.org → Settings). Put `OPENAQ_API_KEY=...` in `.env`, then run `uv run python -m aqi_ml.data.build all` (up to ≈ 40 stations × 16 params × 96 months ≈ 60k requests; the 2000/h cap makes that ≤ ≈ 30 h, fewer when stations lack sensors; resumable — start with `--max-stations 2` to check).
 1. **AQI gap rule** (ADR 0003): the spec's literal rule ("previous band's B_hi as B_lo") gives up to ≈3.3 AQI points more than the official CPCB calculator just above a band start (PM2.5 61 → 104.3 vs 101). Implemented literally. Keep, or switch to the official integer breakpoints? (One-line change + fixture regen.)
 2. Resolved by default: PM2.5 = 250 → Very Poor (upper-inclusive); Severe upper limits 380 / 510; all breakpoints TODO_VERIFY against the official CPCB NAQI document.

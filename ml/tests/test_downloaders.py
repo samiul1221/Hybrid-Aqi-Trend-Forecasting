@@ -149,3 +149,40 @@ def test_open_meteo_rejects_local_time(tmp_path: Path) -> None:
     with pytest.raises(ValueError):
         open_meteo.fetch_hourly_utc(client(tmp_path, handler), "https://a/x", 28.6, 77.2,
                                     date(2024, 1, 1), date(2024, 1, 1), ["temperature_2m"])  # fmt: skip
+
+
+# ---- OpenAQ S3 archive (keyless) ----------------------------------------------------------
+
+
+def _day_file(rows: list[tuple[str, str, str, float]]) -> bytes:
+    import gzip
+
+    head = (
+        '"location_id","sensors_id","location","datetime","lat","lon","parameter","units","value"\n'
+    )
+    body = "".join(f'1,{sid},"X-1","{dt}",28.6,77.2,"{par}","{unit}",{v}\n' for sid, dt, par, unit, v in
+                   [("7", dt, par, unit, v) for dt, par, unit, v in rows])  # fmt: skip
+    return gzip.compress((head + body).encode("utf-8"))
+
+
+def test_archive_end_labels_and_unit_repair() -> None:
+    from aqi_ml.data import openaq_archive as oa
+
+    rows = [
+        (f"2025-11-10T{h:02d}:{m:02d}:00+05:30", "co", "ppb", 1.5)
+        for h in range(1, 3)
+        for m in (0, 15, 30, 45)
+    ]
+    df = oa.infer_periods(oa.parse_day(_day_file(rows)))
+    assert set(df.end - df.s) == {900}  # 15-min spacing -> 15-min periods ending at the timestamp
+    first = df.sort_values("end").iloc[0]
+    assert first.end == 1762716600  # 2025-11-10T01:00+05:30 = 2025-11-09T19:30Z
+    reps: list[dict] = []
+    out = oa.to_canonical(df, ["co"], reps)
+    assert out["co"][1].value.median() == pytest.approx(
+        1.5 * 24.45 / 28.01, rel=1e-3
+    )  # read as mg/m3
+    assert reps and reps[0]["label"] == "ppb" and reps[0]["used"] == "mg/m³"
+    nox = df.assign(parameter="nox", value=0.058)
+    got = oa.to_canonical(nox, ["nox"], [])["nox"][1].value.median()
+    assert got == pytest.approx(58.0, rel=1e-3)  # ppm-labelled-as-ppb slip, keeps NOx >= NO2

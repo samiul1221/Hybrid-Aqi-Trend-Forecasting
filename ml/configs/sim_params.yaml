@@ -1,0 +1,111 @@
+# Physics-based sensor simulator parameters [S10]. Every value cites a source key explained in
+# docs/research_notes/simulator_parameters.md. Deviations from [S10.3] are listed in ADR 0007.
+# dist: {u: [lo, hi]} uniform | {ln: [median, sigma]} lognormal | {const: x}
+version: sim-v1
+
+seed: 20260926
+units_per_station: 3                 # [S10.2]
+splits:                              # [S10.2] adjusted to archive availability (no 2023-2024; ADR 0006)
+  train: ["2018-01-01", "2021-12-31"]
+  val:   ["2022-01-01", "2022-12-31"]
+  test:  ["2025-01-01", "2026-08-31"]
+spatial_holdout_stations: 5          # [S10.2]; chosen by seed among stations with PM2.5 coverage >= 50 %
+min_station_pm25_hours: 8760         # stations with less PM2.5 truth are not simulated
+
+truth:                               # atmosphere-side inputs (same for every unit at a station)
+  gas_interp_max_gap_h: 3            # longer gaps -> station month x IST-hour median climatology (flagged)
+  kappa_aer:                         # aerosol hygroscopicity, time-varying (not a unit property)
+    mean: 0.30                       # [Mandariya2024] 150-200 nm 0.18-0.22 (mass-relevant larger); [Arub2020] PM1 0.13-0.77
+    sd: 0.10
+    clip: [0.05, 0.77]
+    decorrelation_h: 48              # TODO_VERIFY: synoptic-scale composition changes
+  dust_fine_fraction: {const: 0.25}  # PM2.5 share of dust mass per unit coarse mass, TODO_VERIFY (typical 0.2-0.35)
+  voc_ppb_background: {const: 20}    # ethanol-equivalent background for SGP41, TODO_VERIFY
+  voc_per_co: {u: [0.03, 0.10]}      # ppb VOC per ppb CO, per station [Baker2008] NMHC/CO emission ratios, TODO_VERIFY
+  h2_background_ppm: 0.53            # [Novelli1999] tropospheric H2; MQ reducing-gas background
+
+sps30:                               # PM [Sensirion SPS30 datasheet v0.9], ADR 0007
+  scale_s: {u: [1.15, 1.55]}         # jointly calibrated with internal_dt_c to [IITD2025] Delhi winter hourly
+                                     # SPS30 vs BAM: slope 1.46-1.86, R2 0.91-0.92 (see sim data card); [SCAQMD] ~1.45
+  internal_dt_c: {u: [1.5, 3.5]}     # sensing volume warmer than ambient (fan+electronics+housing) -> lower RH
+                                     # at the particles; without it R2 = 0.65 << field 0.91. TODO_VERIFY on a node
+  aw_max_true: 0.97                  # droplet growth limit for the forward model (device clamps 0.95)
+  dust_efficiency: {u: [0.20, 0.40]} # [Gautam2025] dust-storm slope ~0.29 (TODO_VERIFY: page-query value)
+  pm10_fine_ext_q: {u: [0.02, 0.10]} # SPS30 derives PM10 from fine bins [Kuula2020]
+  coarse_visibility_f: {u: [0.05, 0.25]}   # [Kuula2020] bins 2-4 respond only to 0.7-1.3 um; [SCAQMD] PM10 R2 0.07
+  pm1_ratio_r: {u: [0.75, 0.95]}     # TODO_VERIFY on first real week
+  noise_rel: 0.05                    # [S10.3] N(0, 0.05 PM + 1)
+  noise_abs: 1.0
+  rh95_bias: {u: [0.0, 0.20]}        # [S10.3] extra positive bias when RH > 95 %
+  clip: [0, 1000]                    # datasheet range
+  random_missing_frac: 0.01          # [S10.3]
+  outages_per_year: 1                # [S10.3]
+  outage_hours: {u: [6, 48]}
+
+hdc1080:                             # T/RH [TI HDC1080 datasheet: +-0.2 C, +-2 %RH typ]
+  t_bias: {u: [-0.5, 0.5]}           # [S10.3]
+  t_noise: 0.3
+  rad_coeff_c: {u: [1.0, 2.5]}       # dT = c * SW/1000 / (1 + ws_local); [NakamuraMahrt2005] 0.5-2.5 C
+  rh_bias: {u: [-2.0, 2.0]}          # datasheet
+  rh_noise: 2.0                      # [S10.3]
+
+bmp280:                              # pressure [Bosch BMP280: abs +-1 hPa, rel +-0.12 hPa]
+  bias: {u: [-1.0, 1.0]}
+  noise: 0.1
+  mount_height_m: {u: [3, 25]}       # rooftop above ground; -1 hPa per 8.3 m (hydrostatic)
+
+wind:                                # cup anemometer + vane [S10.3]
+  shelter_k: {u: [0.4, 1.0]}         # rooftop sheltering vs 10 m, TODO_VERIFY per site (registry)
+  speed_noise: 0.3
+  stall_ms: 0.3
+  dir_noise_deg: 15
+  dir_offset_deg: {u: [-15, 15]}     # vane north-alignment error at install, TODO_VERIFY
+
+rain:                                # resistive rain board [S10.3]
+  wet_mm_h: 0.1
+  dry_hours: {u: [1, 2]}
+  false_wet_p: 0.02
+  false_wet_rh: 90
+
+bh1750:                              # lux [ROHM BH1750FVI: 1-65535 lx, accuracy x1.2 +-20 %]
+  efficacy_lm_per_w: 108             # [Littlefair1985] ~105; [Li1997] 110.7 yearly mean
+  gain_g: {u: [0.6, 1.2]}            # [S10.3] mounting/shading
+  pm_beta: {u: [0.0, 0.2]}           # [S10.3] extra aerosol dimming per 100 ug/m3
+  noise: 50
+  clip: [0, 121557]                  # [S06.1] firmware lowers MTreg on saturation: lx = counts/1.2*69/MTreg,
+                                     # MTreg=31 -> 65535/1.2*69/31 = 121557 lx (TODO_VERIFY on the board)
+
+mq7:                                 # [Winsen MQ-7 v1.3], [Hanwei MQ-7]; ln Rs model, ADR 0007
+  r0_ohm: {ln: [20000, 0.5]}         # Hanwei Rs 2-20 kOhm @100 ppm -> sigma ~0.5
+  b: {u: [-0.70, -0.45]}             # Winsen Fig.3 slope ~-0.5; Hanwei Fig.3 50->4000 ppm ~-0.66
+  c0_ppm: {u: [0.3, 1.0]}            # equivalent reducing-gas background (H2 ~0.53 ppm, similar MQ-7 H2 curve)
+  g_t: {u: [-0.016, -0.007]}         # Winsen Fig.4: ~-0.011 ln/°C
+  g_rh: {u: [-0.008, -0.003]}        # Winsen Fig.4: ~-0.005 ln/%RH
+  drift_per_day: {u: [-0.001, 0.001]}   # [S10.3] (datasheet Fig.7 suggests less; field worse)
+  noise: 0.05
+
+mq135:                               # [Winsen MQ135 v1.4]
+  r0_ohm: {ln: [30000, 0.5]}
+  b: {u: [-0.55, -0.40]}             # Fig.3: H2 -0.48, NH3 -0.48, toluene -0.43
+  w_co: {u: [0.1, 0.5]}              # CO weak vs H2/NH3 (not in datasheet curves), TODO_VERIFY
+  w_voc: {u: [0.5, 1.5]}             # VOC in ppm ethanol-eq
+  c0_ppm: {u: [0.3, 1.0]}
+  g_ox: {u: [0.0, 0.15]}             # oxidising NO2 RAISES n-type SnO2 resistance (ADR 0007), TODO_VERIFY
+  g_t: {u: [-0.016, -0.007]}         # Fig.4 same shape as MQ-7
+  g_rh: {u: [-0.008, -0.003]}
+  drift_per_day: {u: [-0.001, 0.001]}
+  noise: 0.05
+
+sgp41:                               # [Sensirion SGP41 datasheet v1.0]
+  voc_base: {u: [25000, 35000]}      # [S10.3], TODO_VERIFY first real week
+  voc_k: {u: [1040, 1507]}           # Table 1: -710..-1030 ticks per doubling over 5000->10000 ppb -> /ln(101/51)
+  voc_v0_ppb: {const: 100}           # TODO_VERIFY: response knee below datasheet range
+  voc_k_ox: {u: [0, 700]}            # Fig.2: VOC pixel rises ~+1700 ticks at 500 ppb NO2/O3, TODO_VERIFY
+  voc_noise: 50                      # [S10.3]
+  nox_base: {u: [14000, 17000]}      # [S16.2] example 15100-15620, TODO_VERIFY
+  nox_k: {u: [1437, 3039]}           # Table 1: +950..+2010 per doubling over 150->300 ppb NO2 -> /ln(31/16) (spec 200-800 too low)
+  nox_n0_ppb: {const: 10}            # TODO_VERIFY
+  nox_w_o3: {u: [2.0, 5.0]}          # Fig.3: O3 ~2 doublings above NO2 at equal ppb
+  nox_noise: 30                      # [S10.3]
+  drift_ticks_per_day: {u: [-5, 5]}  # TODO_VERIFY
+  clip: [0, 65535]

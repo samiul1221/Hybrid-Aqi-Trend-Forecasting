@@ -70,7 +70,9 @@ def fetch_hourly_utc(
         h = data["hourly"]
         df = pd.DataFrame({k: h[k] for k in hourly}, dtype=float)
         # resolution-independent epoch seconds (pandas 3 infers second resolution here)
-        epoch = (pd.to_datetime(h["time"], utc=True) - pd.Timestamp(0, tz="UTC")) // pd.Timedelta("1s")
+        epoch = (pd.to_datetime(h["time"], utc=True) - pd.Timestamp(0, tz="UTC")) // pd.Timedelta(
+            "1s"
+        )
         df.insert(0, "epoch", epoch.astype("int64"))
         frames.append(df)
     return pd.concat(frames, ignore_index=True).drop_duplicates("epoch").sort_values("epoch")
@@ -104,9 +106,7 @@ def to_ist(df: pd.DataFrame, accumulated: list[str]) -> pd.DataFrame:
     return out.reset_index()
 
 
-def elevations(
-    client: CachedClient, url: str, coords: list[tuple[float, float]]
-) -> list[float]:
+def elevations(client: CachedClient, url: str, coords: list[tuple[float, float]]) -> list[float]:
     """Elevation (m) per (lat, lon) from the Open-Meteo elevation API (<= 100 per call)."""
     out: list[float] = []
     for i in range(0, len(coords), 100):

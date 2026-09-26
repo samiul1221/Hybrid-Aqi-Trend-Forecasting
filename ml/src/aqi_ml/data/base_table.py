@@ -10,9 +10,9 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from aqi_shared.time_utils import HOUR_S, IST_OFFSET_S
 
 from aqi_ml.data.align import wind_speed_dir
+from aqi_shared.time_utils import HOUR_S, IST_OFFSET_S
 
 POLLUTANTS = ["pm25", "pm10", "pm1", "no2_ppb", "no_ppb", "nox_ppb", "o3_ppb", "so2_ppb",
               "nh3_ppb", "co_ppm", "benzene_ugm3"]  # fmt: skip
@@ -57,7 +57,9 @@ def _source(stn_ok: pd.Series, om_ok: pd.Series) -> pd.Series:
     return src
 
 
-def _pick(stn: pd.Series | None, om: pd.Series, lo: float, hi: float) -> tuple[pd.Series, pd.Series]:
+def _pick(
+    stn: pd.Series | None, om: pd.Series, lo: float, hi: float
+) -> tuple[pd.Series, pd.Series]:
     """Station value when present and plausible, else Open-Meteo. Returns (value, source)."""
     if stn is None:
         return om, _source(pd.Series(False, index=om.index), om.notna())

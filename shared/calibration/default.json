@@ -1,0 +1,13 @@
+{
+  "_doc": "Single calibration source (I06). Default until co-location [S11.2] fits kappa/R_dust. ADR 0007.",
+  "version": "default-kappa-0.4-rdust-0.5-v1",
+  "kappa": 0.4,
+  "kappa_source": "spec [S06.4] default; Delhi HTDMA kappa 0.05-0.56 (Mandariya et al. 2024 ACP), PM1 0.13-0.77 (Arub et al. 2020) - fit on co-location",
+  "aw_max": 0.95,
+  "pm10_scale": 1.0,
+  "R_dust": 0.5,
+  "R_dust_source": "spec default 1.5 is unreachable for SPS30 (coarse invisible; dust-storm PM10/PM2.5 ~1.6, Gautam et al. 2025) - tune on co-location",
+  "dust_rh_max": 60,
+  "high_humidity_rh": 95,
+  "scope": "global"
+}

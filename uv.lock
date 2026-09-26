@@ -94,11 +94,17 @@ name = "aqi-shared"
 version = "0.1.0"
 source = { editable = "shared" }
 dependencies = [
+    { name = "numpy" },
+    { name = "pandas" },
     { name = "pyyaml" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "pyyaml", specifier = "==6.0.3" }]
+requires-dist = [
+    { name = "numpy", specifier = "==2.4.6" },
+    { name = "pandas", specifier = "==3.0.6" },
+    { name = "pyyaml", specifier = "==6.0.3" },
+]
 
 [[package]]
 name = "ast-serialize"

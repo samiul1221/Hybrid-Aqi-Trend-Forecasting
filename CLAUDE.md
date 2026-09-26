@@ -74,10 +74,15 @@ bash scripts/lint.sh                         # ruff check + ruff format --check 
 bash scripts/build-firmware.sh               # arduino-cli compile, FQBN esp32:esp32:esp32s3:PSRAM=opi,FlashSize=16M
 uv run python shared/codegen/gen_c_headers.py        # regenerate firmware headers after editing feature_schema.yaml or cpcb_breakpoints.json
 uv run python shared/fixtures/make_fixtures.py       # regenerate AQI/IST fixtures; review the JSON diff (a changed value = behaviour change)
-uv run python -m aqi_ml.data.build all --max-stations 2   # data pipeline [S09]: stations|openaq|weather|hforecast|base|card|all (needs OPENAQ_API_KEY in .env)
+uv run python -m aqi_ml.data.build all-archive          # keyless CPCB (OpenAQ S3) -> weather -> base table -> data card (resumable; ADR 0006)
+uv run python -m aqi_ml.data.build all --max-stations 2 # same via the OpenAQ API (needs OPENAQ_API_KEY in .env)
+uv run python -m aqi_ml.sim.virtual                     # simulator [S10] -> data/synthetic/<version>/ (records, units, manifest)
+uv run python -m aqi_ml.sim.validate                    # sim data card: SPS30 vs Delhi field calibration + signal checks
 ```
 
-Data: config `ml/configs/data.yaml`; HTTP responses cached under `data/raw/cache/` (delete to refetch); base table `data/processed/base_table/station_id=*/`. Always request Open-Meteo with `timezone=GMT` — its Asia/Kolkata mode mislabels half-hour offsets (ADR 0005). pandas is 3.x: never convert datetimes with `astype(int64) // 10**9` (resolution may be seconds).
+Data: config `ml/configs/data.yaml`; HTTP responses cached under `data/raw/cache/` (delete to refetch); base table `data/processed/base_table/station_id=*/`. Always request Open-Meteo with `timezone=GMT` — its Asia/Kolkata mode mislabels half-hour offsets (ADR 0005). pandas is 3.x: never convert datetimes with `astype(int64) // 10**9` (resolution may be seconds). Never use naive `datetime(...).timestamp()` (uses the PC's timezone).
+
+Simulator: parameters only in `ml/configs/sim_params.yaml` (sources: `docs/research_notes/simulator_parameters.md`, deviations: ADR 0007). Hourly on-device processing (humidity correction, dust flag, baselines, flag bits) lives in `aqi_shared.pipeline`; calibration in `shared/calibration/default.json`. After changing physics, rerun `sim.validate` and keep the SPS30 winter slope inside the IIT-Delhi range.
 
 Single sources: CPCB table `shared/src/aqi_shared/aqi/cpcb_breakpoints.json`; features `shared/schema/feature_schema.yaml` (hash = canonical JSON of parsed YAML); contracts `shared/contracts/*.schema.json` with golden payloads in `shared/fixtures/contract_examples.json`. Generated `*.gen.h` files are committed; a test fails if they are stale.
 
