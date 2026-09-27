@@ -221,7 +221,9 @@ def test_archive_sparse_quarter_hour_snapshots() -> None:
     from aqi_ml.data import openaq_archive as oa
     from aqi_ml.data.openaq import station_to_ist
 
-    rows = [(f"2022-01-01T{h:02d}:15:00+05:30", "pm25", "µg/m³", 100.0 + h) for h in range(0, 24, 2)]
+    rows = [
+        (f"2022-01-01T{h:02d}:15:00+05:30", "pm25", "µg/m³", 100.0 + h) for h in range(0, 24, 2)
+    ]
     df = oa.infer_periods(oa.parse_day(_day_file(rows)))
     assert set(df.end - df.s) == {900}
     wide, _ = station_to_ist(oa.to_canonical(df, ["pm25"]), 0.25)

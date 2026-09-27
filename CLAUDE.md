@@ -90,7 +90,7 @@ Features (ADR 0008): `aqi_ml.features.builder` is the reference for firmware; `f
 
 Single sources: CPCB table `shared/src/aqi_shared/aqi/cpcb_breakpoints.json`; features `shared/schema/feature_schema.yaml` (hash = canonical JSON of parsed YAML); contracts `shared/contracts/*.schema.json` with golden payloads in `shared/fixtures/contract_examples.json`. Generated `*.gen.h` files are committed; a test fails if they are stale.
 
-Firmware pure-logic code in `edge/firmware/aqi_node/src/{pipeline,aqi,features,models,decision}/` must not include Arduino headers, so host tests can compile it.
+Firmware pure-logic code in `edge/firmware/aqi_node/src/{pipeline,aqi,features,models,decision}/` must not include Arduino headers, so host tests can compile it. Every GPIO number, I2C address and bus/electrical constant lives in `edge/firmware/aqi_node/src/config/pins.h` ([S04.2]/[S04.3]); drivers include it and never hard-code pins (`test_host/test_pins.cpp` checks forbidden/duplicate pins and ADC1-only analog inputs).
 
 ## Working rules
 
