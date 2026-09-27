@@ -6,12 +6,14 @@ requires-python = ">=3.11,<3.12"
 dependencies = [
     "aqi-shared",
     "httpx==0.28.1",
+    "lightgbm==4.7.0",
     "numpy==2.4.6",
     "pandas==3.0.6",
     "pyarrow==25.0.1",
     "pyyaml==6.0.3",
     "scikit-learn==1.9.1",
     "scipy==1.17.1",
+    "tensorflow==2.21.0",
 ]
 
 [tool.uv.sources]
