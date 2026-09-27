@@ -91,6 +91,8 @@ def merge_station(
     out = pd.DataFrame(index=idx)
     for c in POLLUTANTS:
         out[c] = a[c] if c in a else np.nan
+    for c in ("pm25_cov", "pm10_cov"):
+        out[c] = a[c].where(out[c.removesuffix("_cov")].notna()) if c in a else np.nan
     out["t"], out["t_src"] = _pick(a.get("t_stn"), w.t2m, *pl["t"])
     out["rh"], out["rh_src"] = _pick(a.get("rh_stn"), w.rh2m, *pl["rh"])
     out["p"], out["p_src"] = _pick(a.get("p_stn"), w.sp, *pl["p"])

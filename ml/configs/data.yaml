@@ -52,7 +52,10 @@ cleaning:                               # [S09] base_table_build
   pm25_max: 1500
   pm25_over_pm10_max: 1.05
   flatline_hours: 6
-  min_bucket_coverage: 0.75             # fraction of an IST hour covered by source data
+  min_bucket_coverage: 0.25             # fraction of an IST hour covered by source data. 0.25 = one CPCB
+                                        # 15-min value: CPCB PM is a BAM hourly value repeated over its
+                                        # 15-min slots, and 2021-22 holds only 15-min snapshots (ADR 0006).
+                                        # Coverage is kept as pm25_cov / pm10_cov in the base table.
   plausible:                            # CPCB met accepted if inside, else Open-Meteo is used
     t: [-5, 50]
     rh: [1, 100]

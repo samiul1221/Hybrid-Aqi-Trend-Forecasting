@@ -29,3 +29,14 @@ No OpenAQ API key was available. OpenAQ also publishes its data on AWS
    The API path (P3) can fill 2023–2024 later with a key; nothing else changes.
 6. Memory: a full run with 16 workers was stopped by the OS for low memory; the step now uses compact
    dtypes, 8 workers and resumes per station.
+
+## Addendum (2026-09-27): 15-min snapshots and coverage
+- 2021-2022 files hold **one 15-min value every ~2 h** (labels :15). Inferring the period from the
+  spacing (2 h, capped at 1 h) plus a 0.75 hour-coverage rule dropped almost all of 2021-22 (2022, the
+  validation year, came out empty). Now: a label that is not a full IST hour is a native 15-min value;
+  full-hour labels use the sensor's modal spacing. Minimum hour coverage is 0.25 (one 15-min value) —
+  CPCB PM is a BAM hourly value repeated over its 15-min slots, so one slot represents the hour.
+  `pm25_cov`/`pm10_cov` (0.25-1.0) are kept in the base table; ~19 % of PM hours have coverage 0.25.
+- Result: PM2.5 station-hours per year 2018: 47k, 2019: 101k, 2020: 127k, 2021: 72k, 2022: 42k,
+  2025: 182k, 2026 (to Aug): 137k. Punjabi Bagh, Pusa and R K Puram only have spring 2018 data and
+  are below the simulator's minimum (8760 PM hours).

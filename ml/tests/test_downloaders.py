@@ -214,3 +214,16 @@ def test_archive_end_labels_and_unit_repair() -> None:
     nox = df.assign(parameter="nox", value=0.058)
     got = oa.to_canonical(nox, ["nox"], [])["nox"][1].value.median()
     assert got == pytest.approx(58.0, rel=1e-3)  # ppm-labelled-as-ppb slip, keeps NOx >= NO2
+
+
+def test_archive_sparse_quarter_hour_snapshots() -> None:
+    """2021-22 CPCB feed: one 15-min value every ~2 h labelled :15 -> 15-min periods, not 2 h."""
+    from aqi_ml.data import openaq_archive as oa
+    from aqi_ml.data.openaq import station_to_ist
+
+    rows = [(f"2022-01-01T{h:02d}:15:00+05:30", "pm25", "µg/m³", 100.0 + h) for h in range(0, 24, 2)]
+    df = oa.infer_periods(oa.parse_day(_day_file(rows)))
+    assert set(df.end - df.s) == {900}
+    wide, _ = station_to_ist(oa.to_canonical(df, ["pm25"]), 0.25)
+    assert len(wide) == 12 and wide.pm25_cov.eq(0.25).all()  # one quarter of each hour covered
+    assert wide.pm25.tolist()[:2] == [100.0, 102.0]

@@ -9,7 +9,8 @@ splits:                              # [S10.2] adjusted to archive availability 
   train: ["2018-01-01", "2021-12-31"]
   val:   ["2022-01-01", "2022-12-31"]
   test:  ["2025-01-01", "2026-08-31"]
-spatial_holdout_stations: 5          # [S10.2]; chosen by seed among stations with PM2.5 coverage >= 50 %
+spatial_holdout_stations: 5          # [S10.2]; chosen by seed among stations with >= holdout_min_pm25_hours
+holdout_min_pm25_hours: 20000
 min_station_pm25_hours: 8760         # stations with less PM2.5 truth are not simulated
 
 truth:                               # atmosphere-side inputs (same for every unit at a station)

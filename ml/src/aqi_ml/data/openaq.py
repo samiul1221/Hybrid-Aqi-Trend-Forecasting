@@ -153,6 +153,8 @@ def station_to_ist(raw: dict[str, tuple[str, pd.DataFrame]], min_coverage: float
         a = intervals_to_ist(s, e, v)
         a = a[a.coverage >= min_coverage]
         cols.append(a.set_index("bucket")["value"].rename(CANONICAL[param][0]))
+        if param in ("pm25", "pm10"):  # label quality: share of the hour covered by source data
+            cols.append(a.set_index("bucket")["coverage"].rename(f"{param}_cov"))
     if "wind_speed" in raw and "wind_direction" in raw:
         (u_ws, ws), (_, wd) = raw["wind_speed"], raw["wind_direction"]
         m = ws.merge(wd, on=["s", "e"], suffixes=("_ws", "_wd")).dropna()

@@ -188,7 +188,17 @@ def _hash_dir(path: Path) -> str:
     return "sha256:" + h.hexdigest()
 
 
-def build(max_stations: int | None = None, cfg_path: Path = sp.SIM_PARAMS) -> Path:
+def _unit_row(sid: str, u: int, truth: pd.DataFrame, p: dict[str, dict[str, Any]],
+              holdout: list[str]) -> dict[str, Any]:  # fmt: skip
+    return {"node_id": f"v-{sid}-{u}", "station_id": sid, "unit": u,
+            "voc_per_co": truth.attrs["voc_per_co"], "holdout": sid in holdout,
+            **{f"{s}.{k}": v for s, d in p.items() for k, v in d.items() if isinstance(v, int | float)}}  # fmt: skip
+
+
+def build(
+    max_stations: int | None = None, cfg_path: Path = sp.SIM_PARAMS, force: bool = False
+) -> Path:
+    """Simulate every eligible station; resumes (skips unit shards that already exist) unless force."""
     cfg = sp.load(cfg_path)
     cal = pl.load_calibration()
     base_cols = ["station_id", "ts", "ist_hour", "pm25", "pm10", *GASES, "t", "rh", "td", "p", "wind_u",
@@ -199,8 +209,8 @@ def build(max_stations: int | None = None, cfg_path: Path = sp.SIM_PARAMS) -> Pa
     counts = base.groupby("station_id").pm25.count()
     stations = sorted(counts[counts >= cfg["min_station_pm25_hours"]].index)
     rng0 = np.random.default_rng(cfg["seed"])
-    cov = base.groupby("station_id").pm25.apply(lambda s: s.notna().mean())
-    eligible = [s for s in stations if cov[s] >= 0.5]
+    # hold-out candidates: well-covered stations (full-period share is low because of the 2023-24 gap)
+    eligible = [s for s in stations if counts[s] >= cfg["holdout_min_pm25_hours"]]
     holdout = sorted(rng0.choice(eligible, size=min(cfg["spatial_holdout_stations"], len(eligible)),
                                  replace=False).tolist())  # fmt: skip
     if max_stations:
@@ -221,20 +231,20 @@ def build(max_stations: int | None = None, cfg_path: Path = sp.SIM_PARAMS) -> Pa
         for u in range(cfg["units_per_station"]):
             rng = sp.unit_rng(cfg["seed"], sid, u)
             p = sp.draw_unit(cfg, rng)
+            part = out / "records" / f"station_id={sid}" / f"unit={u}"
+            if (part / "part-0.parquet").exists() and not force:
+                units_rows.append(_unit_row(sid, u, truth, p, holdout))
+                continue
             rec = pd.concat([simulate_unit(tr.reset_index(drop=True), p, cfg, cal, rng, truth.ts.iloc[0])
                              for _, tr in truth.groupby(segment)], ignore_index=True)  # fmt: skip
             rec.insert(0, "node_id", f"v-{sid}-{u}")
             rec["split"] = _split(rec.ts, cfg["splits"])
             rec["spatial_holdout"] = sid in holdout
             rec["calibration_version"] = cal["version"]
-            part = out / "records" / f"station_id={sid}" / f"unit={u}"
             part.mkdir(parents=True, exist_ok=True)
             rec.to_parquet(part / "part-0.parquet", index=False)
-            units_rows.append({"node_id": f"v-{sid}-{u}", "station_id": sid, "unit": u,
-                               "voc_per_co": truth.attrs["voc_per_co"], "holdout": sid in holdout,
-                               **{f"{s}.{k}": v for s, d in p.items() for k, v in d.items()
-                                  if isinstance(v, int | float)}})  # fmt: skip
-        print(f"{sid}: {len(df)} hours x {cfg['units_per_station']} units")
+            units_rows.append(_unit_row(sid, u, truth, p, holdout))
+        print(f"{sid}: {len(df)} hours x {cfg['units_per_station']} units", flush=True)
     pd.DataFrame(units_rows).to_parquet(out / "units.parquet", index=False)
     manifest = {
         "sim_version": cfg["version"], "sim_params_hash": cfg["_hash"], "seed": cfg["seed"],
@@ -249,8 +259,9 @@ def build(max_stations: int | None = None, cfg_path: Path = sp.SIM_PARAMS) -> Pa
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(prog="aqi_ml.sim.virtual")
     ap.add_argument("--max-stations", type=int, default=None)
+    ap.add_argument("--force", action="store_true", help="re-simulate existing shards")
     a = ap.parse_args(argv)
-    print(f"wrote {build(a.max_stations)}")
+    print(f"wrote {build(a.max_stations, force=a.force)}")
 
 
 if __name__ == "__main__":

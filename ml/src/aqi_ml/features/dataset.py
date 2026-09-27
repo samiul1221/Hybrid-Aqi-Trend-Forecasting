@@ -38,7 +38,9 @@ def _node_seed(seed: int, node_id: str) -> int:
     return int(hashlib.sha256(f"{seed}/{node_id}".encode()).hexdigest()[:16], 16)
 
 
-def build(cfg: dict[str, Any] | None = None, max_nodes: int | None = None) -> Path:
+def build(
+    cfg: dict[str, Any] | None = None, max_nodes: int | None = None, force: bool = False
+) -> Path:
     cfg = cfg or load_config()
     schema = load_schema()
     src = ROOT / "data" / "synthetic" / cfg["source"]
@@ -49,14 +51,22 @@ def build(cfg: dict[str, Any] | None = None, max_nodes: int | None = None) -> Pa
         parts = parts[:max_nodes]
     counts = []
     for part in parts:
+        node = f"v-{part.parent.parent.name.split('=', 1)[1]}-{part.parent.name.split('=', 1)[1]}"
+        d = out / f"node_id={node}"
+        if (d / "windows_b.parquet").exists() and not force:  # resume
+            wa, wb = (
+                pd.read_parquet(d / "windows_a.parquet", columns=["row"]),
+                pd.read_parquet(d / "windows_b.parquet", columns=["source"]),
+            )
+            counts.append({"node_id": node, "hours": None, "windows_a": len(wa), "windows_b": len(wb),
+                           "windows_b_outage": int((wb.source == "outage").sum())})  # fmt: skip
+            continue
         rec = pd.read_parquet(part)
-        node = str(rec.node_id.iloc[0])
         nf = build_node(
             rec, schema, (rec.truth_pm25.to_numpy(float), rec.truth_pm10.to_numpy(float)), cfg
         )
         wa = windows_a(nf, schema)
         wb = build_model_b(nf, schema, np.random.default_rng(_node_seed(cfg["seed"], node)))
-        d = out / f"node_id={node}"
         d.mkdir(parents=True, exist_ok=True)
         nf.hourly.to_parquet(d / "hourly.parquet", index=False)
         wa.to_parquet(d / "windows_a.parquet", index=False)

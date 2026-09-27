@@ -80,14 +80,24 @@ def parse_day(blob: bytes) -> pd.DataFrame:
     return df
 
 
+QUARTER_S = 900
+
+
 def infer_periods(df: pd.DataFrame) -> pd.DataFrame:
-    """Add start 's' per row: period = modal spacing of that sensor's timestamps (<= 1 h)."""
+    """Add start 's' per row (labels are period ENDS).
+
+    A label that is not a full IST hour (e.g. :15, :30, :45) is a CPCB native 15-min value; this also
+    covers the 2021-2022 feed, which holds one 15-min snapshot every ~2 h (ADR 0006). Full-hour labels
+    use the sensor's modal spacing (15 min for 15-min series, 1 h for hourly series), capped at 1 h.
+    """
     out = []
     for _, g in df.sort_values("end").groupby("sensors_id", observed=True):
-        steps = np.diff(np.unique(g.end.to_numpy()))
+        end = g.end.to_numpy(np.int64)
+        steps = np.diff(np.unique(end))
         step = int(pd.Series(steps).mode().iloc[0]) if len(steps) else MAX_PERIOD_S
-        step = min(step, MAX_PERIOD_S)
-        out.append(g.assign(s=g.end - step))
+        step = min(max(step, QUARTER_S), MAX_PERIOD_S)
+        full_hour = (end + 19800) % 3600 == 0
+        out.append(g.assign(s=np.where(full_hour, end - step, end - QUARTER_S)))
     return pd.concat(out, ignore_index=True) if out else df.assign(s=pd.Series(dtype="int64"))
 
 

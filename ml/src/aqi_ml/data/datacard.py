@@ -62,7 +62,8 @@ def summarise(base: pd.DataFrame) -> dict[str, pd.DataFrame]:
 
 
 def write_card(cfg: dict[str, Any]) -> None:
-    base = pd.read_parquet(cfg["paths"]["base_table"])
+    cols = ["station_id", "ts", *POLLUTANTS, *WEATHER, "t_src", "rh_src", "p_src", "wind_src"]
+    base = pd.read_parquet(cfg["paths"]["base_table"], columns=cols)  # subset keeps memory bounded
     base["station_id"] = base.station_id.astype(str)
     st = pd.read_parquet(cfg["paths"]["interim"] / "stations.parquet").set_index("station_id")
     interim = cfg["paths"]["interim"]
