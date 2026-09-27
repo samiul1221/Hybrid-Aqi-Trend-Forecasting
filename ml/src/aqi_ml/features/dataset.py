@@ -83,42 +83,68 @@ def build(
 
 
 def load(root: Path, model: str, split: str | None = None, holdout: bool | None = None,
-         schema: FeatureSchema | None = None) -> dict[str, Any]:  # fmt: skip
-    """Materialise one model's training arrays.
+         schema: FeatureSchema | None = None, seq: bool = True, labels: bool = False,
+         fraction: float = 1.0, seed: int = 0) -> dict[str, Any]:  # fmt: skip
+    """Materialise one model's arrays.
 
-    Returns X_seq [N x 24 x C] (C = 23 for A, 17 for B), M_seq masks, X_rf [N x 50|32], y [N x 6],
-    X_extra [N x 5] (B only) and the window index frame. `split` in {train, val, test}; `holdout`
-    filters spatial hold-out stations (True = only hold-out, False = exclude them).
+    Returns X_rf [N x 50|32], y [N x 6], index (node_id, row, base_ts, split[, k, source]);
+    with seq: X_seq [N x 24 x C] (C = 23 for A, 17 for B) and M_seq masks; X_extra [N x 5] for B.
+    With labels: pm_base [N x 2] label PM at the target base hour (t for A, t-k for B), pm_hist
+    [N x 24 x 2] label PM of the input window, pm_hist_ok [N x 24], y_diurnal [N x 6] ([S13.0]).
+    `split` in {train, val, test}; `holdout` True = only hold-out stations, False = exclude them;
+    `fraction` < 1 keeps a seeded random subset of windows per node.
     """
+    from aqi_ml.models.edge.baselines import diurnal_persistence
+
     schema = schema or load_schema()
-    L = schema.lookback_hours
+    L, H = schema.lookback_hours, schema.horizons
     chans = [c.name for c in (schema.channels if model == "A" else schema.model_b_channels)]
     rf_names = schema.rf_names_a if model == "A" else schema.rf_names_b
-    xs, ms, frames = [], [], []
+    rng = np.random.default_rng(seed)
+    parts: dict[str, list[Any]] = {
+        k: [] for k in ("X_seq", "M_seq", "pm_base", "pm_hist", "pm_hist_ok", "y_diurnal")
+    }
+    frames = []
     for d in sorted(root.glob("node_id=*")):
         w = pd.read_parquet(d / f"windows_{model.lower()}.parquet")
         if split is not None:
             w = w[w.split == split]
         if holdout is not None:
             w = w[w.spatial_holdout == holdout]
+        if fraction < 1.0 and len(w):
+            w = w[rng.random(len(w)) < fraction]
         if w.empty:
             continue
-        h = pd.read_parquet(d / "hourly.parquet", columns=chans + [f"m_{c}" for c in chans])
-        v, m = h[chans].to_numpy(np.float32), h[[f"m_{c}" for c in chans]].to_numpy(np.uint8)
-        idx = w.row.to_numpy()[:, None] + np.arange(-L + 1, 1)[None, :]
-        xs.append(v[idx])
-        ms.append(m[idx])
+        rows = w.row.to_numpy()
+        idx = rows[:, None] + np.arange(-L + 1, 1)[None, :]
+        cols = (chans + [f"m_{c}" for c in chans] if seq else []) + (
+            ["target_pm25", "target_pm10", "ts"] if labels else []
+        )
+        h = pd.read_parquet(d / "hourly.parquet", columns=cols) if cols else None
+        if seq and h is not None:
+            parts["X_seq"].append(h[chans].to_numpy(np.float32)[idx])
+            parts["M_seq"].append(h[[f"m_{c}" for c in chans]].to_numpy(np.uint8)[idx])
+        if labels and h is not None:
+            lab = h[["target_pm25", "target_pm10"]].to_numpy(np.float64)
+            base_rows = rows - (w.k.to_numpy() if model == "B" else 0)
+            parts["pm_base"].append(lab[base_rows])
+            parts["pm_hist"].append(lab[idx])
+            parts["pm_hist_ok"].append(np.isfinite(lab[idx]).all(axis=2))
+            parts["y_diurnal"].append(diurnal_persistence(lab[:, 0], lab[:, 1], h.ts, H)[rows])
         frames.append(w.assign(node_id=d.name.split("=", 1)[1]))
     if not frames:
         raise ValueError("no windows matched")
     win = pd.concat(frames, ignore_index=True)
     out: dict[str, Any] = {
-        "X_seq": np.concatenate(xs),
-        "M_seq": np.concatenate(ms),
         "X_rf": win[[f"rf_{n}" for n in rf_names]].to_numpy(np.float32),
         "y": win[[f"y_{n}" for n in schema.output_order]].to_numpy(np.float32),
-        "index": win[["node_id", "base_ts", "split"] + (["k", "source"] if model == "B" else [])],
+        "index": win[
+            ["node_id", "row", "base_ts", "split"] + (["k", "source"] if model == "B" else [])
+        ],
     }
+    for k, v in parts.items():
+        if v:
+            out[k] = np.concatenate(v)
     if model == "B":
         out["X_extra"] = win[[f"xb_{n}" for n in schema.model_b_extra]].to_numpy(np.float32)
     return out

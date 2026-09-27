@@ -12,7 +12,7 @@ Last updated: 2026-09-26
 | P3 | Data downloaders + base table + data card | done — keyless OpenAQ S3 archive (33 stations) + Open-Meteo ERA5 (rate-limit safe); base table 2018–2022 + 2025–26; `docs/research_notes/data_card.md` (ADR 0005, 0006) |
 | P4 | Simulator with researched parameters + unit tests + virtual-node shards | done — 30 stations × 3 units = 90 virtual nodes, 4.05M unit-hours; SPS30 winter slope vs BAM median 1.64 (P10–P90 1.46–1.85) vs IIT-Delhi 1.46–1.86, R² 0.85; `sim_data_card.md` (ADR 0007) |
 | P5 | Python feature builder (golden fixtures) + target builder + Model B PM-dropout builder | done — `data/datasets/feat-v1`: 1.16M Model A / 1.09M Model B windows (3.3k real-outage); A: train 329k, val 22k, test 567k (+ hold-out stations); golden fixture for firmware (ADR 0008) |
-| P6 | Baselines + RF students A/B (no_KD) + [S21] metrics + emlearn export + host C parity < 1e-4 | todo |
+| P6 | Baselines + RF students A/B (no_KD) + [S21] metrics + emlearn export + host C parity < 1e-4 | done — RF-A 362 KB, parity 1.3e-7, test skill PM2.5 h1/h2/h3 +0.09/+0.13/+0.17 (hold-out stations +0.12/+0.14/+0.18), beats diurnal persistence; RF-B 232 KB, parity 1.4e-7, skill +0.17 vs last-valid persistence; own blob + C evaluator (ADR 0009); label Hampel cleaning |
 | P7 | GDC-CNN A/B per [S13.3]/[S13.4] + TFLite FP32 export + 1-block TFLM op check | todo |
 | P8 | teacher_store + interim LightGBM teacher + OOF + out_KD/full_KD + precondition check | todo |
 | P9 | ZenML pipelines wiring P3–P8 | todo |

@@ -46,6 +46,10 @@ files = ["shared/src", "ml/src"]
 module = "aqi_shared.*"
 strict = true
 
+[[tool.mypy.overrides]]  # third-party packages without type stubs
+module = ["sklearn.*", "joblib.*", "scipy.*", "lightgbm.*", "tensorflow.*", "keras.*", "zenml.*", "mlflow.*"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 testpaths = ["shared/tests", "ml/tests"]
 addopts = "--import-mode=importlib"

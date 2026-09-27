@@ -46,7 +46,38 @@ def clean(df: pd.DataFrame, cfg: dict[str, Any]) -> tuple[pd.DataFrame, dict[str
         flat = _flatline_mask(df[c], cfg["flatline_hours"])
         stats[f"{c}_flatline"] = int(flat.sum())
         df.loc[flat, c] = np.nan
+    if "pm10" in df:
+        big10 = df.pm10 > cfg["pm10_max"]
+        stats["pm10_over_max"] = int(big10.sum())
+        df.loc[big10, "pm10"] = np.nan
+    hp = cfg["hampel"]
+    for c in ("pm25", "pm10"):
+        if c in df:
+            out = hampel_mask(df[c], hp["window_h"], hp["k"], hp["mad_floor_ln"], hp["max_run_h"])
+            stats[f"{c}_hampel"] = int(out.sum())
+            df.loc[out, c] = np.nan
     return df, stats
+
+
+def hampel_mask(
+    s: pd.Series, window_h: int, k: float, mad_floor: float, max_run_h: int = 3
+) -> pd.Series:
+    """Hampel outliers on ln(1+x): centred window, |x - median| > k * max(1.4826 MAD, floor).
+
+    Cloud [C06] / Wu et al. 2026 parameters (24 h, k = 3); applied in log space with a MAD floor so
+    quiet periods are not over-flagged. Only flagged runs of <= max_run_h hours are removed (feed
+    glitches are short); longer runs are real episodes. Labels only (ADR 0009).
+    """
+    lg = np.log1p(s)
+    w = window_h + 1
+    med = lg.rolling(w, center=True, min_periods=6).median()
+    mad = (lg - med).abs().rolling(w, center=True, min_periods=6).median() * 1.4826
+    flag = ((lg - med).abs() > k * np.maximum(mad, mad_floor)).fillna(False)
+    # glitches are short: keep only flagged runs of <= max_run_h hours; longer runs are real episodes
+    run_id = (flag != flag.shift()).cumsum()
+    run_len = flag.groupby(run_id).transform("size")
+    out: pd.Series = flag & (run_len <= max_run_h)
+    return out
 
 
 def _source(stn_ok: pd.Series, om_ok: pd.Series) -> pd.Series:

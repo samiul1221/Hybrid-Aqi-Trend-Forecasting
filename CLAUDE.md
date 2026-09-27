@@ -80,6 +80,8 @@ uv run python -m aqi_ml.sim.virtual                     # simulator [S10] -> dat
 uv run python -m aqi_ml.sim.validate                    # sim data card: SPS30 vs Delhi field calibration + signal checks
 uv run python -m aqi_ml.features.dataset                # P5: records -> data/datasets/<version>/ (hourly + Model A/B windows)
 uv run python -m aqi_ml.features.golden                 # regenerate shared/fixtures/feature_golden (firmware twin target)
+uv run python -m aqi_ml.models.edge.rf.train --role A   # P6 RF student (resumable stages in data/models/<dataset>/rf-A/; --role B)
+uv run python scripts/rf_summary.py data/models/feat-v1/rf-A/meta.json   # skill vs persistence per horizon
 ```
 
 Data: config `ml/configs/data.yaml`; HTTP responses cached under `data/raw/cache/` (delete to refetch); base table `data/processed/base_table/station_id=*/`. Always request Open-Meteo with `timezone=GMT` — its Asia/Kolkata mode mislabels half-hour offsets (ADR 0005). pandas is 3.x: never convert datetimes with `astype(int64) // 10**9` (resolution may be seconds). Never use naive `datetime(...).timestamp()` (uses the PC's timezone).

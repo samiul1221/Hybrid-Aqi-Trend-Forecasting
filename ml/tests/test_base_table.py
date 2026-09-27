@@ -12,6 +12,8 @@ CFG = {
     "pm25_max": 1500,
     "pm25_over_pm10_max": 1.05,
     "flatline_hours": 6,
+    "pm10_max": 3000,
+    "hampel": {"window_h": 24, "k": 3, "mad_floor_ln": 0.2, "max_run_h": 3},
     "plausible": {"t": [-5, 50], "rh": [1, 100], "p": [850, 1100], "ws": [0, 30]},
 }
 B0 = 1704846600  # IST 2024-01-10 06:00
@@ -60,3 +62,16 @@ def test_datacard_summary() -> None:
     s = summarise(base)
     assert s["coverage"].loc["a", "pm25"] == 0.5 and s["coverage"].loc["b", "pm25"] == 1.0
     assert "winter" in s["pm25_season_q"].index
+
+
+def test_hampel_removes_spikes_keeps_episodes() -> None:
+    from aqi_ml.data.base_table import hampel_mask
+
+    base = pd.Series(80 + 10 * np.sin(np.arange(200) / 4))
+    spiky = base.copy()
+    spiky[50], spiky[120] = 2000.0, 1.0  # one-hour glitch up and dropout down
+    m = hampel_mask(spiky, 24, 3, 0.2)
+    assert m[50] and m[120] and m.sum() == 2
+    episode = base.copy()
+    episode[100:112] = 900.0  # a 12-hour real episode (e.g. Diwali night) is not a spike
+    assert not hampel_mask(episode, 24, 3, 0.2)[100:112].any()
