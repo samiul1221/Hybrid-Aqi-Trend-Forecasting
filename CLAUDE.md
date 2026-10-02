@@ -90,6 +90,7 @@ uv run python -m aqi_ml.data.build all --max-stations 2 # same via the OpenAQ AP
 uv run python -m aqi_ml.sim.virtual                     # simulator [S10] -> data/synthetic/<version>/ (records, units, manifest)
 uv run python -m aqi_ml.sim.validate                    # sim data card: SPS30 vs Delhi field calibration + signal checks
 uv run python -m aqi_ml.features.dataset                # P5: records -> data/datasets/<version>/ (hourly + Model A/B windows)
+uv run python -m aqi_ml.data.graph_windows            # N2: teacher graph grids data/graph/<version>/ (same hourly.parquet as the student, ADR 0019/0020)
 uv run python -m aqi_ml.features.golden                 # regenerate shared/fixtures/feature_golden (firmware twin target)
 uv run python -m aqi_ml.models.edge.rf.train --role A   # P6 RF student (resumable stages in data/models/<dataset>/rf-A/; --role B)
 uv run python scripts/rf_summary.py data/models/feat-v1/rf-A/meta.json   # skill vs persistence per horizon

@@ -2,7 +2,7 @@
 
 Last updated: 2026-10-02
 
-Active milestone: **N2 — owner: local session 2026-10-02** (CR v2 [R11]: claim here, release when done)
+Active milestone: **N3 — owner: local session 2026-10-02** (CR v2 [R11]: claim here, release when done)
 
 ## Phase-1 milestones
 
@@ -24,7 +24,7 @@ Active milestone: **N2 — owner: local session 2026-10-02** (CR v2 [R11]: claim
 |---|---|---|
 | N0 | Step 0: architecture review + ADRs | done — `docs/specs/architecture_review_v2.md` approved 2026-10-02 (I1–I25), ADRs 0012–0019, teacher input audit (ADR 0019) |
 | N1 | Cleanup (R05 moves/deletes, spec banners, docs) | done — LightGBM teacher → `baselines/lgbm_teacher`; LightGBM-teacher CNN KD runner removed; verify.py/lineage.py/e2_kd.md kept; banners on C08.3/.4/.5/.9, S12.2, S13.0; 164 tests green |
-| N2 | Graph window builder + leakage/sensor-domain guards + shards + card | todo |
+| N2 | Graph window builder + leakage/sensor-domain guards + shards + card | done — `data/graph/graph-v1`: 30 stations × 75,960 h × 3 units (0.8 GB, ADR 0020); per unit train/val/test base hours 19,289/2,761/12,560; G1 sensor-domain check 182 windows bit-equal; ERA5 oracle future weather (limitation); `research_notes/graph_data_card.md` |
 | N3 | TI-STGNN code + R07 unit tests + overfit test + walkthrough | todo |
 | N4 | Kaggle: datasets, T3 smoke, T0–T3, teacher-vs-S0 gate | todo |
 | N5 | OOF folds + teacher_store v2 | todo |
