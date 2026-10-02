@@ -140,6 +140,7 @@ much of that knowledge survives (T0–T3 × S0–S4). The spec's own wording (§
 | I22 | teacher_store size: full feat_seq + attn in float16 ≈ 7.7 KB/row; ≈ 3.1M train rows (30 stations × 3 units × 35k h) → ≈ 24 GB **per variant**; laptop has 36 GB free. | Store what the student uses: feat_seq patch-averaged [12, D] + AFD mask M12 [12] + h_spatial/h_adr [D] → ≈ 2 KB/row, and only for hours with a student window → < 1 GB per variant. Changes [R07.7] field shapes (ADR). |
 | I23 | CR says student input [24, 23]; the built model takes [12, 46] (2-hour patches). | Wording only; F_S = [12, D_S] as in the CR. |
 | I25 | Owner directive 2026-10-02: teacher input must match the edge sensor domain. Audit (`docs/research_notes/teacher_input_audit.md`): student path is sensor-only; v1 LightGBM teacher used clean neighbour CPCB PM. | ADR 0019; graph builder guards G1–G4. |
+| I26 | (found in N3) [R07.3] w[i,j] = source→target but [R07.5] adds log w_ij to receiver-i logits → literal reading favours downwind senders. | GAT uses w[j, i]; ADR 0021. |
 | I24 | CNN-A D_S = 16 is small for 3 projection heads from D_T = 64. | Keep (student is frozen per [R13]); heads are train-only. |
 
 ## 7. Verification of the 10 items (spec §39 item 7)
