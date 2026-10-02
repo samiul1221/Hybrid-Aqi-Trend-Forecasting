@@ -381,6 +381,7 @@ papers:
 ```
 
 ### C08.3 Graph construction
+> SUPERSEDED by docs/specs/research_spec_v2.md + CHANGE_REQUEST_v2.md [R07.3] (TransNet-style wind prior; ADR 0013).
 
 ```yaml
 graph:
@@ -406,6 +407,7 @@ graph:
 ```
 
 ### C08.4 Input tensors
+> SUPERSEDED by docs/specs/research_spec_v2.md + CHANGE_REQUEST_v2.md [R07.2] (teacher inputs: ADR 0012, sensor domain only: ADR 0019).
 
 ```yaml
 tensors:
@@ -460,6 +462,7 @@ input_gap_policy: "gaps ≤ 2 h: linear interpolation with mask=0; longer: value
 ```
 
 ### C08.5 Architecture — TI-STGNN (Transport-Informed Spatio-Temporal GNN)
+> SUPERSEDED by docs/specs/research_spec_v2.md + CHANGE_REQUEST_v2.md [R02]/[R07] (fixed order Temporal → GAT → ADR → Decoder; no variant A/B; ADR 0013).
 
 Design rationale: Wu et al. show wind-aware dynamic graph attention plus a Transformer temporal encoder gives strong multi-step forecasts with good intervals; TransNet shows that an explicit, mass-conserving advection–diffusion–reaction (ADR) block on a wind graph is the key driver of short-horizon (≤48 h) accuracy; Wang et al. show weather forecasts help; TopoFlow shows physics built into the architecture beats physics as a loss term. TI-STGNN combines these: Transformer per node for time (and to give the student attention maps), ADR block for space, forecast weather in the decoder, quantile heads for intervals. A simpler wind-GAT spatial block is kept as variant B for ablation.
 
@@ -590,6 +593,7 @@ neighbour_estimate_C08_8c:
 ```
 
 ### C08.9 Teacher outputs for distillation (teacher_store)
+> SUPERSEDED by docs/specs/research_spec_v2.md + CHANGE_REQUEST_v2.md [R07.7] (teacher_store v2, ADR 0015).
 
 ```yaml
 teacher_store:

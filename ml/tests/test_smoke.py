@@ -11,8 +11,8 @@ SUBPACKAGES = [
     "models.edge.gdc_cnn",
     "models.edge.baselines",
     "models.edge.model_b",
-    "models.teacher.interim_lgbm",
-    "models.teacher.tistgnn",
+    "baselines.lgbm_teacher",
+    "models.teacher",
 ]
 
 

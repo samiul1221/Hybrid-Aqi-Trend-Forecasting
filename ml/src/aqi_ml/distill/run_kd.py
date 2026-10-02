@@ -1,7 +1,10 @@
-"""P8 distillation experiments (E2/E3): precondition, RF out_KD (alpha grid), CNN out_KD (lambda grid).
+"""FROZEN v1 baseline (ADR 0016): precondition + RF out_KD (alpha grid) with the LightGBM teacher.
 
     uv run python -m aqi_ml.distill.run_kd --role A --arch rf     # resumable per (variant, seed)
-    uv run python -m aqi_ml.distill.run_kd --role A --arch cnn
+
+The LightGBM teacher sees clean neighbour CPCB PM ("clean-neighbour teacher", ADR 0019), so these numbers
+are not comparable to the v2 graph teachers. CNN out_KD with it was removed; results: docs/research_notes/e2_kd.md.
+v2 student KD (S0-S4) lives in distill/variants.py (CR v2 [R08]).
 
 Protocol (Shmuel et al. adapted to time series, [S13.1]/[S13.2]): the no-KD configuration is kept fixed;
 each variant is retrained for several seeds; test windows are split into 5 contiguous time blocks; the
@@ -103,74 +106,6 @@ def run_rf(role: str, dataset: str, teacher: str, seeds: int, fraction: float) -
                        "teacher_coverage_train": float(np.isfinite(y_t_tr).all(axis=1).mean())})  # fmt: skip
 
 
-def run_cnn(role: str, dataset: str, teacher: str, seeds: int) -> Path:
-    import keras
-
-    from aqi_ml.models.edge.gdc_cnn import train as ct
-    from aqi_ml.models.edge.gdc_cnn.model import build
-
-    schema = load_schema()
-    outputs = list(schema.output_order)
-    root = ROOT / "data" / "datasets" / dataset
-    d_model = json.loads(
-        (ROOT / "data" / "models" / dataset / f"cnn-{role}" / "search.json").read_text()
-    )[0]["D"]
-    out = ROOT / "data" / "models" / dataset / f"kd-cnn-{role}"
-    out.mkdir(parents=True, exist_ok=True)
-    cfg = dict(ct.CFG)
-    tr = ct.data(root, role, "train", cfg["train_fraction"], cfg["seed"], labels=role == "B")
-    va = ct.data(root, role, "val", 1.0, cfg["seed"], labels=role == "B")
-    te = ct.data(root, role, "test", 0.25, cfg["seed"], labels=True)
-    y_t_tr, y_t_va = (
-        teacher_for(tr, role, teacher, outputs),
-        teacher_for(va, role, teacher, outputs),
-    )
-    gate = precondition_gate(
-        dataset, role, "cnn", outputs
-    )  # [S12.1]: KD only where the teacher is better
-    y_t_tr[:, ~gate] = np.nan  # -> falls back to the true target for those outputs
-    y_t_va[:, ~gate] = np.nan
-    variants = [("lambda1.0", 1.0)] + [(f"lambda{lam}", lam) for lam in kd.LAMBDAS]
-    n = len(outputs)
-    for name, lam in variants:
-        for seed in range(seeds):
-            f = out / f"{name}_seed{seed}.json"
-            if f.exists():
-                continue
-            keras.utils.set_random_seed(100 + seed)
-            m, _ = build(tr["X"].shape[1], tr["X"].shape[2], d_model)
-            m.compile(
-                optimizer=keras.optimizers.Adam(cfg["lr"]),
-                loss=lambda yt, yp, lam=lam: kd.out_kd_loss(yt, yp, lam, n),
-            )
-            ytr = _pack(
-                tr, y_t_tr
-            )  # [normalised y | normalised teacher]; early stopping uses val RMSE
-            best, best_w, wait = 1e9, None, 0
-            for _ in range(40):
-                m.fit(tr["X"], ytr, batch_size=cfg["batch"], epochs=1, verbose=0)
-                v = rmse(
-                    (m.predict(va["X"], batch_size=1024, verbose=0) * va["scale"] - va["y"]).ravel()
-                )
-                if v < best:
-                    best, best_w, wait = v, m.get_weights(), 0
-                else:
-                    wait += 1
-                    if wait > 5:
-                        break
-            m.set_weights(best_w)
-            pred = ct.predict(m, te)
-            f.write_text(json.dumps(block_rmse(pred, te, outputs)))
-    return _summarise(out, [v for v, _ in variants], "lambda1.0", seeds, outputs,
-                      {"teacher": teacher, "D": d_model, "kd_outputs": [o for o, g in zip(outputs, gate, strict=True) if g]})  # fmt: skip
-
-
-def _pack(d: dict[str, Any], y_t: F32) -> F32:
-    """out_KD target pack: true and teacher targets, both normalised like the student output."""
-    y_teacher = np.where(np.isfinite(y_t), y_t, d["y"])
-    return np.concatenate([d["y"] / d["scale"], y_teacher / d["scale"]], axis=1).astype(np.float32)
-
-
 def _summarise(
     out: Path, variants: list[str], ref: str, seeds: int, outputs: list[str], extra: dict[str, Any]
 ) -> Path:
@@ -223,7 +158,7 @@ def precondition_report(dataset: str, role: str) -> dict[str, Any]:
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(prog="aqi_ml.distill.run_kd")
     ap.add_argument("--role", choices=["A", "B"], default="A")
-    ap.add_argument("--arch", choices=["rf", "cnn", "precondition"], required=True)
+    ap.add_argument("--arch", choices=["rf", "precondition"], required=True)
     ap.add_argument("--dataset", default="feat-v1")
     ap.add_argument("--teacher", default="lgbm-interim-feat-v1")
     ap.add_argument("--seeds", type=int, default=5)
@@ -232,10 +167,8 @@ def main(argv: list[str] | None = None) -> None:
     t0 = time.time()
     if a.arch == "precondition":
         print(json.dumps(precondition_report(a.dataset, a.role), indent=1))
-    elif a.arch == "rf":
-        print(run_rf(a.role, a.dataset, a.teacher, a.seeds, a.fraction), f"{time.time() - t0:.0f}s")
     else:
-        print(run_cnn(a.role, a.dataset, a.teacher, min(a.seeds, 3)), f"{time.time() - t0:.0f}s")
+        print(run_rf(a.role, a.dataset, a.teacher, a.seeds, a.fraction), f"{time.time() - t0:.0f}s")
 
 
 if __name__ == "__main__":

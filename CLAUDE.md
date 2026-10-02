@@ -13,19 +13,29 @@ B.Tech research project: edge–cloud hybrid AQI forecasting for 5–10 sensor n
 - Edge: ESP32-S3 N16R8 node measures PM (SPS30), T/RH, pressure, wind, rain, lux, MQ-7, MQ-135, SGP41; computes India CPCB AQI locally.
 - Edge students forecast humidity-corrected PM2.5/PM10 for T+1..T+3 → AQI trend. Model A uses PM; Model B drops PM (fallback when the SPS30 fails).
 - Each student comes in two architectures: RandomForest (emlearn) and GDC-CNN (TFLite Micro, FP32).
-- Cloud (phase 2): wind-aware graph "teacher" (TI-STGNN) over all nodes, T+1..T+6 with calibrated intervals, pushed to nodes by MQTT.
-- Distillation: teacher outputs (out-of-fold) are stored in `teacher_store` and used to train students (Shmuel-style output KD for RF, Na-style full KD for CNN).
+- Teacher (CR v2, now in phase 1): multi-station TI-STGNN (Embedding → Transformer → wind-aware GAT → ADR → decoder), T+1..T+6, PyTorch, trained on Kaggle GPU. Variants T0–T3 (use_graph/use_wind/use_adr). It reads the SAME sensor-proxy features as the student (ADR 0019).
+- Distillation: OOF teacher outputs + states (feat_seq, attention, h_spatial, h_adr) in `teacher_store` v2 → GDC-CNN student variants S0–S4 (output, temporal, spatial, physics KD). RF and the interim LightGBM teacher are frozen baselines (ADR 0016).
 - Students are pretrained on a physics-based sensor simulator driven by real CPCB + Open-Meteo data, then fine-tuned on real logs.
 - Edge must keep measuring, forecasting and alerting with no cloud at all.
-- **Phase 1 (now):** edge firmware + all ML groundwork (data, simulator, features, students, interim LightGBM teacher, KD, ZenML). Progress: `docs/PROGRESS.md`.
+- **Now:** milestones N0–N9 of `docs/specs/CHANGE_REQUEST_v2.md` [R10] (P0–P7 done). Progress: `docs/PROGRESS.md`; hand-off: `docs/HANDOFF.md`.
 
 ## Source of truth
 
-- `docs/specs/edge_implementation_plan.md` (sections `[S00]`–`[S26]`) — **read it before changing anything in `edge/`, `ml/` or `shared/`.**
-- `docs/specs/cloud_implementation_plan.md` (`[C00]`–`[C21]`) — phase 2; read to keep interfaces compatible. Wire contracts (edge `[S16]`/`[S17]`, cloud `[C14]`) must stay byte-compatible.
+Priority, high → low (CR v2 [R01]):
+1. `docs/specs/research_spec_v2.md` (scientific design; **not in the repo yet** — ask the owner).
+2. `docs/specs/CHANGE_REQUEST_v2.md` (`[R00]`–`[R14]`) + approved `docs/specs/architecture_review_v2.md` — supersede the ML-architecture parts of the old plans (banners mark the sections).
+3. `docs/specs/edge_implementation_plan.md` (sections `[S00]`–`[S26]`) — hardware, firmware, pipeline, AQI, features, targets, Model B, contracts, OTA. **Read it before changing anything in `edge/`, `ml/` or `shared/`.**
+4. `docs/specs/cloud_implementation_plan.md` (`[C00]`–`[C21]`) — backend/streaming/DB/API; its model section [C08] is superseded where it conflicts. Wire contracts (edge `[S16]`/`[S17]`, cloud `[C14]`) must stay byte-compatible.
 - Cite section IDs when referencing decisions. YAML blocks = spec, JSON blocks = wire format. "(tune)" = start value; "(verify)" = check the primary source.
 - Any deviation from the spec gets a short ADR in `docs/decisions/NNNN-*.md`. Never change behaviour silently. Spec paths map to repo paths via `docs/decisions/0001-repo-layout.md`.
 - Uncertain constants (CPCB breakpoints, datasheet values, API variable names) are marked `TODO_VERIFY` with the source to check.
+
+## Simplicity rules (CR v2 [R03], non-negotiable)
+
+- Simplify code, never the architecture. One concept per file, < 250 lines, reads top-to-bottom.
+- Every nn.Module/layer: docstring with what it does, paper + equation, input/output shapes; shape comments on reshaping lines; shape asserts at block boundaries.
+- Dense tensors (N ≈ 30): no PyTorch Geometric, no sparse ops. No registries/factories/Hydra/Lightning; plain PyTorch loop; dataclass config from one YAML per experiment; variant switches are booleans.
+- Comments say WHY (physics/paper), not WHAT. No silent defaults. `docs/walkthrough.md` explains the code reading order.
 
 ## Layout
 
@@ -97,6 +107,7 @@ Firmware pure-logic code in `edge/firmware/aqi_node/src/{pipeline,aqi,features,m
 
 ## Working rules
 
-- Work milestone by milestone (P1–P10 in `docs/PROGRESS.md`). After each: run all tests, update PROGRESS.md, write ADRs for deviations, then stop for review.
+- Work milestone by milestone (N0–N9, CR v2 [R10]; listed in `docs/PROGRESS.md`). Claim a milestone at the top of PROGRESS.md; after each: run all tests, update PROGRESS.md + HANDOFF.md, write ADRs for deviations, then stop for review.
+- GPU work (teacher T0–T3, OOF, student KD) runs on Kaggle via the Kaggle CLI (`KAGGLE_API_TOKEN` in `.env`; ADR 0018; `ml/kaggle/README.md` once N4 adds it). Data, simulator, RF, tests, export and parity stay on the laptop.
 - Small commits per milestone step. Seeds fixed, configs in yaml, secrets only via `.env` (commit `.env.example`).
 - No fake implementations presented as done. Stub only what the spec defers to phase 2, and label it.

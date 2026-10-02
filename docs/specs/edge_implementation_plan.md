@@ -562,6 +562,7 @@ teacher:
 ```
 
 ### S12.2 Teacher artifacts the edge training pipeline needs
+> SUPERSEDED by docs/specs/research_spec_v2.md + CHANGE_REQUEST_v2.md [R07.7] (teacher_store v2; ADR 0015).
 
 ```yaml
 teacher_store:
@@ -586,6 +587,7 @@ teacher_store:
 ## [S13] EDGE MODELS
 
 ### S13.0 Overview
+> SUPERSEDED by docs/specs/research_spec_v2.md + CHANGE_REQUEST_v2.md [R08] (KD variants S0–S4; ADR 0014).
 
 ```yaml
 models:

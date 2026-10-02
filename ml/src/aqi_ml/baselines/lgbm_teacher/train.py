@@ -1,6 +1,6 @@
 """Interim LightGBM teacher ([S12.1], cloud [C08.10]) with out-of-fold predictions -> teacher_store.
 
-    uv run python -m aqi_ml.models.teacher.interim_lgbm.train      # resumable stages
+    uv run python -m aqi_ml.baselines.lgbm_teacher.train      # resumable stages
 
 Privileged inputs (never available to the edge student):
 - 5 nearest OTHER CPCB stations: ln(1+PM2.5) at t, t-1, t-3, ln(1+PM10) at t, distance, upwind score
@@ -260,7 +260,7 @@ def train(dataset: str = "feat-v1", teacher_version: str | None = None) -> Path:
 
 
 def main(argv: list[str] | None = None) -> None:
-    ap = argparse.ArgumentParser(prog="aqi_ml.models.teacher.interim_lgbm.train")
+    ap = argparse.ArgumentParser(prog="aqi_ml.baselines.lgbm_teacher.train")
     ap.add_argument("--dataset", default="feat-v1")
     a = ap.parse_args(argv)
     print(f"wrote {train(a.dataset)}")

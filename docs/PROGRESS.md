@@ -1,6 +1,8 @@
 # PROGRESS
 
-Last updated: 2026-09-26
+Last updated: 2026-10-02
+
+Active milestone: **N2 — owner: local session 2026-10-02** (CR v2 [R11]: claim here, release when done)
 
 ## Phase-1 milestones
 
@@ -14,9 +16,22 @@ Last updated: 2026-09-26
 | P5 | Python feature builder (golden fixtures) + target builder + Model B PM-dropout builder | done — `data/datasets/feat-v1`: 1.16M Model A / 1.09M Model B windows (3.3k real-outage); A: train 329k, val 22k, test 567k (+ hold-out stations); golden fixture for firmware (ADR 0008) |
 | P6 | Baselines + RF students A/B (no_KD) + [S21] metrics + emlearn export + host C parity < 1e-4 | done — RF-A 362 KB, parity 1.3e-7, test skill PM2.5 h1/h2/h3 +0.09/+0.13/+0.17 (hold-out stations +0.12/+0.14/+0.18), beats diurnal persistence; RF-B 232 KB, parity 1.4e-7, skill +0.17 vs last-valid persistence; own blob + C evaluator (ADR 0009); label Hampel cleaning |
 | P7 | GDC-CNN A/B per [S13.3]/[S13.4] + TFLite FP32 export + 1-block TFLM op check | done — step 0 caught REDUCE_PROD (not in TFLM) → static-batch export graph; CNN-A D16 34.7 KB, CNN-B D64 202 KB, host parity < 3e-6; CNN-B arena to measure on device (ADR 0010) |
-| P8 | teacher_store + interim teacher + OOF + out_KD/full_KD + precondition check | partial — LightGBM teacher + OOF store, precondition, RF out_KD A/B (A: KD hurts slightly; B: small PM10 gain), full_KD implemented+tested; CNN out_KD A 6/9, B pending (ADR 0011, docs/HANDOFF.md) |
-| P9 | ZenML pipelines wiring P3–P8 | todo |
-| P10 | Firmware (Arduino sketch, ADR 0002) components + host tests against shared fixtures + mock_cloud | todo |
+| P8 | teacher_store + interim teacher + OOF + out_KD + precondition | **frozen v1 (CR v2)** — LightGBM "clean-neighbour" teacher (uses clean CPCB neighbour PM, ADR 0019) → baseline (ADR 0016); RF out_KD A/B; CNN-A out_KD λ0.5 −1.13 % (`research_notes/e2_kd.md`) |
+
+## CR v2 milestones ([R10]; replace P8-remaining, P9, P10)
+
+| # | Milestone | Status |
+|---|---|---|
+| N0 | Step 0: architecture review + ADRs | done — `docs/specs/architecture_review_v2.md` approved 2026-10-02 (I1–I25), ADRs 0012–0019, teacher input audit (ADR 0019) |
+| N1 | Cleanup (R05 moves/deletes, spec banners, docs) | done — LightGBM teacher → `baselines/lgbm_teacher`; LightGBM-teacher CNN KD runner removed; verify.py/lineage.py/e2_kd.md kept; banners on C08.3/.4/.5/.9, S12.2, S13.0; 164 tests green |
+| N2 | Graph window builder + leakage/sensor-domain guards + shards + card | todo |
+| N3 | TI-STGNN code + R07 unit tests + overfit test + walkthrough | todo |
+| N4 | Kaggle: datasets, T3 smoke, T0–T3, teacher-vs-S0 gate | todo |
+| N5 | OOF folds + teacher_store v2 | todo |
+| N6 | Student train wrapper + S0–S4 (A), S0–S1 (B), export parity | todo |
+| N7 | Experiments (spec §27–§29), skill retained | todo |
+| N8 | Deploy student + P10 firmware + on-device measurements | todo |
+| N9 | Thin ZenML wrappers (deferred, ADR 0017) | todo |
 
 ## Spec acceptance checklist ([S22]) → phase-1 milestone
 
@@ -38,6 +53,8 @@ Last updated: 2026-09-26
 - **MQ-135** (Winsen v1.4): heater constant 5 V; NH3 curve slope ≈ −0.48, H2 ≈ −0.5 on log–log → spec `b135 U(-0.5,-0.3)` plausible, upper end may need −0.55. Same T/RH shape as MQ-7.
 
 ## Open questions for the owner
+
+- **CR v2:** `docs/specs/research_spec_v2.md` is not in the repo yet; LightST (AAAI 2025) PDF missing (novelty check).
 
 - **PM2.5 scale in calibration.json:** before co-location the device's corrected PM is ≈ 0.6–0.8× true (SPS30 reads high, κ 0.4 over-corrects). Add a `pm25_scale` next to the spec's `pm10_scale` so co-location can fit it? (ADR 0007)
 0. **OpenAQ API key needed** (free: explore.openaq.org → Settings). Put `OPENAQ_API_KEY=...` in `.env`, then run `uv run python -m aqi_ml.data.build all` (up to ≈ 40 stations × 16 params × 96 months ≈ 60k requests; the 2000/h cap makes that ≤ ≈ 30 h, fewer when stations lack sensors; resumable — start with `--max-stations 2` to check).
