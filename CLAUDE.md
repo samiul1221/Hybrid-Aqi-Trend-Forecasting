@@ -58,6 +58,7 @@ Rules: no logic duplicated across folders; anything used by more than one compon
 - [ ] I11 Units: PM µg/m³, T °C, RH %, P hPa, wind m/s + degrees FROM, lux; gas sensors dimensionless.
 - [ ] I12 MQ-7, MQ-135, SGP41 are model inputs only: never ppm, never AQI.
 - [ ] Sensor pool is fixed (list above + DS3231 RTC). No MiCS-6814, no LDR, no invented sensors.
+- [ ] Teacher input = edge sensor domain (ADR 0019): teacher and student read the same sensor-proxy features (simulator → device pipeline → feature builder); clean CPCB PM is a target only, never an input (node or neighbours). Privilege = other stations, wind graph, ADR, declared weather.
 - [ ] No future leakage: inputs at `base_ts` use only `ts ≤ base_ts`; OOF teacher predictions; `teacher_train_end < student_test_start`.
 - [ ] CNN ships FP32 on device; INT8 only as ablation.
 
