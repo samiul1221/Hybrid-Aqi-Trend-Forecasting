@@ -12,21 +12,23 @@ At real inference the real sensors replace this box: the ESP32 itself produces Y
 
 X  (one row per IST hour; = a table from data/2_clean/)
     ts                      UTC time of the IST hour start
-    pm25, pm10              true PM (ug/m3, CPCB)            -> SPS30, BH1750 (smog dims light); kept as the answer
+    pm25, pm10              true PM (ug/m3, CPCB)            -> PM sensor (SPS30 or PMS7003, see PM_SENSOR), BH1750;
+                                                                 kept as the answer
     co_ppm, no2_ppb, o3_ppb true gases (CPCB, gaps filled)    -> MQ-7, MQ-135, SGP41
-    t, td, rh               true temperature, dew point, RH   -> HDC1080, SPS30 (humid particles), MQ sensors
+    t, td, rh               true temperature, dew point, RH   -> HDC1080, PM sensor (humid particles), MQ sensors
     p                       true pressure (hPa)               -> BMP280
-    wind_u, wind_v          true wind (m/s)                   -> anemometer, HDC1080 (wind cools the shield)
-    precip                  rain (mm/h)                       -> rain board
+    wind_u, wind_v          true wind (m/s)                   -> 2 perpendicular fans (x, y), HDC1080 (wind cools the shield)
+    precip                  rain (mm/h)                       -> rain plate (digital 0/1)
     swrad                   sunshine (W/m2)                   -> BH1750, HDC1080 (sun heats the shield)
     (made inside the box: kappa = particle water uptake, VOC = 20 ppb + r * CO)
 
 Y  (one row per hour)
-    raw sensor readings:  pm1, pm25, pm10 (SPS30) | t, rh (HDC1080) | p (BMP280) | wind_speed, wind_u, wind_v
-                          (anemometer) | rain_frac (rain board) | lux (BH1750) | mq7_rs, mq135_rs (ohm) |
+    raw sensor readings:  pm1, pm25, pm10 (PM sensor) | t, rh (HDC1080) | p (BMP280) | wind_u, wind_v, wind_speed
+                          (2 fans) | rain_frac (fraction of the hour the plate read 1) | lux (BH1750) | mq7_rs, mq135_rs (ohm) |
                           sraw_voc, sraw_nox (SGP41 ticks)
     ESP32 processing:     pm_measured, pm_state, pm25_corr, pm10_corr (humidity-corrected), coarse_ratio, dust,
-                          Rbase7, Rbase135, base_voc, base_nox (clean-air baselines), aqi_pm (CPCB AQI, 24 h)
+                          Rbase7, Rbase135, base_voc, base_nox (clean-air baselines), voc_index, nox_index
+                          (Sensirion Gas Index Algorithm), aqi_pm (CPCB AQI, 24 h)
     bookkeeping:          sim_outage (simulated SPS30 outage), true_pm25, true_pm10 (the ANSWER - never a model input)
 
 Formulas and sources: notebook 02 (one section per sensor) and docs/simulator_sources.md.
@@ -37,6 +39,10 @@ import hashlib
 
 import numpy as np
 import pandas as pd
+
+# which PM sensor sits on the node: "SPS30" (planned) or "PMS7003" (backup). Same physics, different numbers.
+PM_SENSOR = "SPS30"
+
 
 # a random-number generator that gives the same numbers every run for the same (station, unit)
 def make_rng(station, unit):
@@ -71,15 +77,21 @@ def fill_gas(gas, ts, network_typical):
     return filled.to_numpy()
 
 
-# SPS30: draw this unit's own errors
-def sps30_params(rng):
-    return dict(scale=U(rng, 1.15, 1.55), dt_inside=U(rng, 1.5, 3.5), dust_eff=U(rng, 0.20, 0.40),
-                pm10_q=U(rng, 0.02, 0.10), coarse_f=U(rng, 0.05, 0.25), pm1_r=U(rng, 0.75, 0.95),
-                fog_bias=U(rng, 0.0, 0.20))
+# PM sensor (optical, laser scattering): draw this unit's own errors
+def pm_sensor_params(rng):
+    if PM_SENSOR == "SPS30":     # calibrated to the IIT-Delhi SPS30 field study (winter slope 1.46-1.86)
+        return dict(scale=U(rng, 1.15, 1.55), dt_inside=U(rng, 1.5, 3.5), dust_eff=U(rng, 0.20, 0.40),
+                    pm10_q=U(rng, 0.02, 0.10), coarse_f=U(rng, 0.05, 0.25), pm1_r=U(rng, 0.75, 0.95),
+                    fog_bias=U(rng, 0.0, 0.20))
+    if PM_SENSOR == "PMS7003":   # Plantower: reads higher (EPA PurpleAir fit -> ~1.9x), fan-ventilated (little
+        return dict(scale=U(rng, 1.4, 2.0), dt_inside=U(rng, 0.0, 1.0),     # inside warming), misses dust,
+                    dust_eff=U(rng, 0.15, 0.35), pm10_q=U(rng, 0.05, 0.20),  # poor PM10. TODO_VERIFY in Delhi
+                    coarse_f=U(rng, 0.05, 0.25), pm1_r=U(rng, 0.70, 0.90), fog_bias=U(rng, 0.0, 0.25))
+    raise ValueError(f"unknown PM_SENSOR {PM_SENSOR}")
 
 
-# SPS30: true PM -> what the sensor reports
-def sps30(pm25_true, pm10_true, rh_inside, kappa, p, rng):
+# PM sensor: true PM -> what the sensor reports
+def pm_sensor(pm25_true, pm10_true, rh_inside, kappa, p, rng):
     coarse = np.maximum(pm10_true - pm25_true, 0)
     dust = np.minimum(0.25 * coarse, pm25_true)
     fine = pm25_true - dust
@@ -125,20 +137,24 @@ def bmp280(p_true, p, rng):
     return p_true - p["height"] / 8.3 + p["bias"] + rng.normal(0, 0.1, len(p_true))
 
 
-# anemometer: draw errors / simulate
+# wind: two perpendicular fans (magnet on a blade + hall sensor), one along x (east), one along y (north)
 def wind_params(rng):
-    return dict(shelter=U(rng, 0.4, 1.0), offset=U(rng, -15, 15))
+    return dict(shelter=U(rng, 0.4, 1.0),      # buildings on the roof slow the wind
+                offset=U(rng, -15, 15))        # the fans are mounted a few degrees off true north / east
 
 
-def anemometer(ws_true, wd_true, p, rng):
-    n = len(ws_true)
-    ws = p["shelter"] * ws_true + rng.normal(0, 0.3, n)
-    ws = np.where(ws < 0.3, 0, ws)
-    wd = (wd_true + p["offset"] + rng.normal(0, 15, n)) % 360
-    return ws, wd
+def wind_fans(u_true, v_true, p, rng):
+    n = len(u_true)
+    a = np.deg2rad(p["offset"])
+    u_fan = p["shelter"] * (u_true * np.cos(a) - v_true * np.sin(a)) + rng.normal(0, 0.2, n)   # wind along fan 1
+    v_fan = p["shelter"] * (u_true * np.sin(a) + v_true * np.cos(a)) + rng.normal(0, 0.2, n)   # wind along fan 2
+    u_fan = np.where(np.abs(u_fan) < 0.3, 0, u_fan)       # a fan does not turn below ~0.3 m/s along its axis
+    v_fan = np.where(np.abs(v_fan) < 0.3, 0, v_fan)
+    return u_fan, v_fan
 
 
-# rain board: draw errors / simulate
+# rain plate (digital 0/1): wet while it rains, stays wet D hours while drying, dew/fog can wet it.
+# The ESP32 reads it every minute; per hour we keep the fraction of readings that were 1 (0 = dry hour, 1 = wet hour).
 def rain_params(rng):
     return dict(dry_hours=U(rng, 1, 2))
 
@@ -202,21 +218,47 @@ def mq135(co_ppm, voc_ppb, no2_ppb, t, rh, days, p, rng):
     return mos_resistance(gas, t, rh, days, p, rng) * np.exp(p["g_ox"] * np.log1p(np.nan_to_num(no2_ppb) / 20))
 
 
-# SGP41: draw errors / simulate
+# SGP41: draw this unit's errors
+# Sensitivities fitted to the datasheet (Table 1 + Figures 2-3, curves read by eye -> TODO_VERIFY with SEK-SGP4x data)
 def sgp41_params(rng):
-    return dict(voc_base=U(rng, 25000, 35000), voc_k=U(rng, 1040, 1507), voc_k_ox=U(rng, 0, 700),
-                nox_base=U(rng, 14000, 17000), nox_k=U(rng, 1437, 3039), nox_w_o3=U(rng, 2.0, 5.0),
-                drift=U(rng, -5, 5))
+    k_no2 = U(rng, 1500, 3175)                       # NOx pixel: +950..+2010 ticks for NO2 150 -> 300 ppb (/ 0.633)
+    return dict(voc_base=U(rng, 25000, 35000), nox_base=U(rng, 14000, 17000),
+                voc_k=U(rng, 1040, 1507),            # VOC pixel: -710..-1030 ticks per doubling of ethanol (/ ln 2)
+                voc_per_ppb_o3=U(rng, 7.0, 11.0),    # Fig. 2: ozone pushes the VOC pixel up (~+850 ticks at 100 ppb)
+                voc_per_ppb_no2=U(rng, 2.0, 3.5),    # Fig. 2: NO2 pushes it up less (~+650 ticks at 300 ppb)
+                nox_k_no2=k_no2,
+                nox_k_o3=k_no2 * U(rng, 1.25, 1.45), # Fig. 3: ozone line is ~1.36x steeper than the NO2 line
+                nox_k_voc=U(rng, 100, 170),          # Fig. 3: ethanol lowers the NOx pixel slightly (~-310 per decade)
+                drift=U(rng, -5, 5))                 # ticks per day, TODO_VERIFY
 
 
+# SGP41: true gases -> raw ticks of the two pixels (ticks ~ ln R of the MOx layer)
 def sgp41(voc_ppb, no2_ppb, o3_ppb, days, p, rng):
     n = len(voc_ppb)
-    oxidants = np.nan_to_num(no2_ppb) + np.nan_to_num(o3_ppb)
-    voc = (p["voc_base"] - p["voc_k"] * np.log1p(voc_ppb / 100) + p["voc_k_ox"] * np.log1p(oxidants / 50)
+    no2, o3 = np.nan_to_num(no2_ppb), np.nan_to_num(o3_ppb)
+    voc = (p["voc_base"]
+           - p["voc_k"] * np.log1p(voc_ppb / 100)                     # reducing gases lower R
+           + p["voc_per_ppb_o3"] * o3 + p["voc_per_ppb_no2"] * no2    # oxidising gases raise R
            + p["drift"] * days + rng.normal(0, 50, n))
-    nox = (p["nox_base"] + p["nox_k"] * np.log1p((no2_ppb + p["nox_w_o3"] * o3_ppb) / 10)
+    nox = (p["nox_base"]
+           + p["nox_k_no2"] * np.log1p(no2 / 20)                      # knees fitted to Fig. 3: NO2 20 ppb,
+           + p["nox_k_o3"] * np.log1p(o3 / 12)                        # O3 12 ppb
+           - p["nox_k_voc"] * np.log1p(voc_ppb / 300)
            + p["drift"] * days + rng.normal(0, 30, n))
     return np.clip(np.round(voc), 0, 65535), np.clip(np.round(nox), 0, 65535)
+
+
+# Sensirion Gas Index Algorithm (the official library the ESP32 also runs): raw ticks -> VOC Index / NOx Index
+# VOC Index: 100 = the usual air of the last days, >100 worse, <100 better. NOx Index: 1 = usual, >1 = NOx event.
+# Our data is hourly, so the algorithm runs with a 3600 s sampling interval (its learning times are in hours).
+def gas_index(sraw_voc, sraw_nox):
+    from sensirion_gas_index_algorithm import gas_index_algorithm as gia
+    from sensirion_gas_index_algorithm import sensirion_gas_index_algorithm_wrap as wrap
+    voc_algo = gia.GasIndexAlgorithm(wrap.GasIndexAlgorithm_ALGORITHM_TYPE_VOC, 3600)
+    nox_algo = gia.GasIndexAlgorithm(wrap.GasIndexAlgorithm_ALGORITHM_TYPE_NOX, 3600)
+    voc_index = np.array([voc_algo.process(int(x)) for x in sraw_voc], dtype=float)
+    nox_index = np.array([nox_algo.process(int(x)) for x in sraw_nox], dtype=float)
+    return voc_index, nox_index
 
 
 # SPS30 faults: random missing hours + long outages
@@ -295,7 +337,7 @@ def station_truth(clean, network_typical, station):
 
 # draw all errors of one unit (once, for its whole life)
 def draw_unit(rng):
-    return {"sps30": sps30_params(rng), "hdc1080": hdc1080_params(rng), "bmp280": bmp280_params(rng),
+    return {"pm": pm_sensor_params(rng), "hdc1080": hdc1080_params(rng), "bmp280": bmp280_params(rng),
             "wind": wind_params(rng), "rain": rain_params(rng), "bh1750": bh1750_params(rng),
             "mq7": mq7_params(rng), "mq135": mq135_params(rng), "sgp41": sgp41_params(rng)}
 
@@ -305,13 +347,13 @@ def read_sensors(truth, p, rng):
     days = ((truth.ts - truth.ts.iloc[0]).dt.total_seconds() / 86400).to_numpy()
     g = {c: truth[c].to_numpy(float) for c in truth.columns if c != "ts"}
     r = pd.DataFrame({"ts": truth.ts})
-    rh_inside = np.clip(rh_from_dewpoint(g["td"], g["t"] + p["sps30"]["dt_inside"]), 0, 100)
-    r["pm1"], r["pm25"], r["pm10"] = sps30(g["pm25"], g["pm10"], rh_inside, g["kappa"], p["sps30"], rng)
-    ws, wd = anemometer(g["ws"], g["wd"], p["wind"], rng)
+    rh_inside = np.clip(rh_from_dewpoint(g["td"], g["t"] + p["pm"]["dt_inside"]), 0, 100)
+    r["pm1"], r["pm25"], r["pm10"] = pm_sensor(g["pm25"], g["pm10"], rh_inside, g["kappa"], p["pm"], rng)
+    u_fan, v_fan = wind_fans(g["wind_u"], g["wind_v"], p["wind"], rng)
     r["t"], r["rh"] = hdc1080(g["t"], g["td"], g["swrad"], p["wind"]["shelter"] * g["ws"], p["hdc1080"], rng)
     r["p"] = bmp280(g["p"], p["bmp280"], rng)
-    r["wind_speed"] = ws
-    r["wind_u"], r["wind_v"] = -ws * np.sin(np.deg2rad(wd)), -ws * np.cos(np.deg2rad(wd))
+    r["wind_u"], r["wind_v"] = u_fan, v_fan
+    r["wind_speed"] = np.hypot(u_fan, v_fan)
     r["rain_frac"] = rain_board(g["precip"], g["rh"], p["rain"], rng)
     r["lux"] = bh1750(g["swrad"], g["pm25"], p["bh1750"], rng)
     r["mq7_rs"] = mq7(g["co_ppm"], r.t.to_numpy(), r.rh.to_numpy(), days, p["mq7"], rng)
@@ -335,6 +377,7 @@ def process_on_device(r, missing, outage, truth):
     r["dust"] = (r.coarse_ratio > 0.5) & (r.rh < 60) & r.pm_measured
     r["Rbase7"], r["Rbase135"] = rolling_baseline(r.mq7_rs, 0.90), rolling_baseline(r.mq135_rs, 0.90)
     r["base_voc"], r["base_nox"] = rolling_baseline(r.sraw_voc, 0.90), rolling_baseline(r.sraw_nox, 0.10)
+    r["voc_index"], r["nox_index"] = gas_index(r.sraw_voc.to_numpy(), r.sraw_nox.to_numpy())
     r["aqi_pm"] = rolling_aqi(r.pm25_corr.to_numpy(), r.pm10_corr.to_numpy(), r.pm_measured.to_numpy())
     r["sim_outage"] = outage
     return r

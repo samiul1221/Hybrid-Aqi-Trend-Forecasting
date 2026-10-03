@@ -60,3 +60,15 @@ week / co-location. Section numbers like [S10.3] refer to `docs/specs/edge_imple
 | SGP41 NOx | base U(14k, 17k), k U(1437, 3039), n0 10 ppb, w_O3 U(2, 5) | SRAW = base + k ln(1 + (NO2 + w·O3)/n0) | SGP41-DS | spec k U(200, 800) is ~3× below the datasheet |
 | VOC truth | 20 + U(0.03, 0.10)·CO[ppb] ppb | per station | Baker2008 | TODO_VERIFY; spec's mixed-unit proxy replaced |
 | gas truth gaps | ≤ 3 h interpolate; else station month×hour median; else network | `truth_*_src` column | | inputs only, never targets (I07) |
+
+## Update 2026-10-03: SGP41 refit, PMS7003 option, wind fans, rain plate
+
+| item | value | source |
+|---|---|---|
+| MOx physics (all gas sensors) | oxygen ions on the n-type oxide surface → depletion layer; reducing gases lower R, oxidising gases (NO2, O3) raise R; isotherm → power law R = R0(1 + KC)^±β; SGP41 ticks ∝ ln R | "Current state of knowledge on the metal oxide based gas sensing mechanism", Sens. Actuators B (2022), https://www.sciencedirect.com/science/article/pii/S0925400522001733; "Materials design strategies for semiconducting metal-oxide chemiresistive gas sensors", RSC (2026); SGP41 datasheet Table 1 note 3 |
+| SGP41 NOx pixel | k_NO2·ln(1+NO2/20) + k_O3·ln(1+O3/12) − k_e·ln(1+VOC/300); k_NO2 U(1500, 3175) (Table 1: +950…+2010 ticks for 150→300 ppb NO2), k_O3 = k_NO2·U(1.25, 1.45), k_e U(100, 170) | SGP41 datasheet v1.0 Table 1 + Fig. 3 (read by eye, TODO_VERIFY with SEK-SGP4x raw data) |
+| SGP41 VOC pixel | −k_V·ln(1+VOC/100) + a_O3·O3 + a_NO2·NO2; k_V U(1040, 1507); a_O3 U(7, 11), a_NO2 U(2, 3.5) ticks/ppb | datasheet Table 1 + Fig. 2 |
+| VOC / NOx Index | Sensirion Gas Index Algorithm (official `sensirion-gas-index-algorithm` 3.2.2, BSD-3) at 3600 s sampling | github.com/Sensirion/gas-index-algorithm; "VOC Index for Experts" app note |
+| PMS7003 (switch `PM_SENSOR`) | scale U(1.4, 2.0), ΔT U(0, 1) °C, dust efficiency U(0.15, 0.35), PM10 extrapolation U(0.05, 0.20), PM1 ratio U(0.70, 0.90) | κ-Köhler calibration for Plantower (Patel et al. 2024 AMT); PMS dust underestimation (Kaur et al. 2026 AMT); PMS7003 vs GRIMM (Macías-Hernández et al. 2023 Urban Climate); dryer study PMS7003 −25…40 % (Lekamge et al. 2025 npj CAS); EPA PurpleAir correction ≈ 1/1.9 — TODO_VERIFY in Delhi |
+| wind | two perpendicular fans (hall sensor), each reads the wind along its axis: k·(rotated u, v) + N(0, 0.2), 0 below 0.3 m/s; k U(0.4, 1.0), mounting offset U(−15°, 15°) | owner's hardware description |
+| rain | digital 0/1 plate; hourly feature = fraction of minute readings that were 1 | owner's hardware description |
