@@ -17,6 +17,8 @@ Start with `README.md`, then `docs/DESIGN.md` (all decisions in plain words).
 - All code lives in the notebooks `notebooks/01..05`, each self-contained: many SMALL cells, every code cell starts
   with a `# what this cell does` comment, formulas in markdown above the code (one function per sensor / block).
   Each notebook reads the previous step from `data/` and writes the next; there is no shared `src/` package.
+- One exception: `simulator.py` (repo root) is the sensor box `simulate(X, station, unit) -> Y`, used by notebook 02
+  (which explains it sensor by sensor). One function per sensor, formulas in notebook 02's markdown.
 - Don't add files or folders unless needed.
 - Notebooks find their data on Kaggle automatically (`/kaggle/input`) and locally (`../data`).
 

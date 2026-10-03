@@ -26,6 +26,9 @@ built and why, in one place. "TODO_VERIFY" = check with a primary source or real
 - Each unit draws its own errors once (bias, gain, drift), plus random missing hours and ~1 outage per year.
 - After the sensors, the ESP32's own processing runs (humidity correction κ = 0.4, dust flag, gas baselines, AQI).
 
+- All simulator code is in `simulator.py` (`simulate(X, station, unit) -> Y`); notebook 02 explains and runs it.
+  The simulator is only for training data and demos; at inference the real sensors replace it.
+
 ## 3. Features and targets (notebook 03)
 - 23 features from the ESP32's own sensors (PM, T/RH/P, wind, rain, light, gas sensors relative to their clean-air
   baseline, time of day/week/year, current AQI, PM mask). Model B (SPS30 broken) drops the 6 PM features and adds
@@ -54,6 +57,10 @@ tests network knowledge, not "clean data teaching noisy data".
   (TransNet uses 0.01 on its own scale).
 - Future weather = ERA5 actuals ("oracle weather") because archived forecasts do not exist for most of 2018-23 →
   a limitation to state in the report. Boundary-layer height is empty for Delhi in Open-Meteo, so it is not used.
+- **Inference inputs:** the student needs only its own 23 sensor features (no weather, no internet). The teacher needs
+  every node's 23 features + Open-Meteo past weather, the 6-h forecast and the current wind. Mismatch to remember:
+  training used ERA5 actuals as "future weather", live inference must use forecasts (less accurate). Plan: report as a
+  limitation now; later fine-tune the teacher on archived Open-Meteo forecasts (available from ~2022).
 - Variants T0-T3 switch graph / wind / ADR off and on. ~0.2 M parameters.
 - Out-of-fold outputs: 3 teachers each skip one block of training hours (± 30 h gap) and predict it, so the
   student never learns from a teacher that saw the answer.

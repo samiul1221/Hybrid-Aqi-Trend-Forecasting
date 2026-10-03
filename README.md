@@ -15,10 +15,23 @@ reads the previous step from `data/` and writes the next.
 | step | notebook | runs on | in → out |
 |---|---|---|---|
 | 1 | `notebooks/01_data.ipynb` | laptop | CPCB hourly files + Open-Meteo weather → `data/2_clean/` (one clean table per station) |
-| 2 | `notebooks/02_simulator.ipynb` | laptop | true air + weather → what 3 virtual ESP32 units per station would read (one formula per sensor) → `data/3_sensors/` |
+| 2 | `notebooks/02_simulator.ipynb` | laptop | explains `simulator.py` sensor by sensor, then runs it: true air + weather → what 3 virtual ESP32 units per station would read → `data/3_sensors/` |
 | 3 | `notebooks/03_dataset.ipynb` | laptop | 23 features, targets, windows, teacher grids → `data/4_features/` |
 | 4 | `notebooks/04_teacher.ipynb` | Kaggle GPU | teacher T0-T3 (Transformer → wind graph → ADR physics → decoder) + its outputs for the student |
 | 5 | `notebooks/05_student_kd.ipynb` | Kaggle GPU | student S0-S4 (distillation) → results table → `.tflite` for the ESP32 |
+
+**`simulator.py` — the sensor box.** `Y = simulator.simulate(X, station, unit)`: X = true hourly air + weather of one
+station (a `data/2_clean` table), Y = what one ESP32 would log (raw sensor readings + its hourly processing). Only
+needed to make training data (and for demos) while there are no real nodes; at real inference the real sensors
+produce Y. Command line: `uv run python simulator.py data/2_clean/<station>.parquet --unit 0 -o Y.parquet`.
+
+**What the models need at inference**
+
+| | edge student (ESP32) | cloud teacher |
+|---|---|---|
+| sensor data | its own 23 features, last 24 h | the 23 features of every node, last 24 h |
+| weather | none | Open-Meteo: past 24 h, forecast for the next 6 h, wind now |
+| internet / teacher / simulator | not needed | internet needed; no simulator |
 
 ## Data folder (not in git)
 
