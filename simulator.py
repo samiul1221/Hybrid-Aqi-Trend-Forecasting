@@ -15,21 +15,24 @@ X  (one row per IST hour; = a table from data/2_clean/)
     pm25, pm10              true PM (ug/m3, CPCB)            -> PM sensor (SPS30 or PMS7003, see PM_SENSOR), BH1750;
                                                                  kept as the answer
     co_ppm, no2_ppb, o3_ppb true gases (CPCB, gaps filled)    -> MQ-7, MQ-135, SGP41
+    nh3_ppb, benzene_ppb,   true NH3 / benzene / toluene      -> MQ-135, SGP41 VOC pixel
+    toluene_ppb
     t, td, rh               true temperature, dew point, RH   -> HDC1080, PM sensor (humid particles), MQ sensors
     p                       true pressure (hPa)               -> BMP280
-    wind_u, wind_v          true wind (m/s)                   -> 2 perpendicular fans (x, y), HDC1080 (wind cools the shield)
+    wind_u, wind_v          true wind (m/s)                   -> 2 perpendicular fans (|x|, |y|), HDC1080 (wind cools the shield)
     precip                  rain (mm/h)                       -> rain plate (digital 0/1)
     swrad                   sunshine (W/m2)                   -> BH1750, HDC1080 (sun heats the shield)
-    (made inside the box: kappa = particle water uptake, VOC = 20 ppb + r * CO)
+    (made inside the box: kappa = particle water uptake, H2 = 0.53 ppm + traffic H2 with CO,
+     VOC = ethanol-equivalent from benzene + toluene)
 
 Y  (one row per hour)
     raw sensor readings:  pm1, pm25, pm10 (PM sensor) | t, rh (HDC1080) | p (BMP280) | wind_u, wind_v, wind_speed
                           (2 fans) | rain_frac (fraction of the hour the plate read 1) | lux (BH1750) | mq7_rs, mq135_rs (ohm) |
                           sraw_voc, sraw_nox (SGP41 ticks)
     ESP32 processing:     pm_measured, pm_state, pm25_corr, pm10_corr (humidity-corrected), coarse_ratio, dust,
-                          Rbase7, Rbase135, base_voc, base_nox (clean-air baselines), voc_index, nox_index
+                          mq7_rc, mq135_rc (T/RH-compensated Rs), Rbase7, Rbase135, base_voc, base_nox (clean-air baselines), voc_index, nox_index
                           (Sensirion Gas Index Algorithm), aqi_pm (CPCB AQI, 24 h)
-    bookkeeping:          sim_outage (simulated SPS30 outage), true_pm25, true_pm10 (the ANSWER - never a model input)
+    bookkeeping:          sim_outage (simulated PM sensor outage), true_pm25, true_pm10 (the ANSWER - never a model input)
 
 Formulas and sources: notebook 02 (one section per sensor) and docs/simulator_sources.md.
 """
@@ -40,8 +43,12 @@ import hashlib
 import numpy as np
 import pandas as pd
 
-# which PM sensor sits on the node: "SPS30" (planned) or "PMS7003" (backup). Same physics, different numbers.
-PM_SENSOR = "SPS30"
+# which PM sensor sits on the node: "PMS7003" (the one we have now) or "SPS30" (later). Same physics, different numbers.
+# Must match PM_SENSOR in firmware/aqi_node/aqi_node.ino.
+PM_SENSOR = "PMS7003"
+
+# gases measured by CPCB that drive our gas sensors (ppm for CO, ppb for the rest)
+GASES = ("co_ppm", "no2_ppb", "o3_ppb", "nh3_ppb", "benzene_ppb", "toluene_ppb")
 
 
 # a random-number generator that gives the same numbers every run for the same (station, unit)
@@ -137,7 +144,8 @@ def bmp280(p_true, p, rng):
     return p_true - p["height"] / 8.3 + p["bias"] + rng.normal(0, 0.1, len(p_true))
 
 
-# wind: two perpendicular fans (magnet on a blade + hall sensor), one along x (east), one along y (north)
+# wind: two perpendicular fans (magnet on a blade + one hall sensor), one along x (east), one along y (north);
+# they give the wind SPEED along each axis, not its sign
 def wind_params(rng):
     return dict(shelter=U(rng, 0.4, 1.0),      # buildings on the roof slow the wind
                 offset=U(rng, -15, 15))        # the fans are mounted a few degrees off true north / east
@@ -150,7 +158,8 @@ def wind_fans(u_true, v_true, p, rng):
     v_fan = p["shelter"] * (u_true * np.sin(a) + v_true * np.cos(a)) + rng.normal(0, 0.2, n)   # wind along fan 2
     u_fan = np.where(np.abs(u_fan) < 0.3, 0, u_fan)       # a fan does not turn below ~0.3 m/s along its axis
     v_fan = np.where(np.abs(v_fan) < 0.3, 0, v_fan)
-    return u_fan, v_fan
+    # one hall sensor per fan counts turns but cannot tell which way the fan spins -> only the size is known
+    return np.abs(u_fan), np.abs(v_fan)
 
 
 # rain plate (digital 0/1): wet while it rains, stays wet D hours while drying, dew/fog can wet it.
@@ -184,38 +193,69 @@ def bh1750(sun, pm25_true, p, rng):
     return np.clip(lux, 0, 121557)
 
 
-# MQ-7 / MQ-135: draw errors
-def mq_params(rng, r0_median):
-    return dict(r0=r0_median * np.exp(rng.normal(0, 0.5)), b=None, c0=U(rng, 0.3, 1.0),
-                g_t=U(rng, -0.016, -0.007), g_rh=U(rng, -0.008, -0.003), drift=U(rng, -0.001, 0.001))
+# ---- MQ-7 and MQ-135: SnO2 chemiresistors (same physics as the SGP41, Yuan et al. 2022 Adv. Sci.) ----------------
+# Rs = R_air * (1 + gas / C_knee)^b : power law from the adsorption isotherm (b < 0: reducing gases lower Rs),
+# times exp(g_T (T - T_ref) + g_RH (RH - RH_ref)) (water on the surface also gives electrons), slow drift and noise.
 
-
+# MQ-7 (Hanwei datasheet): Rs(100 ppm CO) = 2-20 kOhm, clean air ~25x higher, slope Rs(300)/Rs(100) < 0.5,
+# H2 reacts ~1.4x more than CO (Fig. 3), Fig. 4: about -0.006 ln/degC and -0.0025 ln/%RH
 def mq7_params(rng):
-    p = mq_params(rng, 20000)
-    p["b"] = U(rng, -0.70, -0.45)
-    return p
+    r_100ppm = 6300 * np.exp(rng.normal(0, 0.55))         # lognormal over the 2-20 kOhm datasheet range
+    return dict(r_air=25 * r_100ppm, knee_ppm=U(rng, 0.5, 1.1), b=U(rng, -0.75, -0.55), w_h2=U(rng, 1.2, 1.6),
+                g_t=U(rng, -0.009, -0.005), g_rh=U(rng, -0.004, -0.0015), drift=U(rng, -0.0005, 0.0005))
 
 
+# MQ-135 (Winsen datasheet v1.4): Rs(400 ppm H2) 1.2-7 kOhm (Vs 2-4 V at RL 4.7k), Rs(air)/Rs(400 ppm H2) >= 5,
+# Fig. 3 slopes -0.40 (toluene) ... -0.48 (H2); NH3 ~0.9x and toluene ~0.7x as strong as H2 at equal ppm;
+# Fig. 4: about -0.011 ln/degC and -0.005 ln/%RH. NO2 is oxidising and raises Rs.
 def mq135_params(rng):
-    p = mq_params(rng, 30000)
-    p.update(b=U(rng, -0.55, -0.40), w_co=U(rng, 0.1, 0.5), w_voc=U(rng, 0.5, 1.5), g_ox=U(rng, 0.0, 0.15))
-    return p
+    return dict(r_air=27000 * np.exp(rng.normal(0, 0.45)), knee_ppm=U(rng, 3.0, 6.0), b=U(rng, -0.52, -0.42),
+                w_nh3=U(rng, 0.7, 1.0), w_bt=U(rng, 0.5, 0.8),     # benzene + toluene
+                w_co=U(rng, 0.1, 0.4), g_ox=U(rng, 0.0, 0.15),     # TODO_VERIFY: not in the Winsen figure
+                g_t=U(rng, -0.013, -0.008), g_rh=U(rng, -0.007, -0.004), drift=U(rng, -0.001, 0.001))
 
 
-# metal-oxide sensor: gas -> resistance (formula above)
-def mos_resistance(gas_ppm, t, rh, days, p, rng):
-    ln_rs = (np.log(p["r0"]) + p["b"] * np.log(gas_ppm + p["c0"]) + p["g_t"] * (t - 20)
-             + p["g_rh"] * (rh - 65) + p["drift"] * days + rng.normal(0, 0.05, len(gas_ppm)))
+# the gas mixture each MQ sensor "feels", in ppm of its reference gas (CO for MQ-7, H2 for MQ-135)
+def mq7_gas(co_ppm, h2_ppm, p):
+    return co_ppm + p["w_h2"] * h2_ppm
+
+
+def mq135_gas(co_ppm, h2_ppm, nh3_ppb, benzene_ppb, toluene_ppb, p):
+    return h2_ppm + p["w_co"] * co_ppm + p["w_nh3"] * nh3_ppb / 1000 + p["w_bt"] * (benzene_ppb + toluene_ppb) / 1000
+
+
+# metal-oxide sensor: felt gas + T + RH -> resistance
+def mos_resistance(gas_ppm, t, rh, t_ref, rh_ref, days, p, rng):
+    ln_rs = (np.log(p["r_air"]) + p["b"] * np.log1p(gas_ppm / p["knee_ppm"])
+             + p["g_t"] * (t - t_ref) + p["g_rh"] * (rh - rh_ref) + p["drift"] * days
+             + rng.normal(0, 0.03, len(gas_ppm)))
     return np.exp(ln_rs)
 
 
-def mq7(co_ppm, t, rh, days, p, rng):
-    return mos_resistance(co_ppm, t, rh, days, p, rng)
+def mq7(co_ppm, h2_ppm, t, rh, days, p, rng):
+    return mos_resistance(mq7_gas(co_ppm, h2_ppm, p), t, rh, 20, 65, days, p, rng)
 
 
-def mq135(co_ppm, voc_ppb, no2_ppb, t, rh, days, p, rng):
-    gas = p["w_co"] * co_ppm + p["w_voc"] * voc_ppb / 1000
-    return mos_resistance(gas, t, rh, days, p, rng) * np.exp(p["g_ox"] * np.log1p(np.nan_to_num(no2_ppb) / 20))
+def mq135(co_ppm, h2_ppm, nh3_ppb, benzene_ppb, toluene_ppb, no2_ppb, t, rh, days, p, rng):
+    gas = mq135_gas(co_ppm, h2_ppm, nh3_ppb, benzene_ppb, toluene_ppb, p)
+    oxidising = np.exp(p["g_ox"] * np.log1p(np.nan_to_num(no2_ppb) / 20))
+    return mos_resistance(gas, t, rh, 20, 55, days, p, rng) * oxidising
+
+
+# ---- how the ESP32 reads an MQ sensor (pins.h): 5 V -> Rs -> RL -> 10k/20k divider -> 12-bit ADC ------------------
+# Vout = 5 V * RL / (Rs + RL); the ADC sees 2/3 of it; the firmware turns the voltage back into Rs with the
+# NOMINAL RL. Real resistors are +-5 %, the ADC has gain/offset errors and noise, and it cannot read below
+# ~0.05 V or above ~3.1 V (TODO_VERIFY on the board).
+def adc_params(rng):
+    return dict(rl_error=U(rng, 0.95, 1.05), gain=U(rng, 0.98, 1.02), offset=U(rng, -0.015, 0.015))
+
+
+def read_through_adc(rs, p, rng, rl_nominal=10000.0):
+    rl_real = rl_nominal * p["rl_error"]
+    v_out = 5.0 * rl_real / (rs + rl_real)
+    v_adc = np.clip(v_out * (2 / 3) * p["gain"] + p["offset"] + rng.normal(0, 0.005, len(rs)), 0.05, 3.10)
+    v_est = v_adc / (2 / 3)
+    return rl_nominal * (5.0 - v_est) / v_est
 
 
 # SGP41: draw this unit's errors
@@ -326,9 +366,13 @@ def rolling_aqi(pm25, pm10, measured):
 def station_truth(clean, network_typical, station):
     rng = make_rng(station, -1)
     truth = clean[["ts", "pm25", "pm10", "t", "rh", "td", "p", "wind_u", "wind_v", "precip", "swrad"]].copy()
-    for gas in ("co_ppm", "no2_ppb", "o3_ppb"):
+    for gas in GASES:
         truth[gas] = fill_gas(clean[gas], clean.ts, network_typical[gas])
-    truth["voc_ppb"] = 20 + U(rng, 0.03, 0.10) * truth.co_ppm * 1000
+    # H2: 0.53 ppm background (Novelli 1999) + traffic H2, emitted with CO (~0.5 mol H2 per mol CO, TODO_VERIFY)
+    truth["h2_ppm"] = 0.53 + 0.5 * np.maximum(truth.co_ppm - 0.15, 0)
+    # VOC "ethanol equivalent" for the SGP41: background + all VOCs, scaled from measured benzene + toluene
+    # (benzene + toluene are only part of urban VOCs; factor TODO_VERIFY)
+    truth["voc_ppb"] = 20 + U(rng, 4, 8) * (truth.benzene_ppb + truth.toluene_ppb)
     truth["kappa"] = kappa_series(len(truth), rng)
     truth["ws"] = np.hypot(truth.wind_u, truth.wind_v)
     truth["wd"] = np.rad2deg(np.arctan2(-truth.wind_u, -truth.wind_v)) % 360
@@ -339,7 +383,8 @@ def station_truth(clean, network_typical, station):
 def draw_unit(rng):
     return {"pm": pm_sensor_params(rng), "hdc1080": hdc1080_params(rng), "bmp280": bmp280_params(rng),
             "wind": wind_params(rng), "rain": rain_params(rng), "bh1750": bh1750_params(rng),
-            "mq7": mq7_params(rng), "mq135": mq135_params(rng), "sgp41": sgp41_params(rng)}
+            "mq7": mq7_params(rng), "mq135": mq135_params(rng), "sgp41": sgp41_params(rng),
+            "adc7": adc_params(rng), "adc135": adc_params(rng)}
 
 
 # every sensor of one unit reads the true values
@@ -356,8 +401,12 @@ def read_sensors(truth, p, rng):
     r["wind_speed"] = np.hypot(u_fan, v_fan)
     r["rain_frac"] = rain_board(g["precip"], g["rh"], p["rain"], rng)
     r["lux"] = bh1750(g["swrad"], g["pm25"], p["bh1750"], rng)
-    r["mq7_rs"] = mq7(g["co_ppm"], r.t.to_numpy(), r.rh.to_numpy(), days, p["mq7"], rng)
-    r["mq135_rs"] = mq135(g["co_ppm"], g["voc_ppb"], g["no2_ppb"], r.t.to_numpy(), r.rh.to_numpy(), days, p["mq135"], rng)
+    t_air, rh_air = g["t"], g["rh"]                    # the MQ heater sits in the outside air
+    rs7 = mq7(g["co_ppm"], g["h2_ppm"], t_air, rh_air, days, p["mq7"], rng)
+    rs135 = mq135(g["co_ppm"], g["h2_ppm"], g["nh3_ppb"], g["benzene_ppb"], g["toluene_ppb"], g["no2_ppb"],
+                  t_air, rh_air, days, p["mq135"], rng)
+    r["mq7_rs"] = read_through_adc(rs7, p["adc7"], rng)              # what the firmware computes from the ADC
+    r["mq135_rs"] = read_through_adc(rs135, p["adc135"], rng)
     r["sraw_voc"], r["sraw_nox"] = sgp41(g["voc_ppb"], g["no2_ppb"], g["o3_ppb"], days, p["sgp41"], rng)
     return r
 
@@ -375,7 +424,11 @@ def process_on_device(r, missing, outage, truth):
     r["pm10_corr"] = humidity_correct(r.pm10, r.rh)
     r["coarse_ratio"] = (r.pm10 - r.pm25) / np.maximum(r.pm1, 1)
     r["dust"] = (r.coarse_ratio > 0.5) & (r.rh < 60) & r.pm_measured
-    r["Rbase7"], r["Rbase135"] = rolling_baseline(r.mq7_rs, 0.90), rolling_baseline(r.mq135_rs, 0.90)
+    # MQ temperature / humidity compensation with the datasheets' TYPICAL slopes (each real unit differs a bit,
+    # so some T/RH effect is left, as on real hardware). For the MQ-135 in outdoor air T/RH matter more than the gases.
+    r["mq7_rc"] = r.mq7_rs * np.exp(0.007 * (r.t - 20) + 0.0028 * (r.rh - 65))
+    r["mq135_rc"] = r.mq135_rs * np.exp(0.0105 * (r.t - 20) + 0.0055 * (r.rh - 55))
+    r["Rbase7"], r["Rbase135"] = rolling_baseline(r.mq7_rc, 0.90), rolling_baseline(r.mq135_rc, 0.90)
     r["base_voc"], r["base_nox"] = rolling_baseline(r.sraw_voc, 0.90), rolling_baseline(r.sraw_nox, 0.10)
     r["voc_index"], r["nox_index"] = gas_index(r.sraw_voc.to_numpy(), r.sraw_nox.to_numpy())
     r["aqi_pm"] = rolling_aqi(r.pm25_corr.to_numpy(), r.pm10_corr.to_numpy(), r.pm_measured.to_numpy())
@@ -400,7 +453,7 @@ def simulate(X, station, unit, network_typical=None):
     If not given, the station's own typical values are used."""
     if network_typical is None:
         local = X.ts.dt.tz_convert("Asia/Kolkata")
-        network_typical = {g: X[g].groupby([local.dt.month, local.dt.hour]).median() for g in ("co_ppm", "no2_ppb", "o3_ppb")}
+        network_typical = {g: X[g].groupby([local.dt.month, local.dt.hour]).median() for g in GASES}
     truth = station_truth(X, network_typical, station)
     Y, _ = simulate_unit(truth, station, unit)
     return Y

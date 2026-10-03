@@ -72,3 +72,17 @@ week / co-location. Section numbers like [S10.3] refer to `docs/specs/edge_imple
 | PMS7003 (switch `PM_SENSOR`) | scale U(1.4, 2.0), ΔT U(0, 1) °C, dust efficiency U(0.15, 0.35), PM10 extrapolation U(0.05, 0.20), PM1 ratio U(0.70, 0.90) | κ-Köhler calibration for Plantower (Patel et al. 2024 AMT); PMS dust underestimation (Kaur et al. 2026 AMT); PMS7003 vs GRIMM (Macías-Hernández et al. 2023 Urban Climate); dryer study PMS7003 −25…40 % (Lekamge et al. 2025 npj CAS); EPA PurpleAir correction ≈ 1/1.9 — TODO_VERIFY in Delhi |
 | wind | two perpendicular fans (hall sensor), each reads the wind along its axis: k·(rotated u, v) + N(0, 0.2), 0 below 0.3 m/s; k U(0.4, 1.0), mounting offset U(−15°, 15°) | owner's hardware description |
 | rain | digital 0/1 plate; hourly feature = fraction of minute readings that were 1 | owner's hardware description |
+
+## Update 2026-10-03 (2): MQ-7 / MQ-135 refit, ADC layer, PMS7003 default, speed-only fans
+
+| item | value | source |
+|---|---|---|
+| MQ physics | $R_s = R_{air}(1 + gas/C_{knee})^b \cdot e^{g_T(T-T_{ref}) + g_{RH}(RH-RH_{ref}) + d\cdot days + N(0, 0.03)}$; hourly data = steady state (response times are seconds-minutes) | Yuan et al. 2022 Adv. Sci. doi:10.1002/advs.202203594; Filipovic & Selberherr 2019 Materials 12:2410 |
+| MQ-7 | $R_{100}$ (Rs at 100 ppm CO) lognormal over 2-20 kΩ, $R_{air} = 25 R_{100}$, knee U(0.5, 1.1) ppm, b U(−0.75, −0.55), gas = CO + U(1.2, 1.6)·H2, g_T U(−0.009, −0.005), g_RH U(−0.004, −0.0015), ref 20 °C / 65 %; model reproduces Fig. 3 Rs/R0 within ~10 % | Hanwei MQ-7 datasheet (docs/papers/Datasheet/MQ-7.pdf); PMC9685467; ScienceDirect S0263224126012352; SparkFun MQ-7 notes |
+| MQ-135 | $R_{air}$ lognormal median 27 kΩ, knee U(3, 6) ppm, b U(−0.52, −0.42), gas = H2 + U(0.1, 0.4)·CO + U(0.7, 1.0)·NH3 + U(0.5, 0.8)·(benzene + toluene), × (1 + NO2/20)^U(0, 0.15), g_T U(−0.013, −0.008), g_RH U(−0.007, −0.004), ref 20 °C / 55 % | Winsen MQ135 v1.4 manual (docs/papers/Datasheet); PMC6695634; CO / NO2 weights TODO_VERIFY |
+| H2 (not measured) | 0.53 ppm background + 0.5·max(CO − 0.15, 0) | Novelli 1999 background; traffic ratio TODO_VERIFY |
+| what moves the MQ-135 in Delhi (std of ln Rs, 2023) | RH 0.111, T 0.085, traffic H2 0.037, NO2 0.030, CO 0.018, NH3 0.002, BTEX 0.001 → outdoors it is a T/RH-dominated traffic-combustion index; NH3 / benzene are far below its 10-1000 ppm range | notebook 02 §2.7 |
+| on-device T/RH compensation | $R_c = R_s e^{-g_T(T-T_{ref}) - g_{RH}(RH-RH_{ref})}$ with the datasheets' typical slopes (MQ-7 0.007 / 0.0028, MQ-135 0.0105 / 0.0055); feature $\ln(R_c / R_{c,base})$, base = 90th percentile of the previous 7 days | datasheets Fig. 4 |
+| ADC readback | Vout = 5 V·RL/(Rs + RL) → 10k/20k divider → ESP32 ADC; firmware assumes nominal RL = 10 kΩ; real RL ±5 %, gain ±2 %, offset ±15 mV, noise 5 mV, readable 0.05-3.1 V; median Rs error 3.5 % | pins.h; ESP32 ADC docs; TODO_VERIFY on the board (MQ-7 with 10 kΩ sits at 0.33-1.02 V: 47 kΩ would use more of the range) |
+| PM sensor default | `PM_SENSOR = "PMS7003"` (owner has no SPS30 yet). Simulated raw PMS7003 vs true PM2.5 in Delhi winter: median slope 2.19, R² 0.61 (96 units). No Delhi field study for the PMS7003 found; EPA PurpleAir fit ≈ 1.9× | TODO_VERIFY with co-location |
+| wind fans | one hall sensor per fan → only the speed along each axis is known: features are $|u_{fan}|$, $|v_{fan}|$. The teacher's wind direction comes from ERA5, not from the fans | owner's hardware (old sketch env-anamoly-3-RF) |

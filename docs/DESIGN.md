@@ -21,8 +21,10 @@ built and why, in one place. "TODO_VERIFY" = check with a primary source or real
 ## 2. Simulator (notebook 02)
 - No ESP32 data yet → 3 virtual units per station (32 stations → 96 units). Physics + datasheet formulas, not ML,
   one small function per sensor with its formula written above it.
-- SPS30 calibrated to the IIT-Delhi field study (winter slope vs reference 1.46-1.86, R² ≈ 0.9): needs the
-  "sensor is warmer inside" effect (without it R² was 0.65). Result on CPCB data: median slope 1.75, R² 0.86.
+- PM sensor: a PMS7003 is fitted now (`PM_SENSOR = "PMS7003"`, simulated slope vs truth 2.19, R² 0.61; TODO_VERIFY by
+  co-location). The SPS30 option is calibrated to the IIT-Delhi field study (winter slope 1.46-1.86, R² ≈ 0.9): it needs
+  the "sensor is warmer inside" effect (without it R² was 0.65); result on CPCB data: median slope 1.75, R² 0.86.
+- Wind: two perpendicular fans with one hall sensor each → speed along each axis only, features |u|, |v|.
 - Each unit draws its own errors once (bias, gain, drift), plus random missing hours and ~1 outage per year.
 - After the sensors, the ESP32's own processing runs (humidity correction κ = 0.4, dust flag, gas baselines, AQI).
 

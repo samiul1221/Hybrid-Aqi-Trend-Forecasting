@@ -29,7 +29,8 @@ Start with `README.md`, then `docs/DESIGN.md` (all decisions in plain words).
 - No future leakage: inputs use hours ≤ t; teacher outputs for student training are out-of-fold.
 - Times: IST clock hours; `ts` is the UTC instant of the IST hour start. Open-Meteo: always request `timezone=GMT`.
 - pandas 3: never `astype(int64) // 10**9` for datetimes; use `(ts - Timestamp(0, tz="UTC")) // Timedelta("1s")`.
-- Sensor pool is fixed (SPS30, HDC1080, BMP280, anemometer, rain board, BH1750, MQ-7, MQ-135, SGP41, DS3231).
+- Sensor pool is fixed (PMS7003 now / SPS30 later, HDC1080, BMP280, 2 perpendicular fans (speed only), rain plate 0/1,
+  BH1750, MQ-7, MQ-135, SGP41, DS3231). Board now: ESP32-WROOM-32 DevKit 38-pin; ESP32-S3 later.
 - CPCB AQI only. Unverified constants get `TODO_VERIFY`. Never present a stub as done.
 
 ## Where things are
