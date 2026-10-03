@@ -1,1 +1,0 @@
-"""Edge students and teachers."""

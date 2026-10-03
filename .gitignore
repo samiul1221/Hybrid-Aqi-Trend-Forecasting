@@ -2,13 +2,11 @@
 .venv/
 __pycache__/
 *.py[cod]
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
 *.egg-info/
 dist/
 
 # data and run outputs (never commit)
+.ipynb_checkpoints/
 /data/
 mlruns/
 mlartifacts/
@@ -16,7 +14,8 @@ mlartifacts/
 
 # builds
 build/
-edge/firmware/aqi_node/build/
+firmware/aqi_node/build/
+kaggle/_staging/
 
 # secrets
 .env
@@ -26,3 +25,4 @@ edge/firmware/aqi_node/build/
 .idea/
 .DS_Store
 Thumbs.db
+.playwright-mcp/

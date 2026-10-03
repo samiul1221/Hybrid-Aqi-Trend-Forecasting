@@ -1,22 +1,56 @@
-# aqi-hybrid
+# Hybrid AQI forecasting for Delhi: cloud teacher → ESP32 student
 
-Edge–cloud hybrid AQI forecasting for Delhi: ESP32-S3 sensor nodes run small "student" models (RandomForest, GDC-CNN) that forecast PM2.5/PM10 and the CPCB AQI trend 1–3 h ahead; a cloud graph "teacher" (phase 2) forecasts 1–6 h for all nodes and distils its knowledge into the students.
+B.Tech research prototype. A big **cloud teacher** that sees the whole Delhi monitoring network (graph + wind +
+transport physics) teaches a tiny **student** that runs alone on an ESP32-S3 node and forecasts PM2.5 / PM10
+(→ CPCB AQI trend) for the next 1-3 hours, even without internet.
 
-- Specs (source of truth): `docs/specs/edge_implementation_plan.md`, `docs/specs/cloud_implementation_plan.md`
-- Progress: `docs/PROGRESS.md` · Decisions: `docs/decisions/`
+**Research question:** how much of the teacher's network knowledge (neighbours, wind, transport physics)
+survives in a student that only sees its own sensors?
 
-## Setup
+## The pipeline: five notebooks, each one step
 
-Needs [uv](https://docs.astral.sh/uv/) and, for firmware, `arduino-cli` with the `esp32:esp32` core 3.x.
+Every notebook is self-contained (all code inside, small cells, each starting with a `#` line saying what it does),
+reads the previous step from `data/` and writes the next.
 
-```bash
-uv sync --all-packages        # installs Python 3.11 + all workspace packages
-cp .env.example .env          # fill OPENAQ_API_KEY
-bash scripts/test-all.sh      # Python tests + host C++ firmware tests
-bash scripts/lint.sh          # ruff + mypy
-bash scripts/build-firmware.sh
+| step | notebook | runs on | in → out |
+|---|---|---|---|
+| 1 | `notebooks/01_data.ipynb` | laptop | CPCB hourly files + Open-Meteo weather → `data/2_clean/` (one clean table per station) |
+| 2 | `notebooks/02_simulator.ipynb` | laptop | true air + weather → what 3 virtual ESP32 units per station would read (one formula per sensor) → `data/3_sensors/` |
+| 3 | `notebooks/03_dataset.ipynb` | laptop | 23 features, targets, windows, teacher grids → `data/4_features/` |
+| 4 | `notebooks/04_teacher.ipynb` | Kaggle GPU | teacher T0-T3 (Transformer → wind graph → ADR physics → decoder) + its outputs for the student |
+| 5 | `notebooks/05_student_kd.ipynb` | Kaggle GPU | student S0-S4 (distillation) → results table → `.tflite` for the ESP32 |
+
+## Data folder (not in git)
+
+```
+data/
+  1_download/   cpcb/<station>/  official CPCB hourly CSVs (downloaded by hand, 2018 - Sep 2026)
+                weather/         Open-Meteo ERA5 weather per station (downloaded by notebook 01)
+                stations.csv     33 stations: id, name, lat, lon, elevation
+  2_clean/      one table per station, one row per IST hour: true PM2.5/PM10, CO/NO2/O3, ERA5 weather
+  3_sensors/    one table per virtual unit (32 stations x 3): simulated ESP32 readings (+ true PM as the answer)
+  4_features/   23 features per unit, grid_u0..2.npz (all stations side by side), window lists
+  5_models/     results downloaded from Kaggle
 ```
 
-## Layout
+## Run it
 
-`shared/` cross-component logic and fixtures · `ml/` ML library + ZenML pipelines · `edge/firmware/aqi_node/` Arduino sketch · `edge/firmware/test_host/` host tests · `infra/` MLOps compose · `cloud/`, `frontend/` phase 2.
+```bash
+uv sync                                                    # Python 3.11 + packages
+# run notebooks/01, 02, 03 top to bottom (laptop)
+uv run python kaggle/kaggle_run.py upload                  # send data/4_features to Kaggle (private, 1.2 GB)
+uv run python kaggle/kaggle_run.py teacher --smoke         # quick test on Kaggle
+uv run python kaggle/kaggle_run.py teacher                 # notebook 04 on a T4 GPU
+uv run python kaggle/kaggle_run.py student                 # notebook 05 (uses 04's output)
+uv run python kaggle/kaggle_run.py download student
+```
+Kaggle needs `KAGGLE_API_TOKEN=...` in `.env` (see `.env.example`).
+
+## Other folders
+
+- `kaggle/kaggle_run.py` — upload / run / download on Kaggle.
+- `firmware/aqi_node/` — ESP32-S3 Arduino sketch (`src/config/pins.h` = every pin). Work starts after the student is chosen.
+- `backend/` — later: FastAPI + TimescaleDB + MQTT; `backend/mlops/` — later: ZenML + MLflow + MinIO.
+- `frontend/` — later: dashboard.
+- `docs/DESIGN.md` — every design decision in plain words. `docs/simulator_sources.md` — where every simulator number
+  comes from. `docs/specs/` — original plans and change request. `docs/papers/` — papers and datasheets.
