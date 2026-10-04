@@ -17,8 +17,7 @@ reads the previous step from `data/` and writes the next.
 | 1 | `notebooks/01_data.ipynb` | laptop | CPCB hourly files + Open-Meteo weather → `data/2_clean/` (one clean table per station) |
 | 2 | `notebooks/02_simulator.ipynb` | laptop | explains `simulator.py` sensor by sensor, then runs it: true air + weather → what 3 virtual ESP32 units per station would read → `data/3_sensors/` |
 | 3 | `notebooks/03_dataset.ipynb` | laptop | 23 features, targets, windows, teacher grids → `data/4_features/` |
-| 4 | `notebooks/04_teacher.ipynb` | Kaggle GPU | teacher T0-T3 (Transformer → wind graph → ADR physics → decoder) + its outputs for the student |
-| 5 | `notebooks/05_student_kd.ipynb` | Kaggle GPU | student S0-S4 (distillation) → results table → `.tflite` for the ESP32 |
+| 4 | `notebooks/04_train.ipynb` | Kaggle GPU (one session) | **Part A** teacher T0-T3 + ablation runs (Transformer → wind graph → ADR physics → decoder), benchmarks, outputs for the student; **Part B** student: tuning, S0-S4 distillation, loss + sensor ablation, benchmarks → best student as `.tflite` + `student_model.h` for the ESP32 |
 
 **`simulator.py` — the sensor box.** `Y = simulator.simulate(X, station, unit)`: X = true hourly air + weather of one
 station (a `data/2_clean` table), Y = what one ESP32 would log (raw sensor readings + its hourly processing). Only
@@ -52,10 +51,10 @@ data/
 uv sync                                                    # Python 3.11 + packages
 # run notebooks/01, 02, 03 top to bottom (laptop)
 uv run python kaggle/kaggle_run.py upload                  # send data/4_features to Kaggle (private, 1.2 GB)
-uv run python kaggle/kaggle_run.py teacher --smoke         # quick test on Kaggle
-uv run python kaggle/kaggle_run.py teacher                 # notebook 04 on a T4 GPU
-uv run python kaggle/kaggle_run.py student                 # notebook 05 (uses 04's output)
-uv run python kaggle/kaggle_run.py download student
+uv run python kaggle/kaggle_run.py train --smoke           # quick test on Kaggle (a few minutes)
+uv run python kaggle/kaggle_run.py train                   # notebook 04 on a T4 GPU: teacher, then student (<= 12 h)
+uv run python kaggle/kaggle_run.py status
+uv run python kaggle/kaggle_run.py download                # results + firmware/aqi_node/student_model.h
 ```
 Kaggle needs `KAGGLE_API_TOKEN=...` in `.env` (see `.env.example`).
 

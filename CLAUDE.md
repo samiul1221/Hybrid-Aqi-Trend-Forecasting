@@ -14,7 +14,7 @@ Start with `README.md`, then `docs/DESIGN.md` (all decisions in plain words).
 ## Code style (owner's request — most important)
 - Easy to read and present beats "professional". Write like a careful student: plain functions, short comments
   that say WHY, no frameworks, no factories/registries/config classes, no type-checking ceremony.
-- All code lives in the notebooks `notebooks/01..05`, each self-contained: many SMALL cells, every code cell starts
+- All code lives in the notebooks `notebooks/01..04` (04 = all training on Kaggle: Part A teacher, Part B student), each self-contained: many SMALL cells, every code cell starts
   with a `# what this cell does` comment, formulas in markdown above the code (one function per sensor / block).
   Each notebook reads the previous step from `data/` and writes the next; there is no shared `src/` package.
 - One exception: `simulator.py` (repo root) is the sensor box `simulate(X, station, unit) -> Y`, used by notebook 02
@@ -39,7 +39,8 @@ Start with `README.md`, then `docs/DESIGN.md` (all decisions in plain words).
   Splits: train 2018-2023, val 2024, test 2025-Sep 2026; 5 hold-out stations never trained on.
 - Training runs only on Kaggle (never train models on the laptop; local runs are tiny smoke tests at most).
 - `kaggle/kaggle_run.py`: upload / run / download on a Kaggle T4 GPU (`KAGGLE_API_TOKEN` in `.env`).
-- `firmware/aqi_node/` Arduino sketch; every pin in `src/config/pins.h`.
+- `firmware/aqi_node/` Arduino sketch (WROOM-32): `features.h` = the device's feature code, checked against the
+  notebooks by `firmware/check_features.py`; the trained model arrives as `student_model.h` beside the sketch.
 - `backend/` (+ `backend/mlops/`: ZenML, MLflow, MinIO) and `frontend/`: later phase, keep as is.
 - `docs/specs/` original plans (reference), `docs/simulator_sources.md`, `docs/papers/`.
 
@@ -47,5 +48,5 @@ Start with `README.md`, then `docs/DESIGN.md` (all decisions in plain words).
 ```bash
 uv sync                                   # setup (Python 3.11)
 uv add --bounds exact <pkg>               # add a dependency (pinned)
-uv run python kaggle/kaggle_run.py upload | teacher | student | status teacher | download teacher
+uv run python kaggle/kaggle_run.py upload | train [--smoke] | status | download
 ```

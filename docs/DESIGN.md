@@ -67,15 +67,28 @@ tests network knowledge, not "clean data teaching noisy data".
 - Out-of-fold outputs: 3 teachers each skip one block of training hours (± 30 h gap) and predict it, so the
   student never learns from a teacher that saw the answer.
 
-## 6. Student (notebook 05) — GDC-CNN, Keras → TFLite FP32
+## 6. Student (notebook 04, Part B) — GDC-CNN, Keras → TFLite FP32
 - Na et al. 2026 architecture: patches of 2 h, 3 gated dilated depthwise conv blocks. Width 16 (A) / 64 (B).
 - S0 plain; S1 + teacher forecast; S2 + teacher time features & attention (Na's L_feat, L_AFD); S3 + teacher GAT
   state; S4 + teacher ADR state. Weights: λp = 0.4 on the true target (Na; TODO_VERIFY in the paper's code),
   KD terms share the rest and ramp up over 10 epochs. Teacher forecast copied only where it beats S0 (Shmuel).
 - Only the student is exported; projection heads are thrown away. FP32 on the ESP32 (INT8 only as a test).
 
+## 6b. Benchmarks, tuning and ablation (notebook 04)
+- Benchmarks for every model and persistence, on the test period, at the 27 training stations and separately at the
+  5 never-seen stations, per output (pollutant x horizon) and per season: RMSE / MAE of the ln change, R², skill vs
+  persistence, RMSE / MAE in ug/m3, CPCB category accuracy, and (teacher) q10-q90 band coverage.
+- Teacher ablation: add one block (T0 -> T3) and remove one block from T3 (no wind, no future weather; no ADR = T2);
+  T3 is trained 3 times (seeds) to see what is noise.
+- Student: lr x width tuned on S0 (validation year only); S0-S4 with every allowed teacher; remove one loss from
+  S4-T3; remove one sensor from S0 (which sensors does the node need?). Every student 3 seeds -> mean +- spread.
+- Saved: only the best teacher (cloud inference later) + teacher outputs for the student, and only the best
+  student (.keras, .tflite, student_model.h). All in one Kaggle session: teacher <= 8.5 h, student until 11.3 h.
+- Fixed on the way: S0 now uses the same loss as S1-S4 (fair comparison); the teacher's "unseen" score uses only
+  the 5 hold-out stations; feature gaps are filled from the past only (no future leakage).
+
 ## 7. Training place
-- Laptop: data, simulator, features (notebooks 01-03). Kaggle T4 GPU: all training (notebooks 04-05, `kaggle/kaggle_run.py`).
+- Laptop: data, simulator, features (notebooks 01-03). Kaggle T4 GPU: all training in one session (notebook 04: teacher, then student; `kaggle/kaggle_run.py`).
   Not TPU: PyTorch on TPU needs torch_xla and our graph code is not a good fit.
 
 ## 8. Earlier results (version 1 on the OpenAQ data, kept for the report; synthetic sensors)
