@@ -82,6 +82,11 @@ tests network knowledge, not "clean data teaching noisy data".
   T3 is trained 3 times (seeds) to see what is noise.
 - Student: lr x width tuned on S0 (validation year only); S0-S4 with every allowed teacher; remove one loss from
   S4-T3; remove one sensor from S0 (which sensors does the node need?). Every student 3 seeds -> mean +- spread.
+- Baselines on the student's exact test windows: persistence, ridge regression, LightGBM, and the teachers
+  themselves ("gain kept" = (student - S0) / (teacher - S0)). Extra metrics: bias, high-PM error, Poor hit /
+  false-alarm rate, direction accuracy, and "_device" versions that start from the node's own PM (deployment view).
+- Validation for early stopping is spread over all 3 units and the whole year; normalisation uses all 3 units;
+  out-of-fold: 5 folds for T3, 3 for T0-T2; results labelled hindcast (oracle future weather); run_manifest.json.
 - Saved: only the best teacher (cloud inference later) + teacher outputs for the student, and only the best
   student (.keras, .tflite, student_model.h). All in one Kaggle session: teacher <= 8.5 h, student until 11.3 h.
 - Fixed on the way: S0 now uses the same loss as S1-S4 (fair comparison); the teacher's "unseen" score uses only
