@@ -26,3 +26,6 @@ kaggle/_staging/
 .DS_Store
 Thumbs.db
 .playwright-mcp/
+
+# firmware: your Wi-Fi password and cloud URL
+firmware/aqi_node/secrets.h
