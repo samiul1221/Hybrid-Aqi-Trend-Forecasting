@@ -1,5 +1,5 @@
 """
-Check that the ESP32 code (firmware/aqi_node/features.h) gives the student exactly the input it was trained on.
+Check that the ESP32 code (firmware/aqi_node/features.cpp) gives the student exactly the input it was trained on.
 
     uv run python firmware/check_features.py        # needs g++ (MinGW) and data/3_sensors + data/4_features
 
@@ -87,7 +87,7 @@ with tempfile.TemporaryDirectory() as tmp:
             row = " ".join("-9999" if np.isnan(v) else f"{v:.7g}" for v in values[i])
             f.write(f"{start.iloc[i]} {int(log.pm_measured.iloc[i])} {int(check[i])} {row}\n")
     (tmp / "harness.cpp").write_text(HARNESS)
-    subprocess.run(["g++", "-O2", "-std=c++11", "-I", str(ROOT / "firmware" / "aqi_node"), "harness.cpp", "-o", "harness"],
+    subprocess.run(["g++", "-O2", "-std=c++11", "-I", str(ROOT / "firmware" / "aqi_node"), "harness.cpp", str(ROOT / "firmware" / "aqi_node" / "features.cpp"), "-o", "harness"],
                    cwd=tmp, check=True)
     subprocess.run([str(tmp / "harness")], cwd=tmp, check=True)
     lines = (tmp / "out.txt").read_text().splitlines()
