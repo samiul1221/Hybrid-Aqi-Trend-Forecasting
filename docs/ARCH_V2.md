@@ -1,5 +1,8 @@
 # Architecture v2: a node-network AQI forecaster for Delhi (cloud graph teacher + regional broadcast + on-device local model)
 
+> **Superseded by `docs/ARCH_V3.md` (17 Nov 2026).** v3 adds node memory (E8) and corrects the "no-regret" claim
+> for the full split model (E9). This file is kept for history.
+
 Version 2, 15 Nov 2026. One file that explains the whole system end to end: what the nodes do, what the cloud does,
 what is new, what was tested, what failed, and what comes next. Plain words first, formulas after.
 

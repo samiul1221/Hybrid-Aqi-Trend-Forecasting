@@ -36,6 +36,7 @@ S10 = {u: sensor(u, "ln_pm10") for u in range(3)}
 R25 = {u: np.nanmean(S25[u][:, TRAIN_ST], 1) for u in range(3)}
 R10 = {u: np.nanmean(S10[u][:, TRAIN_ST], 1) for u in range(3)}
 LOGPM = np.log1p(grids[0]["pm"][:, TRAIN_ST])           # true PM (the same for every unit): regional TARGET only
+OUTPUTS = [(0, 1), (0, 2), (0, 3), (1, 1), (1, 2), (1, 3)]      # (pollutant, hours ahead) the cloud forecasts
 def lagged(a, k):
     out = np.full_like(a, np.nan)
     out[k:] = a[:-k] if k else a
@@ -58,17 +59,17 @@ def region_table(u):
         cols[name] = grids[u]["X"][:, 0, FEATURES.index(name)]
     return pd.DataFrame(cols)
 
-TARGET = np.full((T_ALL, 6), np.nan)
-for j, (p, h) in enumerate([(0, 1), (0, 2), (0, 3), (1, 1), (1, 2), (1, 3)]):
+TARGET = np.full((T_ALL, len(OUTPUTS)), np.nan)
+for j, (p, h) in enumerate(OUTPUTS):
     TARGET[:-h, j] = np.nanmean(LOGPM[h:, :, p] - LOGPM[:-h, :, p], 1)
 
 TAB = {u: region_table(u) for u in range(3)}
 PARAMS = dict(objective="l2", learning_rate=0.05, num_leaves=31, min_data_in_leaf=100, verbose=-1, num_threads=4)
 FOLDS = [(2018, 2019), (2020, 2021), (2022, 2023)]
-RHAT = {u: np.full((T_ALL, 6), np.nan, np.float32) for u in range(3)}
+RHAT = {u: np.full((T_ALL, len(OUTPUTS)), np.nan, np.float32) for u in range(3)}
 is_train = SPLIT == "train"
 cloud_rows = []
-for j in range(6):
+for j in range(len(OUTPUTS)):
     def fit(hours):
         x = pd.concat([TAB[u].iloc[hours] for u in range(3)])
         y = np.concatenate([TARGET[hours, j]] * 3)
