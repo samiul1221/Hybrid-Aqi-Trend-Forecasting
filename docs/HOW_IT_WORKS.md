@@ -1,5 +1,7 @@
 # How the system works (in plain words)
 
+> **Naming note:** this file describes version 1, where the big cloud graph model was called the "teacher" and the on-device model the "student". The current design (v3) is in `docs/ARCH_V3.md`; it no longer treats the box model as a copy of the cloud model.
+
 ## 1. The idea in one paragraph
 
 A small box with cheap sensors sits on a roof in Delhi. Every hour it guesses how dirty the air will be in the

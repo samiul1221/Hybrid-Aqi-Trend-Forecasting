@@ -1,5 +1,7 @@
 # What the ablation study found (and what to do about it)
 
+> **Naming note:** this file describes version 1, where the big cloud graph model was called the "teacher" and the on-device model the "student". The current design (v3) is in `docs/ARCH_V3.md`; it no longer treats the box model as a copy of the cloud model.
+
 All numbers come from the **latest successful Kaggle run** (`aqi-train`, finished 9 Oct 2026, no failed runs;
 files in `data/5_models/kaggle/`). Test period: Jan 2025 – Sep 2026, never used for training.
 

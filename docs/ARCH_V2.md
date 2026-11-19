@@ -1,5 +1,7 @@
 # Architecture v2: a node-network AQI forecaster for Delhi (cloud graph teacher + regional broadcast + on-device local model)
 
+> **Naming note:** this file describes version 1, where the big cloud graph model was called the "teacher" and the on-device model the "student". The current design (v3) is in `docs/ARCH_V3.md`; it no longer treats the box model as a copy of the cloud model.
+
 > **Superseded by `docs/ARCH_V3.md` (17 Nov 2026).** v3 adds node memory (E8) and corrects the "no-regret" claim
 > for the full split model (E9). This file is kept for history.
 

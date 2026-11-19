@@ -7,14 +7,15 @@ Guidance for Claude Code in this repository.
 - At the end of every response, explain what you did, why, and how, in simple, concise language.
 
 ## What this is
-A **student-style research prototype** (B.Tech): cloud graph teacher (TI-STGNN, PyTorch) distils network
-knowledge into an ESP32-S3 student (GDC-CNN, Keras → TFLite FP32) that forecasts PM2.5/PM10 1-3 h ahead.
+A **student-style research prototype** (B.Tech): a cloud graph model (TI-STGNN, PyTorch) and a regional forecaster
+send network information to a tiny box model on the ESP32-S3 (GDC-CNN, Keras → TFLite FP32) that forecasts PM2.5/PM10 1-3 h ahead
+(current design: `docs/ARCH_V3.md`; older files and notebooks call the cloud graph model "teacher" and the box model "student").
 Start with `README.md`, then `docs/DESIGN.md` (all decisions in plain words).
 
 ## Code style (owner's request — most important)
 - Easy to read and present beats "professional". Write like a careful student: plain functions, short comments
   that say WHY, no frameworks, no factories/registries/config classes, no type-checking ceremony.
-- All code lives in the notebooks `notebooks/01..04` (04 = all training on Kaggle: Part A teacher, Part B student), each self-contained: many SMALL cells, every code cell starts
+- All code lives in the notebooks `notebooks/01..04` (04 = all training on Kaggle: Part A cloud graph model, Part B box model), each self-contained: many SMALL cells, every code cell starts
   with a `# what this cell does` comment, formulas in markdown above the code (one function per sensor / block).
   Each notebook reads the previous step from `data/` and writes the next; there is no shared `src/` package.
 - One exception: `simulator.py` (repo root) is the sensor box `simulate(X, station, unit) -> Y`, used by notebook 02
@@ -23,10 +24,10 @@ Start with `README.md`, then `docs/DESIGN.md` (all decisions in plain words).
 - Notebooks find their data on Kaggle automatically (`/kaggle/input`) and locally (`../data`).
 
 ## Hard rules (research correctness)
-- Teacher and student inputs come only from simulated sensor features (same grids, checked in notebook 03).
+- Cloud graph model and box model inputs come only from simulated sensor features (same grids, checked in notebook 03).
   True CPCB PM is a TARGET only, never an input (node or neighbours).
-- Target `y = ln(1+PM[t+h]) − ln(1+PM[t])`, order `[pm25_h1..h3, pm10_h1..h3]` (teacher h1..h6).
-- No future leakage: inputs use hours ≤ t; teacher outputs for student training are out-of-fold.
+- Target `y = ln(1+PM[t+h]) − ln(1+PM[t])`, order `[pm25_h1..h3, pm10_h1..h3]` (cloud graph model h1..h6).
+- No future leakage: inputs use hours ≤ t; cloud graph model outputs used to train the box model are out-of-fold.
 - Times: IST clock hours; `ts` is the UTC instant of the IST hour start. Open-Meteo: always request `timezone=GMT`.
 - pandas 3: never `astype(int64) // 10**9` for datetimes; use `(ts - Timestamp(0, tz="UTC")) // Timedelta("1s")`.
 - Sensor pool is fixed (PMS7003 now / SPS30 later, HDC1080, BMP280, 2 perpendicular fans (speed only), rain plate 0/1,

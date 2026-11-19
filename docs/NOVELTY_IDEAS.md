@@ -15,8 +15,8 @@ Everything here is on simulated sensor boxes, like the rest of the project.
 1. **The box sees almost nothing the cloud does not.** It uploads all 23 features every hour. With hourly data
    its only private assets are: its long memory, its offline hours, and its own forecast. The one truly
    node-private signal is **sub-hourly** data (idea 9), and the present data cannot test it.
-2. **The student may simply be under-trained.** On the same windows the student (S0) scores 14.0 and the
-   teacher 20.8, but the graph explains only about 1.9 of that gap and future weather about 1. The student
+2. **The box model may simply be under-trained.** On the same windows the box model (S0) scores 14.0 and the
+   cloud graph model 20.8, but the graph explains only about 1.9 of that gap and future weather about 1. The box model
    trains on 200 000 of 2.6 M windows. This is an inference across different tables, not a verified fact;
    experiment E10 checks it. If true, it matters more than any idea below.
 
@@ -30,7 +30,7 @@ Everything here is on simulated sensor boxes, like the rest of the project.
 | Metric | RMSE % change vs the baseline, 95 % week-block paired bootstrap CI; skill vs persistence |
 | Setup | 3 seeds, seen (27) and unseen (5) stations, test 2025 - Sep 2026 |
 | Tuning | on 2024 only (one exception: E7, see there) |
-| Hard rules | true CPCB PM is a target only; no future data; teacher outputs out-of-fold; fixed sensor pool |
+| Hard rules | true CPCB PM is a target only; no future data; cloud graph model outputs out-of-fold; fixed sensor pool |
 | Kill threshold | written down **before** the run and not changed afterwards |
 
 A failed idea is reported as a negative result, not hidden.
@@ -72,7 +72,7 @@ Ideas 1-13 come from other fields. Ideas 14-18 come from the papers in `docs/pap
 ### Idea 1. Node memory of its "usual self" (E8)
 
 - **In simple words:** the box keeps a table of its usual offset from the region for every clock hour. It tells
-  the student "how unusual am I right now" and "how my offset usually moves in the next 1-3 h".
+  the box model "how unusual am I right now" and "how my offset usually moves in the next 1-3 h".
 - **Borrowed from:** finance (error-correction models, Engle and Granger 1987), weather climatology and anomaly
   forecasting. As feature engineering it is probably not novel.
 - **Why it could work:** the consensus filter keeps one average offset (24 h EWMA), blind to the hour of day.
@@ -135,9 +135,9 @@ Ideas 1-13 come from other fields. Ideas 14-18 come from the papers in `docs/pap
 - **What to write in the paper:** the simple disagreement rule is close to the best the cloud can do with what
   it knows; the oracle gap is mostly luck.
 - **Deviation:** fitted on the first half of the test period and scored on the second half, because saved
-  teacher and student forecasts exist only for the test period. Results: `data/6_experiments/trigger/`.
+  cloud graph model and box model forecasts exist only for the test period. Results: `data/6_experiments/trigger/`.
 
-### Check E10. Does the student need more training data?
+### Check E10. Does the box model need more training data?
 
 - **Arms:** 200k windows, width 32 (reference); 1 M windows, width 32; 1 M windows, width 64. Same validation
   and test windows, 2 seeds, Kaggle T4 GPU.
@@ -149,16 +149,16 @@ Ideas 1-13 come from other fields. Ideas 14-18 come from the papers in `docs/pap
 ## 5. Ideas not yet tested
 
 ### Idea 4. Reference-free personalisation
-- **Simple:** the cloud fine-tunes each box's last layer using the teacher's forecast as the label, so a new
+- **Simple:** the cloud fine-tunes each box's last layer using the cloud graph model's forecast as the label, so a new
   site needs no CPCB station.
 - **From:** personalised federated learning (FedPer, to verify), test-time adaptation. Moderately novel for
   low-cost air-quality nodes (to verify).
-- **Why:** one global 15k model serves every site, and teacher labels exist for every node for free.
-- **Experiment:** B0; per-node head from 4, 12 and 52 weeks of 2024 teacher labels; a 4-byte "node passport"
+- **Why:** one global 15k model serves every site, and cloud graph model labels exist for every node for free.
+- **Experiment:** B0; per-node head from 4, 12 and 52 weeks of 2024 cloud graph model labels; a 4-byte "node passport"
   input (noise level, humidity slope, mean offset, daily amplitude); true-label head as an upper bound (seen
   stations only). Kill: weaker than −0.5 % on unseen stations.
 - **Cost:** about 3 h, about 200 bytes per week, 0 extra parameters.
-- **Risk:** global distillation gave only +0.9, and unseen sites already score higher than seen ones.
+- **Risk:** global cloud matching gave only +0.9, and unseen sites already score higher than seen ones.
 
 ### Idea 5. Network error feedback
 - **Simple:** feed the model its own recent forecast errors, scored against the network-denoised level (not
@@ -179,9 +179,9 @@ Ideas 1-13 come from other fields. Ideas 14-18 come from the papers in `docs/pap
 - **Risk:** hour, season and fan wind already tell the regime.
 
 ### Idea 7. Forecast reconciliation (cheapest to test)
-- **Simple:** the cloud's copies of all students must average to the regional forecast; broadcast the mismatch.
+- **Simple:** the cloud's copies of all box models must average to the regional forecast; broadcast the mismatch.
 - **From:** econometrics (MinT, Wickramasuriya, Athanasopoulos and Hyndman 2019). Not novel as a method.
-- **Why:** it removes the error that all students share.
+- **Why:** it removes the error that all box models share.
 - **Experiment:** post-hoc on saved forecasts, no training. Kill: weaker than −0.2 %.
 - **Cost:** under 1 h, 6 bytes per hour, 0 parameters.
 - **Risk:** split-res is already a top-down reconciliation.
@@ -279,30 +279,30 @@ before claiming that a paper lacks something.
 - **From:** TransNet reports recall, precision and false alarms at a "Very Unhealthy" threshold; Wu et al. report
   interval coverage and width.
 - **Do:** recall, precision and false alarms for crossing into CPCB "Poor" or worse at +1..+3 h; coverage and
-  width of the teacher's 10-90 % band after calibrating it on 2024 (it covers 75 % today, not 80 %).
+  width of the cloud graph model's 10-90 % band after calibrating it on 2024 (it covers 75 % today, not 80 %).
 - **Why:** it makes the tables comparable to published ones at no compute cost.
 
-### Idea 17. Two cheap student arms
+### Idea 17. Two cheap box model arms
 - **Longer window (from TSMNet, Tang and Guan 2025, which folds a series by its period):** 48 or 72 h of input
   instead of 24 h. It overlaps with idea 1, so wait for E8 first.
-- **Side task (from Wang et al. 2024, where predicting weather alongside helps):** the student also predicts
+- **Side task (from Wang et al. 2024, where predicting weather alongside helps):** the box model also predicts
   its own next-hour humidity, temperature and wind. The labels come from the box, so no CPCB station is needed.
 - **Kill:** weaker than −0.3 % each. About 3 h CPU for both.
 
 ### Idea 18. On-device measurements
-- **From:** Na et al. 2026 (the student's source) report 256 ms inference on an ESP32-S3.
-- **Do:** latency, flash, RAM and energy of the student with the broadcast inputs on the WROOM-32.
+- **From:** Na et al. 2026 (the box model's source) report 256 ms inference on an ESP32-S3.
+- **Do:** latency, flash, RAM and energy of the box model with the broadcast inputs on the WROOM-32.
 - **Why:** reviewers of edge papers expect it.
 
 ### How the papers position the work
-- **Closest:** Na et al. and REDNet both distil a big teacher into an edge model that then runs alone. In the
+- **Closest:** Na et al. and REDNet both train a small edge model to copy a big model, and the small model then runs alone. In the
   pages read, neither sends cloud context to the device at inference. That is the split design's gap.
-- **Bigger students are normal:** REDNet's student has 174k parameters against 15k here. This supports E10.
+- **Bigger box models are normal:** REDNet's box model has 174k parameters against 15k here. This supports E10.
 - **Simulated data is defensible:** Morales-García et al. 2025 use synthetic data to train graph models when real
   data is short, and show traffic data helps, which matches the MQ-7 finding.
 - **Scale explains the physics result:** TransNet finds transport operators essential across 170 stations in a
   whole country; here 32 stations sit in one airshed at 1-3 h.
-- **Low priority:** Shmuel et al. 2026 distil a boosting model into a readable formula. It could be done for the
+- **Low priority:** Shmuel et al. 2026 turn a boosting model into a readable formula. It could be done for the
   regional forecaster, but like the fuzzy gate it buys interpretability, not accuracy.
 
 ---

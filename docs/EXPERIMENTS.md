@@ -22,10 +22,10 @@ it, the result, the verdict, and the novelty (if any) that came out of it.
 | **seen / unseen** | the 27 training stations (test years) / the 5 hold-out stations never trained on (new places). |
 | **test period** | Jan 2025 - Sep 2026. Train 2018-2023, validation 2024. |
 | **kill threshold** | the pass / fail rule, written down **before** the run (E7-E9) and not changed afterwards. |
-| **ctx** | the box-alone baseline student: GDC-CNN + raw "regime" context input (E3). Skill 16.0 seen, 17.5 unseen. |
+| **ctx** | the box-alone baseline box model: GDC-CNN + raw "regime" context input (E3). Skill 16.0 seen, 17.5 unseen. |
 
-Numbers in E6, E8, E9 and E10 use the **same student test windows**, so their skills can be compared across those
-tables (ctx scores 16.01 seen in all of them). E1 (teacher, +1..+6 h), E2 (LightGBM probe) and E4 / E7 (saved
+Numbers in E6, E8, E9 and E10 use the **same box model test windows**, so their skills can be compared across those
+tables (ctx scores 16.01 seen in all of them). E1 (cloud graph model, +1..+6 h), E2 (LightGBM probe) and E4 / E7 (saved
 unit-0 forecasts) use other samples: compare them only inside their own table.
 
 ---
@@ -65,34 +65,34 @@ are earlier versions of the training notebook and are not used for any number he
 
 | ID | question | verdict | key number | novelty that came out |
 |---|---|---|---|---|
-| v1 | Does a graph teacher distilled into an MCU student work? | partly | teacher 20.8, student 15.0 (S0 14.0) | fair distillation; "you can't distil what the box can't see" |
+| v1 | Can a box model be trained to match a big cloud graph model? | partly | cloud graph model 20.8, box model 15.0 (S0 14.0) | fair cloud matching; "you can't pass on what the box can't see" |
 | E1 | Is "wind adds nothing" real? | **yes, real** | graph −2.6 %; wind = placebo | placebo-controlled wind test (negative result) |
 | E2 | Does wind-directed neighbour info help a simple model? Which sensors pay for their power? | no / fans + MQ-7 | neighbours −1.0 % at +1 h, upwind = downwind | sensor value per watt (all 128 subsets) |
-| E3 | What makes the box-alone student better? | ctx input | −0.49 % | (fuzzy gate = interpretable only) |
+| E3 | What makes the box-alone box model better? | ctx input | −0.49 % | (fuzzy gate = interpretable only) |
 | E4 | How should box and cloud forecasts be combined? | trigger + path re-base | 66 % of gain at 20 % of messages | event-triggered sending; path re-basing rule |
 | E5 | Can a few bytes of network context help the box? | yes, 1 byte | −0.71 % fresh, no harm stale | byte-level context, no-regret (for 1 byte) |
 | E6 | Can the box predict only its local difference from a cloud regional forecast? | **yes, best** | −1.58 %; unseen 17.5 → 19.9 | **split cloud-edge forecaster (main claim)** |
 | E7 | Can a learned send rule beat the disagreement rule? | **fails** | +0.16 skill (needed +0.5) | negative: simple rule ≈ best possible |
 | E8 | Does the node's per-hour memory of its offset help? | **passes** | −1.09 % seen, −0.89 % unseen vs b0 | **node memory (new supporting claim)** |
 | E9 | Does a +9 h buffered path keep a stale broadcast useful? | **fails** | stale ≥ 2-3 h ≈ no broadcast; missing hurts | negative: robustness training has a price |
-| E10 | Is the student short of training data? | **yes** | 1 M windows −1.06 %; width 64 adds 0 | (a fix, not a novelty) |
+| E10 | Is the box model short of training data? | **yes** | 1 M windows −1.06 %; width 64 adds 0 | (a fix, not a novelty) |
 
 ---
 
-## 3. v1: the original teacher-student run (`aqi-train`, notebook 04)
+## 3. v1: the original cloud-model-to-box-model run (`aqi-train`, notebook 04)
 
-**Kaggle:** `samiulseikh/aqi-train`, T4 GPU, `notebooks/04_train.ipynb` (Part A teacher, Part B student). Full
+**Kaggle:** `samiulseikh/aqi-train`, T4 GPU, `notebooks/04_train.ipynb` (Part A cloud graph model, Part B box model). Full
 write-up: `docs/ABLATION_FINDINGS.md`.
 
 **Hypotheses**
 - H1: a graph over all stations (TI-STGNN) forecasts better than one station alone.
 - H2: a wind-direction prior and an advection-diffusion-reaction (ADR) physics block improve the graph.
-- H3: distillation (KD) passes the teacher's network knowledge into a 15k-parameter single-station student.
-- H4: copying the teacher's spatial / physics states helps the student more than copying its forecast.
+- H3: cloud matching passes the cloud graph model's network knowledge into a 15k-parameter single-station box model.
+- H4: copying the cloud graph model's spatial / physics states helps the box model more than copying its forecast.
 - H5: every sensor in the fixed pool is useful.
 
-**How:** teacher variants T0 (own station) → T1 (+graph) → T2 (+wind prior) → T3 (+ADR), 3 seeds; out-of-fold
-teacher outputs for the student; students S0 (alone), S1 (copy forecast), S2 (+ time features / attention),
+**How:** cloud graph model variants T0 (own station) → T1 (+graph) → T2 (+wind prior) → T3 (+ADR), 3 seeds; out-of-fold
+cloud graph model outputs for the box model; box models S0 (alone), S1 (copy forecast), S2 (+ time features / attention),
 S3 (+ neighbour state), S4 (+ physics state); sensor ablation (drop one sensor at a time); baselines: linear,
 LightGBM, persistence.
 
@@ -102,19 +102,19 @@ LightGBM, persistence.
 |---|---|---|
 | H1 graph | T0 21.7 → T1 23.6 (1-6 h skill) | **supported** |
 | H2 wind / ADR | T2 23.6, T3 23.8 (≤ 0.2, noise level) | **rejected** |
-| H3 KD | S0 14.0 → S2-T0 15.0 (+0.9); teacher 20.8. Student keeps only 12-24 % of the teacher's lead | weak |
-| H4 spatial KD | S3 / S4 worse than S1 / S2 | **rejected** |
+| H3 cloud matching | S0 14.0 → S2-T0 15.0 (+0.9); cloud graph model 20.8. Box model keeps only 12-24 % of the cloud graph model's lead | weak |
+| H4 spatial-state matching | S3 / S4 worse than S1 / S2 | **rejected** |
 | H5 sensors | MQ-7 −0.45, fans −0.26, SGP41 −0.14, BMP280 −0.09; MQ-135, light, rain ≈ 0 | partly |
 
 Deployment check: starting from the box's own (uncalibrated) PM, the AQI colour is right only 43 % of the time
 (71 % from the true PM). The level needs co-location calibration.
 
-**What we learned:** the teacher's advantage is *seeing other nodes*. A box that sees only itself cannot be taught
+**What we learned:** the cloud graph model's advantage is *seeing other nodes*. A box that sees only itself cannot be taught
 that. This one finding motivated all of v2: **give the box a few bytes of network information instead of trying
-to distil it.**
+to train it into the box model.**
 
-**Novelty out of it:** fair distillation (teacher and student see identical simulated node features, true PM is a
-target only), and the negative result "distilling spatial / physics states into a single-station student hurts".
+**Novelty out of it:** fair cloud matching (cloud graph model and box model see identical simulated node features, true PM is a
+target only), and the negative result "making a single-station box model match the cloud's spatial / physics states hurts".
 
 ---
 
@@ -128,10 +128,10 @@ target only), and the negative result "distilling spatial / physics states into 
   matters, the ERA5 wind prior and measured CPCB wind should beat a **placebo** (wind rotated 180°).
 - **How:** notebook 04 Part A with two small patches; arms T1 (graph, distance prior), T2-era5, T2-cpcb (measured
   station WS / WD, ERA5 where missing), T2-rot180 (placebo), and T0 / T0-nofuture / T0-noweather (no graph, to split
-  the teacher's lead into "neighbours" vs "weather"). 3 seeds; scored overall, by wind-speed bin and by season.
+  the cloud graph model's lead into "neighbours" vs "weather"). 3 seeds; scored overall, by wind-speed bin and by season.
 - **Result (skill +1..+6 h, seen):**
 
-| teacher | skill |
+| cloud graph model | skill |
 |---|---|
 | T0 own station, no weather | 22.82 |
 | T0 past weather only | 23.01 |
@@ -181,7 +181,7 @@ target only), and the negative result "distilling spatial / physics states into 
 - **Novelty:** **sensor value per watt** (exhaustive subset search), a design rule for the node. The finding
   "neighbours act as one regional level" led directly to E5 and E6.
 
-### E3. What makes the box-alone student better?
+### E3. What makes the box-alone box model better?
 
 - **Kaggle:** `samiulseikh/aqi-exp-student` (CPU). **Script:** `experiments/exp_student.py`.
 - **Hypotheses:** instance normalisation throws away the absolute level and regime (PM level, RH, season, CO), so
@@ -191,7 +191,7 @@ target only), and the negative result "distilling spatial / physics states into 
   linear head), S0+wx (weather now + next 3 h, hindcast), S0+wxnow, FZ+wx. Bootstrap vs S0.
 - **Result:**
 
-| student | skill seen | skill unseen | params |
+| box model | skill seen | skill unseen | params |
 |---|---|---|---|
 | S0 | 15.64 | 17.16 | 14 278 |
 | **S0 + ctx** | **16.02** | **17.49** | 14 790 |
@@ -204,16 +204,16 @@ ctx vs S0: −0.49 % (CI −0.63 to −0.36). Fuzzy vs ctx: +0.02 % (no differen
   "winter, humid, high PM, high CO"). Weather does not help the box.
 - **Novelty:** none claimed; the fuzzy gate is an interpretability extra.
 
-### Helper. Saved teacher forecasts (`aqi-exp-teachpred`)
+### Helper. Saved cloud graph model forecasts (`aqi-exp-teachpred`)
 
 - **Kaggle:** `samiulseikh/aqi-exp-teachpred` (CPU). **Script:** `experiments/exp_teachpred.py`.
-- The best v1 teacher (T3, seed 2) forecasts every test hour at unit 0, so E4 could run without waiting for a GPU.
+- The best v1 cloud graph model (T3, seed 2) forecasts every test hour at unit 0, so E4 could run without waiting for a GPU.
 
 ### E4. Cloud-box fusion and messaging
 
 - **Where:** run locally, no training (`experiments/exp_fusion.py`) on the saved forecasts of E1 / helper and E3.
 - **Hypotheses:** A, a stale cloud forecast is still useful if moved to "now" correctly. B, sending the personal
-  cloud forecast only when cloud and box disagree (the cloud runs a twin of the student) beats random sending.
+  cloud forecast only when cloud and box disagree (the cloud runs a twin of the box model) beats random sending.
   C, online-adaptive blend weights (Bates-Granger, Jacobson / TCP-RTT style) beat fixed weights.
 - **How:** A, link dies `a` hours ago, re-base the old forecast (on the box's sensor, or on its own path);
   B, send to the top-k % disagreement hours vs random vs oracle, and under a token bucket (messages per day);
@@ -232,7 +232,7 @@ forecast's own path + fixed blend gives 19.4 at 1 h, 18.3 at 2 h, 17.8 at 3 h (b
 fixed when stale, worse when fresh.
 - **Verdict:** disagreement-triggered sending keeps ~66 % of the cloud gain at 20 % of the messages (random: ~19 %).
   Path re-basing works, sensor re-basing does not. Fixed blend weights are enough.
-- **Novelty:** **event-triggered personal forecasts with a student twin and a token bucket** (applied from
+- **Novelty:** **event-triggered personal forecasts with a box model twin and a token bucket** (applied from
   networking); the **path re-basing rule** for stale forecasts (small, but a real design rule).
 
 ### E5. A few bytes of network context (netctx)
@@ -240,9 +240,9 @@ fixed when stale, worse when fresh.
 - **Kaggle:** `samiulseikh/aqi-exp-netctx` (CPU). **Script:** `experiments/exp_netctx.py`.
 - **Hypotheses:** N1, Delhi stations share one regional signal (clusters). N2, boxes can agree on the regional mean
   by radio gossip without the cloud. N3, **one byte** per hour (regional mean of the boxes' own ln PM2.5, 8-bit)
-  helps the student, and is no-regret when stale or missing.
+  helps the box model, and is no-regret when stale or missing.
 - **How:** N1, cluster stations by the correlation of their 3-h changes. N2, push-sum gossip within 10 km, 20
-  rounds, 20 % packet loss. N3, students get the regional mean (float, 8-bit, per cluster, or gossip), trained with
+  rounds, 20 % packet loss. N3, box models get the regional mean (float, 8-bit, per cluster, or gossip), trained with
   20 % missing and 0-3 h old context plus an age input; scored fresh, 1-3 h old and missing.
 - **Result:** one cluster of 28 stations + 4 singletons. Gossip error 0.32 vs city mean (own reading 0.69).
 
@@ -266,7 +266,7 @@ fixed when stale, worse when fresh.
 - **How:**
   - Regional forecaster: LightGBM, 6 outputs (city-mean true ln-PM change, PM2.5 / PM10, +1..+3 h) from regional
     means of the boxes' own sensors + current ERA5 + clock; **out-of-fold** over 3 two-year blocks.
-  - Student arms (GDC-CNN + ctx, 3 seeds): ctx; denoise (consensus filter `d_i = R + EWMA_24h(S_i − R)`);
+  - Box model arms (GDC-CNN + ctx, 3 seeds): ctx; denoise (consensus filter `d_i = R + EWMA_24h(S_i − R)`);
     split (6 regional forecasts + gap to region as inputs); **split-res** (output = `R̂ + s · Dense6(...)`);
     ctx-trend (Huber + hinge on wrong direction); ctx-aqi (errors weighted near CPCB breakpoints).
   - All arms trained with a **fresh** broadcast (no staleness training).
@@ -294,7 +294,7 @@ fixed when stale, worse when fresh.
 - **Hypothesis:** the oracle in E4 (27.2 at 20 %) is far above the disagreement rule (20.7). A model that predicts
   the benefit of sending, from what the cloud knows at hour t, can close part of that gap.
 - **How:** target = (box error)² − (cloud error)² of that hour (true PM as target only). Inputs: both forecasts and
-  their gaps, the teacher's +4..+6 h, the city-mean teacher forecast, the box's uploaded sensors, clock. LightGBM fitted
+  their gaps, the cloud graph model's +4..+6 h, the city-mean cloud graph model forecast, the box's uploaded sensors, clock. LightGBM fitted
   on the **first half** of the test period, every rule scored on the **second half** (saved forecasts exist only for
   the test period). **Kill:** learned − disagreement < +0.5 skill at 20 %, or CI contains 0.
 - **Result:** box alone 15.87, cloud always 23.53 (second half).
@@ -317,7 +317,7 @@ Token bucket: best gain +0.26 skill at 4 and 6 messages / day; none at 1, 2 or 1
 - **Kaggle:** `samiulseikh/aqi-exp-memory` (CPU, ~10 min per arm, 3 seeds). **Script:** `experiments/exp_memory.py`.
 - **Hypothesis:** the consensus filter keeps one 24-h average offset from the region, blind to the clock. Local
   sources (traffic peaks, evening burning) repeat at the same hours and differ by site. A per-clock-hour memory of the
-  box's offset from the region tells the student (a) how unusual it is now and (b) how its offset usually moves in
+  box's offset from the region tells the box model (a) how unusual it is now and (b) how its offset usually moves in
   the next 1-3 h. The gain must be **site-specific**, so another node's table (placebo) must not give it.
 - **How:**
   - offset `o_i(t) = own ln PM_i(t) − R(t)` (R = regional mean from the broadcast; no true PM)
@@ -349,7 +349,7 @@ Token bucket: best gain +0.26 skill at 4 and 6 messages / day; none at 1, 2 or 1
 
 - **Verdict:** **passes all three kill conditions**, on seen and unseen stations. Surprise and profile each help and
   together help more than either. The placebo gets only ~1/6 of the gain, so the gain is **site-specific**.
-- **What we learned:** the box's own daily pattern of "how I differ from the city" is real information the student
+- **What we learned:** the box's own daily pattern of "how I differ from the city" is real information the box model
   does not extract from its 24-h window by itself. The consensus filter, by contrast, adds only −0.27 % on top of
   split-res (its −0.90 % alone overlaps with what the broadcast already gives).
 - **Novelty:** **node memory**: a 48-number per-clock-hour table of the node's offset from the regional broadcast,
@@ -399,14 +399,14 @@ Token bucket: best gain +0.26 skill at 4 and 6 messages / day; none at 1, 2 or 1
      useful information about the regional trajectory.
 - **Novelty:** negative / design result: **for a cloud-assisted MCU model, robustness to stale links has an accuracy
   price, and a residual output makes a missing broadcast harmful**. Fix to test next: keep two models on the box
-  (split model when the broadcast is fresh, ctx student otherwise), see Section 7.
+  (split model when the broadcast is fresh, ctx box model otherwise), see Section 7.
 
-### E10. Does the student need more training data?
+### E10. Does the box model need more training data?
 
 - **Kaggle:** `samiulseikh/aqi-exp-moredata` (T4 GPU, 2 seeds). **Script:** `experiments/exp_moredata.py`.
-- **Hypothesis:** every student so far trained on 200 000 of the 2.6 M training windows. The teacher's lead over the
-  student (~6 skill) is larger than the graph explains (~2), so the student may be short of data, or of width.
-- **How:** the same S0+ctx student, same validation and test windows; train on 200k (reference), 1 M random training
+- **Hypothesis:** every box model so far trained on 200 000 of the 2.6 M training windows. The cloud graph model's lead over the
+  box model (~6 skill) is larger than the graph explains (~2), so the box model may be short of data, or of width.
+- **How:** the same S0+ctx box model, same validation and test windows; train on 200k (reference), 1 M random training
   windows (27 training stations, 2018-23), and 1 M at width 64. No kill threshold (a diagnosis).
 - **Result:**
 
@@ -417,19 +417,19 @@ Token bucket: best gain +0.26 skill at 4 and 6 messages / day; none at 1, 2 or 1
 | 1 M, width 64 | 16.58 | 17.97 | 48 006 | −1.00 | −0.84 |
 
 1 M width 64 vs 1 M width 32: +0.06 % seen, −0.08 % unseen (no difference).
-- **Verdict:** **the student is data-limited, not size-limited.** 5× more windows gives about as much as the ctx
+- **Verdict:** **the box model is data-limited, not size-limited.** 5× more windows gives about as much as the ctx
   input and the consensus filter together; doubling the width gives nothing.
-- **What we learned:** the 15k-parameter student is big enough for the ESP32; every arm of the final comparison
+- **What we learned:** the 15k-parameter box model is big enough for the ESP32; every arm of the final comparison
   should be trained on ≥ 1 M windows. Not a novelty, but it changes every number before the paper.
 
 ---
 
 ## 5. What we know now (the learnings in one place)
 
-1. **The network is the information, not the physics.** Seeing other nodes is worth −2.6 % for the teacher; wind
+1. **The network is the information, not the physics.** Seeing other nodes is worth −2.6 % for the cloud graph model; wind
    direction and ADR physics add nothing measurable at 1-6 h in Delhi (placebo-controlled).
 2. **Delhi is one airshed** at this spacing: one cluster of 28 stations; per-cluster context = city-wide context.
-3. **Distillation can't carry network knowledge into a box that can't see the network** (v1: +0.9 skill only).
+3. **Cloud matching can't carry network knowledge into a box that can't see the network** (v1: +0.9 skill only).
    Sending the network's summary as a few bytes works much better (E6: +1.7 seen, +2.4 unseen).
 4. **The box's job is the local difference.** The best box model stacks: cloud regional forecast (split-res) +
    consensus level + **node memory**. Skill on the same test windows:
@@ -451,7 +451,7 @@ Token bucket: best gain +0.26 skill at 4 and 6 messages / day; none at 1, 2 or 1
 8. **Robustness has a price (E9):** training one model for every broadcast age makes it weak when fresh, and the
    residual output makes a missing broadcast harmful. The "no-regret" claim is only proven for the 1-byte level (E5).
 9. **What does not help:** custom trend / AQI losses, fuzzy gate (= ctx), weather on the box, online blend weights,
-   learned send rule, spatial-state KD.
+   learned send rule, spatial-state matching.
 10. **Hardware:** fans and MQ-7 earn their place; MQ-135 adds ~0 for ~0.8 W (simulated; TODO_VERIFY power).
 
 ---
@@ -462,9 +462,9 @@ Token bucket: best gain +0.26 skill at 4 and 6 messages / day; none at 1, 2 or 1
 |---|---|---|---|
 | 1 | **Split cloud-edge forecaster** for low-cost AQI nodes: the cloud forecasts the shared regional change from all nodes (6-8 bytes), the MCU model predicts only the local difference | E6: −1.58 % (CI −1.90 to −1.27); unseen 17.5 → 19.9 | main contribution |
 | 2 | **Node memory**: a per-clock-hour table of the node's offset from the broadcast, placebo-controlled | E8: −1.09 % seen / −0.89 % unseen on top of split + consensus; placebo gets ~1/6 | supporting component; "the node remembers its own habits" |
-| 3 | **Bandwidth-accuracy curve** with event-triggered personal forecasts (student twin + token bucket), and the proof that a learned rule cannot beat the simple one | E4 + E7 | supporting; negative result included |
+| 3 | **Bandwidth-accuracy curve** with event-triggered personal forecasts (box model twin + token bucket), and the proof that a learned rule cannot beat the simple one | E4 + E7 | supporting; negative result included |
 | 4 | **The price of robustness**: staleness training vs fresh accuracy; residual output and missing broadcasts | E5 vs E9 | design lesson (after the E11 fix is tested, it becomes "how to make it no-regret") |
-| 5 | **Placebo-controlled negative results**: wind direction (180° rotation, measured vs ERA5), ADR, spatial KD, custom losses | E1, E2, v1, E6 | honest negative results section |
+| 5 | **Placebo-controlled negative results**: wind direction (180° rotation, measured vs ERA5), ADR, spatial-state matching, custom losses | E1, E2, v1, E6 | honest negative results section |
 | 6 | **Sensor value per watt** (exhaustive 128-subset Pareto) | E2 | design rule for the node |
 | 7 | Path re-basing for stale forecasts | E4 | small design rule |
 
@@ -484,8 +484,8 @@ gain at one fifth of the messages."*
 
 | step | experiment | why | cost | keep it if |
 |---|---|---|---|---|
-| **E11** | **Final combined model on 1 M windows**: ctx vs split-res vs b0 vs mem, all trained on 1 M windows, 3 seeds; plus mem + KD soft targets | turns E6 + E8 + E10 into one clean headline table with a direct mem-vs-ctx bootstrap | 1 GPU run (~3-4 h) | mem beats ctx by ≥ 3 % with CI excluding 0 on seen and unseen |
-| **E12** | **Two models on the box** (fixes E9): fresh-trained mem model when the broadcast is ≤ 1 h old, ctx student otherwise; vs one model trained with mostly-fresh ages (70 % fresh, 15 % 1-2 h, 15 % missing) | make the split design truly no-regret without losing the fresh gain | 1 CPU run (~3 h) | fresh within 0.2 % of the fresh-only model AND missing within +0.1 % of ctx |
+| **E11** | **Final combined model on 1 M windows**: ctx vs split-res vs b0 vs mem, all trained on 1 M windows, 3 seeds; plus mem + cloud-matching targets | turns E6 + E8 + E10 into one clean headline table with a direct mem-vs-ctx bootstrap | 1 GPU run (~3-4 h) | mem beats ctx by ≥ 3 % with CI excluding 0 on seen and unseen |
+| **E12** | **Two models on the box** (fixes E9): fresh-trained mem model when the broadcast is ≤ 1 h old, ctx box model otherwise; vs one model trained with mostly-fresh ages (70 % fresh, 15 % 1-2 h, 15 % missing) | make the split design truly no-regret without losing the fresh gain | 1 CPU run (~3 h) | fresh within 0.2 % of the fresh-only model AND missing within +0.1 % of ctx |
 | E13 | **Fault robustness** (idea 14): stuck / spike / +30 % drift / dead PM sensor for 6 h, 24 h, 7 d; ctx vs mem vs mem with fault augmentation; virtual-sensor fallback for a dead sensor | new robustness claim; memory and consensus use the box's own PM, so faults matter more now | 1 CPU run | mem loses less skill than ctx under faults |
 | E14 | **Node-count test**: broadcast built from 5, 10, 15, 27 nodes | how many nodes a city needs; supports "the nodes are essential" | 1 CPU run | at 10 nodes ≥ half of the full gain |
 | E15 | Severe-event and interval metrics (idea 16) and forecast reconciliation (idea 7) | comparability with published tables; no training | < 1 h | (reporting) |
@@ -496,7 +496,7 @@ gain at one fifth of the messages."*
 ## 8. Caveats
 
 - Simulated sensors decide how informative each sensor and each node is. Everything needs real-box confirmation.
-- The teacher is a hindcast (ERA5 actual future weather). Live forecasts will be ~1 point worse (up to 3 at +6 h).
+- The cloud graph model is a hindcast (ERA5 actual future weather). Live forecasts will be ~1 point worse (up to 3 at +6 h).
 - E7 was fitted and scored inside the test period (first half / second half), because no 2024 forecasts were saved.
 - Skills in Section 5 item 4 come from two runs (E6 and E8) on the same test windows; the derived −3.4 % / −4.3 %
   has no bootstrap CI yet (E11 gives it).

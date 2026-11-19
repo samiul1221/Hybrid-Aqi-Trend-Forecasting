@@ -1,5 +1,7 @@
 # Design decisions (plain words)
 
+> **Naming note:** this file describes version 1, where the big cloud graph model was called the "teacher" and the on-device model the "student". The current design (v3) is in `docs/ARCH_V3.md`; it no longer treats the box model as a copy of the cloud model.
+
 Detailed plans: `docs/specs/` (edge plan, cloud plan, CHANGE_REQUEST_v2). This page says what we actually
 built and why, in one place. "TODO_VERIFY" = check with a primary source or real hardware later.
 

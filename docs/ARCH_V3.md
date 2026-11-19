@@ -1,6 +1,6 @@
 # Architecture v3: a node-network AQI forecaster for Delhi
 
-**Cloud graph teacher + regional broadcast + on-device local model with node memory**
+**Cloud graph model + regional broadcast + on-device local model with node memory**
 
 Version 3, 17 Nov 2026. This file explains the **whole system end to end** for someone who has never seen the
 project: what the sensor nodes are, what the cloud does, what runs on the box, how everything was trained and
@@ -29,11 +29,14 @@ tested, what is new, what failed, and what comes next. Plain words first, formul
 
 - We put low-cost sensor boxes (ESP32 + PM, gas and weather sensors) around Delhi. Each box forecasts how PM2.5 and
   PM10, and so the CPCB AQI, will **change** in the next 1, 2 and 3 hours.
-- **v1:** a big **cloud teacher** (a graph neural network over all nodes) taught a tiny **student** that runs alone
-  on the box (knowledge distillation). The teacher is much better (skill 20.8 vs 15.0) because it **sees the other
-  nodes**, and teaching cannot pass that into a box that sees only itself.
-- **v2:** stop pretending the box is alone. The cloud uses all nodes to forecast the **shared, city-wide change**
-  and broadcasts it in **8 bytes**. The box predicts only **its own local difference** on top of it.
+- **What v3 is, honestly:** a **cloud-assisted on-device forecaster**. It is NOT a model that copies a big model into
+  a small one. The cloud and the box run **different models on different inputs**: the cloud forecasts the shared
+  city-wide change (from all boxes), the box forecasts its own place (from its own sensors plus what the cloud sent).
+- **Why not copy the big model into the box (v1 attempt):** the big cloud graph model scores 20.8 against the box
+  model's 15.0 because it **sees the other nodes**. Training the box model to match it added only +0.9, since the box
+  cannot see what the cloud sees. So v2 sends that network information to the box as a **live input** instead.
+- **v2:** the cloud uses all nodes to forecast the **shared, city-wide change** and broadcasts it in **8 bytes**.
+  The box predicts only **its own local difference** on top of it.
 - **v3:** the box also keeps a small **memory of its own habits**: for every clock hour, how far it usually sits
   above or below the city. This tells the model "how unusual am I right now" and "how my offset usually moves in
   the next hours". It costs 0 bytes on the link and 48 numbers in flash.
@@ -48,7 +51,7 @@ tested, what is new, what failed, and what comes next. Plain words first, formul
 
 | | |
 |---|---|
-| **Forecast** | change of PM2.5 and PM10 at +1, +2, +3 h for each box (the cloud teacher does +1..+6 h) |
+| **Forecast** | change of PM2.5 and PM10 at +1, +2, +3 h for each box (the cloud graph model does +1..+6 h) |
 | **Target** | `y = ln(1+PM[t+h]) − ln(1+PM[t])` of the **true** CPCB PM; output order `[pm25_h1..h3, pm10_h1..h3]` |
 | **Why the change, not the level** | the box's own PM sensor is biased (humidity, calibration). The change is easier to learn; the level comes from the calibrated sensor or the cloud. |
 | **Score** | **skill** = `1 − RMSE / RMSE(persistence)` in %, persistence = "PM stays the same". 0 = no better than the lazy guess. Also direction accuracy (up / down right) and CPCB category accuracy. |
@@ -71,7 +74,7 @@ flowchart LR
         RB --> MEM[("Node memory<br/>offset per clock hour, 48 numbers")]
         F --> CONS
         F --> MEM
-        F --> ST["Student GDC-CNN (~15k params)<br/>local correction"]
+        F --> ST["Box model GDC-CNN (~15k params)<br/>local correction"]
         RB --> ST
         CONS --> ST
         MEM --> ST
@@ -81,10 +84,10 @@ flowchart LR
     end
     F -- "upload every hour" --> CLOUD
     subgraph CLOUD["Cloud"]
-        ALL[Features of ALL nodes + weather] --> GNN["Graph teacher TI-STGNN (T1)<br/>per-node forecast h1..h6"]
+        ALL[Features of ALL nodes + weather] --> GNN["Cloud graph model TI-STGNN (T1)<br/>per-node forecast h1..h6"]
         ALL --> REG["Regional forecaster (LightGBM)<br/>city-wide change, 6 numbers"]
         ALL --> LVL["Regional level now<br/>(mean of nodes' own PM)"]
-        TWIN["Twin of each node's student<br/>(knows what the box predicts)"]
+        TWIN["Twin of each node's box model<br/>(knows what the box predicts)"]
         GNN --> TRIG{"|cloud − box| large<br/>and tokens left?"}
         TWIN --> TRIG
     end
@@ -97,16 +100,80 @@ Without Mermaid:
 
 ```
  node i: sensors -> 23 features --upload--> CLOUD: all nodes + weather
-                                              |-> graph teacher T1 (per node, h1..h6)
+                                              |-> cloud graph model T1 (per node, h1..h6)
                                               |-> regional forecaster (6 numbers, same for all)
                                               |-> regional level now (2 numbers)
           <-- 8-byte broadcast + 1 sequence byte (every hour, to everyone) --|
           <-- personal forecast (only when cloud and box disagree) ---------|
  node i: consensus level  = region + my usual 24 h offset
          node memory      = my usual offset at each clock hour (48 numbers)
-         student(own 24 h + ctx + broadcast + consensus + memory) = regional + local correction
+         box model(own 24 h + ctx + broadcast + consensus + memory) = regional + local correction
          show: fresh personal forecast > blend(stale personal, box) > box
 ```
+
+### 2.1 Data flow and tensor shapes (one hour, step by step)
+
+Shapes are per node unless written `[N, …]` (N = 27 nodes in training, 32 at test). Numbers come from
+`notebooks/04_train.ipynb` (cloud graph model, box model) and `experiments/exp_split.py`, `exp_memory.py` (v2 / v3 parts).
+
+**① On the box: sensing**
+- Each sensor is averaged over the IST clock hour → **23 features** `S_i(t)`: ln PM2.5 / PM10 / PM1, coarse ratio, T, RH,
+  p, fan wind u / v, rain fraction, ln light, MQ-7 / MQ-135 / VOC / NOx (relative to clean-air baseline), hour /
+  weekday / day-of-year as sin / cos, current AQI, PM-valid mask.
+- The box keeps the last 24 hours → window `[24, 23]`.
+
+**② Upload:** one record `[23]` per hour to the cloud. The cloud stacks all nodes → `X [N, 24, 23]` + mask `M`.
+
+**③a Cloud: regional forecaster (LightGBM)**
+- Regional level now: `R25(t) = mean_i S_i,ln_pm25(t)`, same for PM10 (nodes' own sensors, never true PM).
+- Feature row for hour t, **36 numbers**: R25 and R10 at lags 0, 1, 2, 3, 6, 12, 23 h plus their 1-h and 3-h changes
+  (2 × 9 = 18) · regional mean RH, T, MQ-7, fan u, fan v (5) · city-mean ERA5 now (7) · clock sin / cos of hour,
+  day of year, weekday (6).
+- **6 separate LightGBM models** (one per output; L2, 300 trees, 31 leaves, lr 0.05), out-of-fold over the 2-year blocks
+  of the training years → `R̂ [6]` = city-mean change of ln PM, `[pm25 +1, +2, +3, pm10 +1, +2, +3]`.
+
+**③b Cloud: graph model TI-STGNN (T1), d = 64**
+
+| step | operation | output shape |
+|---|---|---|
+| input | 23 sensor + 7 ERA5 channels, z-scored, missing → 0, with mask; 6 static numbers per node | `X, M [N, 24, 30]`, `S [N, 6]` |
+| embedding | `Linear([X·M, M] 60→64) + Linear(S 6→64)` + sine code of the hour position | `[N, 24, 64]` |
+| temporal encoder | per node: 2 × Transformer layer (4 heads, FFN 256, pre-norm, dropout 0.1) → LayerNorm | `F [N, 24, 64]` |
+| current state | last hour of F | `h_t [N, 64]` |
+| spatial block (GAT) | `score_ij = LeakyReLU(a_r·W h_i + a_s·W h_j) + β·log prior_j→i`, prior = 1 / distance (T1); dead nodes masked; softmax over senders; `h_s = h_t + Linear(α · W h)` | `h_s [N, 64]` |
+| ADR / wind prior | T2 / T3 ablations only; identity in T1 | `[N, 64]` |
+| decoder | `z = GLU(Linear([h_s, h_t] 128→128))` → 64; queries `q_k = hourcode_k + Linear(x_fut 9→64) + z`, k = 1..6, with `x_fut` = ERA5 t+1..t+6 (7) + clock (2); one Transformer decoder layer cross-attending to F | `[N, 6, 64]` |
+| heads | `Linear 64→2` (forecast) and `Linear 64→4` (distances to q10 / q90) | `ŷᵀ, q10, q90 [N, 12]` |
+
+Loss: Huber(ŷᵀ, y) + 0.5 · pinball(q10, q90); AdamW 1e-3, batch 64, node dropout 0.1, T4 GPU.
+
+**④ Broadcast:** `R̂ [6]` + `R25(t), R10(t)` as int8 = 8 bytes, + 1 sequence byte. On the box this becomes the
+**broadcast input [8]** = `[3·R̂ (6), R25 − own25, R10 − own10]`.
+
+**⑤ On the box: node state (no extra bytes)**
+- Consensus `d = R + EWMA_24h(S − R)` → **[3]** = `[d − S, 3·Δ1h d, 3·Δ3h d]`.
+- Memory table `M [24 clock hours, 2 pollutants]`, EWMA over 10 days of the offset `o = S − R` →
+  **[8]** = surprise (2) + 3 × profile for h = 1..3 (6).
+
+**⑥ On the box: box model GDC-CNN (width D = 32)**
+
+| step | operation | output shape |
+|---|---|---|
+| instance norm | each feature minus its own 24-h mean, divided by its std (clock, rain, mask left as is); `s` = std of ln PM2.5 (×3) and ln PM10 (×3) | `[24, 23]`, `s [6]` |
+| patches | 2 consecutive hours side by side | `[12, 46]` |
+| embedding | `Dense 46→32` + learned position code | `[12, 32]` |
+| 3 GDC blocks | dilation 1, 2, 4: LayerNorm → causal depthwise conv k = 3 → `Dense 64` + GLU → `Dense 32`, residual add | `[12, 32]` |
+| flatten | | `[384]` |
+| side branches | each `Dense 32` + GELU: ctx [9] (ln PM2.5, RH, T, MQ-7, 4 clock / season, wind speed), broadcast [8], consensus [3], memory [8] | 4 × `[32]` |
+| join + head | concat `[512]` → `Dense 512→6` → × s | local correction `s·c [6]` |
+
+**⑦ Combine:** `ŷ_i = R̂ + s · c` → `[6]`, the predicted change of ln(1+PM) for `[pm25 +1..+3, pm10 +1..+3]`.
+Shown PM = `exp(ln(1+PM_now) + ŷ) − 1`, then CPCB AQI.
+
+**⑧ Screen:** fresh personal forecast → cloud; 1-3 h old → fixed blend; else `ŷ_i` (Section 6.6).
+
+**⑨ Trigger:** the cloud runs the twin box model on the same uploads → `ŷ^twin [6]`; if `|ŷᵀ(+1..3) − ŷ^twin|` is in the
+top 20 % and tokens remain → personal forecast `[6]` as int16 = 12 bytes.
 
 ---
 
@@ -116,7 +183,7 @@ Without Mermaid:
 
 | part | measures | used for | value (simulated) |
 |---|---|---|---|
-| ESP32-WROOM-32 DevKit 38-pin now (ESP32-S3 later) | runs the student, Wi-Fi | model + upload | |
+| ESP32-WROOM-32 DevKit 38-pin now (ESP32-S3 later) | runs the box model, Wi-Fi | model + upload | |
 | PMS7003 now / SPS30 later | PM1, PM2.5, PM10 | main signal | essential |
 | MQ-7 | CO (traffic) | context | **best extra sensor** (−0.45 skill if removed) |
 | 2 perpendicular fans + hall sensors | wind speed along 2 axes (speed only) | local mixing | **useful** (−0.26) |
@@ -137,18 +204,18 @@ Power numbers are TODO_VERIFY. Sensor values come from the simulator, so they mu
 2. **Upload** the hourly record to the cloud (if online).
 3. **Receive** the hourly broadcast (if online): 6 regional forecasts + 2 regional levels + sequence byte.
 4. **Update** its consensus offset (24 h EWMA) and its **memory table** for this clock hour (Section 6.4).
-5. Run the student on the last 24 h + context + broadcast + consensus + memory → forecast for +1..+3 h.
+5. Run the box model on the last 24 h + context + broadcast + consensus + memory → forecast for +1..+3 h.
 6. Show the best forecast available (Section 6.6).
 
 ### 3.3 Why the nodes are essential (not just "sensors for a cloud model")
 
 | what the node gives | why the cloud cannot do it alone | evidence |
 |---|---|---|
-| **Its upload is the network.** The cloud's graph and regional forecast are built only from node features; there is no other PM input. | no nodes, no network | graph of other nodes: −2.6 % error for the teacher (E1) |
+| **Its upload is the network.** The cloud's graph and regional forecast are built only from node features; there is no other PM input. | no nodes, no network | graph of other nodes: −2.6 % error for the cloud graph model (E1) |
 | **Real-time local state** (own PM, CO, humidity, local wind) | a box's PM is often about 2× above or below the city average (traffic, burning, dust) | regional forecast alone: skill 11.1; + the box's local model: 17.7 (E6) |
 | **Its own daily habits** (memory table) | site-specific, repeats at the same clock hours | +0.9 skill seen, +0.8 new places; another node's table gives only ~1/6 of that (E8) |
 | **Works offline** | the cloud is unreachable in outages | box-alone model as fallback (Section 6.5) |
-| **Its own forecast** tells the cloud when a personal message is worth sending | the cloud runs a twin of the student | disagreement sending beats random by 3-4 skill points (E4) |
+| **Its own forecast** tells the cloud when a personal message is worth sending | the cloud runs a twin of the box model | disagreement sending beats random by 3-4 skill points (E4) |
 | **New places** | a new box gets the broadcast from day 1 | unseen stations gain the most: 17.5 → 21.1 |
 
 The node-count effect (how many nodes the broadcast needs) is **not tested yet** (Section 12, E14).
@@ -171,10 +238,10 @@ The node-count effect (how many nodes the broadcast needs) is **not tested yet**
 - The simulated PMS7003 has slope 2.19 vs truth and R² 0.61 (TODO_VERIFY by co-location).
 
 ### 4.3 Hard rules (research correctness)
-1. **True CPCB PM is a target only, never an input.** Teacher, regional forecaster and student all get only
-   simulated node features (+ weather for the cloud). So distillation and broadcasting move *network knowledge*,
+1. **True CPCB PM is a target only, never an input.** Cloud graph model, regional forecaster and box model all get only
+   simulated node features (+ weather for the cloud). So broadcasting (and the optional cloud matching) move *network knowledge*,
    not "clean data".
-2. **No future leakage.** Inputs use hours ≤ t. Anything one model makes for another model's training (teacher
+2. **No future leakage.** Inputs use hours ≤ t. Anything one model makes for another model's training (cloud graph model
    outputs, regional forecasts) is **out-of-fold**. The memory entry used for hour t+h was last updated at t+h−24.
 3. The 5 hold-out stations are never trained on.
 
@@ -182,7 +249,7 @@ The node-count effect (how many nodes the broadcast needs) is **not tested yet**
 
 ## 5. The cloud side
 
-### 5.1 Graph teacher TI-STGNN
+### 5.1 Cloud graph model TI-STGNN
 
 **What:** a PyTorch model (~0.2 M parameters) that sees all nodes' last 24 h and forecasts each node's change at
 +1..+6 h, with a 10-90 % band.
@@ -200,7 +267,7 @@ The node-count effect (how many nodes the broadcast needs) is **not tested yet**
 **Variants:** T0 (own station), T1 (+graph), T2 (+wind prior), T3 (+ADR).
 **What survived:** only the **graph** (−2.6 %). Wind prior and ADR equal a placebo.
 **Decision:** the live cloud uses **T1**. T2 / T3 stay in the paper as negative results.
-**Roles in v3:** (a) personal forecasts for the trigger (5.4), (b) soft targets for distillation (7), (c) a
+**Roles in v3:** (a) personal forecasts for the trigger (5.4), (b) extra targets for cloud matching (7), (c) a
 possible alternative regional source (mean of its per-node forecasts; not yet compared).
 
 ### 5.2 Regional forecaster
@@ -215,7 +282,7 @@ possible alternative regional source (mean of its per-node forecasts; not yet co
 - city-mean ERA5 weather now (7 channels; no future weather); clock (hour, weekday, day of year as sin / cos).
 
 **Target:** mean over nodes of the true change (target only).
-**Model:** LightGBM, 6 outputs, **out-of-fold over year blocks** (2018-19, 2020-21, 2022-23), so the student is
+**Model:** LightGBM, 6 outputs, **out-of-fold over year blocks** (2018-19, 2020-21, 2022-23), so the box model is
 trained on regional forecasts that never saw those hours.
 
 **Why it works:** Delhi behaves as **one airshed**. Clustering stations by the correlation of their 3-h changes gives
@@ -229,7 +296,7 @@ uses it for the consensus filter (6.3) and the node memory (6.4). It is 2 of the
 
 ### 5.4 Personal forecasts with event-triggered sending
 
-The cloud keeps a **twin** of each node's student and runs it on the uploaded features, so it knows the box's
+The cloud keeps a **twin** of each node's box model and runs it on the uploaded features, so it knows the box's
 forecast without asking ("dual prediction" from sensor networks). Each hour it sends a node its personal T1
 forecast **only if**:
 - the disagreement `|cloud − box|` is among the largest (send-on-delta), and
@@ -255,7 +322,7 @@ level.
 
 ## 6. The edge side (the box)
 
-### 6.1 Student network: GDC-CNN
+### 6.1 Box model network: GDC-CNN
 
 - Based on Na et al.: the last 24 h are cut into **12 patches of 2 h**, with **instance normalisation** (the
   window's own level and scale are removed and kept as `s`), a position code, and **3 gated dilated depthwise
@@ -336,7 +403,7 @@ What is known:
 
 **v3 design rule (planned, E12):** keep **two models on the box** (flash allows it: 2 × ~60 KB):
 1. the split + consensus + memory model, trained with a fresh broadcast, used while the broadcast is ≤ 1 h old;
-2. the ctx student (box alone), used when the broadcast is older or missing.
+2. the ctx box model (box alone), used when the broadcast is older or missing.
 
 E12 also compares this with one model trained on mostly fresh ages (70 % fresh, 15 % 1-2 h, 15 % missing). Until
 E12 runs, **the split model is not claimed to be no-regret.**
@@ -372,15 +439,17 @@ E12 runs, **the split model is not claimed to be no-regret.**
 |---|---|---|
 | `notebooks/01_data` | laptop | CPCB + Open-Meteo → clean hourly tables |
 | `notebooks/02_simulator` | laptop | `simulator.py`: 3 virtual boxes per station |
-| `notebooks/03_dataset` | laptop | 23 features, targets, windows, teacher grids `grid_u{0,1,2}.npz` |
-| `notebooks/04_train` Part A | Kaggle GPU (`aqi-train`) | teacher T0-T3, ablations, **out-of-fold** teacher outputs |
-| `notebooks/04_train` Part B | Kaggle GPU (`aqi-train`) | student S0-S4 (distillation), sensor ablation, TFLite export |
-| v2 / v3 additions | Kaggle CPU / GPU (`aqi-exp-*`) | regional forecaster (OOF), consensus, memory, split student, fusion, trigger |
+| `notebooks/03_dataset` | laptop | 23 features, targets, windows, graph grids `grid_u{0,1,2}.npz` |
+| `notebooks/04_train` Part A | Kaggle GPU (`aqi-train`) | cloud graph model T0-T3, ablations, **out-of-fold** cloud graph model outputs |
+| `notebooks/04_train` Part B | Kaggle GPU (`aqi-train`) | box model S0-S4 (cloud matching), sensor ablation, TFLite export |
+| v2 / v3 additions | Kaggle CPU / GPU (`aqi-exp-*`) | regional forecaster (OOF), consensus, memory, split box model, fusion, trigger |
 
-- **Distillation** stays as a way to train the box model: copying the teacher's forecast (+ its time features /
-  attention) gave +0.9 skill over a plain student in v1. Whether it still adds on top of the broadcast is untested
-  (E11).
-- **Training size:** the students so far used 200 000 of 2.6 M training windows. 1 M windows gives −1.06 % RMSE
+- **The box model is trained on its own true targets plus the broadcast inputs.** It is not a copy of the cloud model:
+  the two models see different inputs and predict different things (city-wide change vs the box's own change).
+- **Cloud matching is optional and not part of the v3 result.** In v1, adding "match the cloud graph model's forecast
+  (+ its time features / attention)" to the box model's training gave +0.9 skill. Whether it still adds anything on
+  top of the broadcast is untested (E11); if it does not, it is dropped.
+- **Training size:** the box models so far used 200 000 of 2.6 M training windows. 1 M windows gives −1.06 % RMSE
   seen and −0.77 % new places (E10). The final models will use ≥ 1 M windows.
 - Laptop only for data and smoke tests; all training on Kaggle (`kaggle/kaggle_run.py`, `experiments/kaggle_exp.py`).
 
@@ -392,11 +461,11 @@ E12 runs, **the split model is not claimed to be no-regret.**
 
 | # | idea | status |
 |---|---|---|
-| v1-1 | Cloud graph teacher → MCU student distillation (TI-STGNN → GDC-CNN) | works but small (+0.9 skill; keeps 12-24 % of the teacher's lead). A baseline / training method, not the headline. |
-| v1-2 | **Fair distillation**: identical simulated features for teacher and student, true PM only as target | **kept**: the gain is network knowledge, not cleaner data |
+| v1-1 | Cloud graph model → MCU box model trained to match its forecasts (TI-STGNN → GDC-CNN) | works but small (+0.9 skill; keeps 12-24 % of the cloud graph model's lead). A baseline / training method, not the headline. |
+| v1-2 | **Fair cloud matching**: identical simulated features for cloud graph model and box model, true PM only as target | **kept**: the gain is network knowledge, not cleaner data |
 | v1-3 | Wind-direction fix of the TransNet prior | correct physics, no measurable gain → negative result |
 | v1-4 | ADR physics block | ≤ 0.2 % → negative result |
-| v1-5 | Distilling spatial / physics states into the student | **hurts** → negative result |
+| v1-5 | Making the box model match the cloud's spatial / physics states | **hurts** → negative result |
 
 ### 8.2 From v2
 
@@ -405,7 +474,7 @@ E12 runs, **the split model is not claimed to be no-regret.**
 | **N1** | **Split cloud-edge forecaster**: cloud broadcasts the city-wide change (8 B), box predicts only its local difference | −1.58 % (CI −1.90 to −1.27); skill 16.0 → 17.7, new places 17.5 → 19.9 | **main contribution** |
 | N2 | Consensus level | −0.90 % alone; −0.27 % on top of N1 | supporting |
 | N3 | Byte-level regional context (1 byte, 8-bit = float), staleness / dropout training | −0.71 % fresh, no-regret for a level-only byte | supporting (scope corrected in v3) |
-| N4 | Event-triggered personal forecasts + student twin + token bucket | at 20 % of hours ~66 % of the gain | supporting: bandwidth-accuracy curve |
+| N4 | Event-triggered personal forecasts + box model twin + token bucket | at 20 % of hours ~66 % of the gain | supporting: bandwidth-accuracy curve |
 | N5 | Stale-forecast re-basing on its own path + fixed blend by age | sensor re-base −71 %; path re-base 19.4 at 1 h | small design rule |
 | N6 | Placebo-controlled wind test | wind direction = 180° placebo | honest negative result |
 | N7 | Sensor value per watt (all 128 subsets) | fans + MQ-7 worth it; MQ-135 ≈ 0 for ~0.8 W | design rule |
@@ -445,11 +514,11 @@ thirds of the full cloud model's gain at one fifth of the messages."*
 ## 9. Evidence (simulated nodes, test Jan 2025 - Sep 2026)
 
 % error = RMSE change vs the reference (negative = better); CI = 95 % week-block paired bootstrap. Skills are means
-over 3 seeds unless noted. Compare numbers within a table. E6, E8, E9 and E10 share the same student test windows.
+over 3 seeds unless noted. Compare numbers within a table. E6, E8, E9 and E10 share the same box model test windows.
 
-### 9.1 Teacher (E1, `aqi-exp-wind`, GPU)
+### 9.1 Cloud graph model (E1, `aqi-exp-wind`, GPU)
 
-| teacher | skill 1-6 h (seen) |
+| cloud graph model | skill 1-6 h (seen) |
 |---|---|
 | T0 own station, no weather | 22.82 |
 | T0 + future weather (hindcast) | 23.99 |
@@ -463,7 +532,7 @@ Graph vs no graph −2.60 % (CI −2.93 to −2.27); future weather −1.27 %; E
 
 ### 9.2 Box alone (E3, `aqi-exp-student`)
 
-| student | skill seen | skill new |
+| box model | skill seen | skill new |
 |---|---|---|
 | S0 | 15.64 | 17.16 |
 | **S0 + ctx** | **16.02** | **17.49** |
@@ -484,7 +553,7 @@ Graph vs no graph −2.60 % (CI −2.93 to −2.27); future weather −1.27 %; E
 | custom trend loss | 15.62 | 16.93 | 69.6 % | +0.64 vs ctx (worse) |
 | custom AQI loss | 15.59 | 16.97 | 69.6 % | +0.38 vs ctx (worse) |
 
-### 9.4 Training size (E10, `aqi-exp-moredata`, GPU, 2 seeds; ctx student)
+### 9.4 Training size (E10, `aqi-exp-moredata`, GPU, 2 seeds; ctx box model)
 
 | training set | skill seen | skill new | params |
 |---|---|---|---|
@@ -540,7 +609,7 @@ Learned rule vs disagreement at 20 % (second half of test): 21.12 vs 20.97, −0
 |---|---|---|
 | wind direction in the graph (ERA5, measured, DE-tuned kernel) | = 180° placebo | Section 11 |
 | ADR physics block | ≤ 0.2 % | the graph learns "who matters" from data |
-| distilling spatial / physics states | worse | the box can't imitate what it can't see |
+| matching the cloud's spatial / physics states | worse | the box can't imitate what it can't see |
 | fuzzy Takagi-Sugeno gate | = ctx | value is interpretability only |
 | weather inputs on the box | no gain or worse | own T / RH / fans carry it; ERA5 is coarse |
 | custom trend / AQI-breakpoint losses | +0.4 to +0.6 % worse | they pull away from the scored error |
@@ -551,7 +620,7 @@ Learned rule vs disagreement at 20 % (second half of test): 21.12 vs 20.97, −0
 | learned send rule (E7) | +0.16 skill (needed +0.5) | the oracle gap is unpredictable luck |
 | +9 h buffered path (E9) | stale ≥ 3 h ≈ no broadcast | regional change is not predictable far enough ahead to rescue a stale link |
 | one model trained for all broadcast ages (E9) | loses most fresh gain; missing hurts | residual output + rarely-fresh training |
-| wider student (E10) | = width 32 | data-limited, not size-limited |
+| wider box model (E10) | = width 32 | data-limited, not size-limited |
 
 ---
 
@@ -575,7 +644,7 @@ nodes (≤ 2 km) or longer horizons (6-24 h) may change this (idea 15 in `NOVELT
 
 | step | what | keep / pass if |
 |---|---|---|
-| **E11** | Final combined model on 1 M windows: ctx vs split-res vs b0 vs mem (+ mem with KD soft targets; 8-bit regional forecasts; LightGBM vs mean-of-T1 regional source), 3 seeds, GPU | mem beats ctx by ≥ 3 % RMSE, CI excluding 0, seen and new places |
+| **E11** | Final combined model on 1 M windows: ctx vs split-res vs b0 vs mem (+ mem with cloud-matching targets; 8-bit regional forecasts; LightGBM vs mean-of-T1 regional source), 3 seeds, GPU | mem beats ctx by ≥ 3 % RMSE, CI excluding 0, seen and new places |
 | **E12** | Two models on the box (fresh-trained mem model when broadcast ≤ 1 h old, ctx otherwise) vs one mostly-fresh-trained model | fresh within 0.2 % of the fresh-only model AND missing within +0.1 % of ctx |
 | E13 | Fault robustness: stuck / spikes / +30 % drift / dead PM sensor for 6 h, 24 h, 7 d; virtual-sensor fallback from other nodes | mem loses less skill than ctx under faults |
 | E14 | Node count: broadcast from 5, 10, 15, 27 nodes | at 10 nodes ≥ half the full gain |
@@ -589,11 +658,11 @@ nodes (≤ 2 km) or longer horizons (6-24 h) may change this (idea 15 in `NOVELT
 ## 13. Limitations
 
 - **Simulated sensors**: the simulator decides how informative each sensor and node is.
-- **Hindcast weather** for the teacher (ERA5 actuals): live forecasts ~1 point worse, up to 3 at +6 h. The regional
+- **Hindcast weather** for the cloud graph model (ERA5 actuals): live forecasts ~1 point worse, up to 3 at +6 h. The regional
   forecaster and the box use no future weather.
 - **Nodes = CPCB station places** (5-15 km apart); a real network may be denser or sparser.
 - **27 nodes** built the broadcast; fewer is untested (E14).
-- **Not yet tested:** 8-bit regional forecasts, KD on top of the broadcast, the two-model fallback, the stack on
+- **Not yet tested:** 8-bit regional forecasts, cloud matching on top of the broadcast, the two-model fallback, the stack on
   1 M windows, a direct mem-vs-ctx bootstrap (all E11 / E12).
 - The memory and consensus use the box's own PM, so a faulty PM sensor affects them too (E13).
 - The shown **level** still depends on co-location calibration.
@@ -606,9 +675,9 @@ nodes (≤ 2 km) or longer horizons (6-24 h) may change this (idea 15 in `NOVELT
 | word | meaning |
 |---|---|
 | node / box | one ESP32 sensor unit |
-| teacher | the cloud graph model TI-STGNN |
-| student | the tiny model on the box (GDC-CNN) |
-| distillation (KD) | training the student to also copy the teacher's outputs |
+| cloud graph model | the big cloud model TI-STGNN that sees all nodes; used for personal forecasts, not as a model the box copies (older drafts and some file names call it "teacher"; the box model is "student") |
+| box model | the tiny model on the box (GDC-CNN) |
+| cloud matching | training the box model to also match the cloud graph model's outputs |
 | regional forecast / broadcast | the city-wide change for +1..+3 h (+ regional level), the same for all nodes, 8 bytes |
 | local correction | what the box adds for its own place |
 | consensus level | region now + the node's 24-h average offset |
@@ -620,7 +689,7 @@ nodes (≤ 2 km) or longer horizons (6-24 h) may change this (idea 15 in `NOVELT
 | placebo | the same input made meaningless on purpose (wind rotated 180°, another node's memory) |
 | hindcast | a test using the real future weather instead of a forecast |
 | token bucket | a fixed allowance of messages per day |
-| twin | the cloud's copy of a node's student, to know what the box predicts |
+| twin | the cloud's copy of a node's box model, to know what the box predicts |
 | gossip | boxes averaging values with neighbours directly, without the cloud |
 
 ---
@@ -630,6 +699,7 @@ nodes (≤ 2 km) or longer horizons (6-24 h) may change this (idea 15 in `NOVELT
 | what | path |
 |---|---|
 | this design | `docs/ARCH_V3.md` (v2 kept as `docs/ARCH_V2.md`) |
+| detailed figure with all shapes (appendix / Fig. 2) | `docs/arch_v3_detailed.drawio` |
 | every experiment: hypothesis, method, result, Kaggle notebook | `docs/EXPERIMENTS.md` |
 | ideas not yet run | `docs/NOVELTY_IDEAS.md` |
 | v1 design / v1 results | `docs/DESIGN.md`, `docs/ABLATION_FINDINGS.md`, `docs/HOW_IT_WORKS.md` |
