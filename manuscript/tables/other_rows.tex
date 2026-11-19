@@ -1,0 +1,11 @@
+\begin{tabular}{|p{4.0cm}|c|c|}
+\hline
+Comparison & $\Delta$RMSE [CI] & Result \\
+\hline
+Trend loss (hinge on wrong direction) vs. Huber & +0.64 [+0.41, +0.87] & worse \\
+AQI-breakpoint weighted loss vs. Huber & +0.38 [+0.22, +0.54] & worse \\
+1 M training windows vs. 200 k & -1.06 [-1.30, -0.81] & better \\
+Width 64 vs. width 32 (1 M windows) & +0.06 [-0.08, +0.20] & no difference \\
+Learned send rule vs. disagreement rule (20\% sent) & -0.20 [-0.34, -0.05] & below threshold \\
+\hline
+\end{tabular}

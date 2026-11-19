@@ -1,0 +1,14 @@
+\begin{tabular}{|p{4.3cm}|c|c|}
+\hline
+Cloud variant & Skill & $\Delta$RMSE [CI] \\
+\hline
+Own station, no weather & 22.82$\pm$0.50 & -- \\
+Own station, past weather & 23.01$\pm$0.21 & -0.25 [-0.54, +0.05] \\
+Own station, + future weather (hindcast) & 23.99$\pm$0.61 & -1.27 [-1.61, -0.94] \\
++ graph attention over stations & 25.97$\pm$0.16 & -2.60 [-2.93, -2.27] \\
++ ERA5 wind prior & 26.11$\pm$0.41 & -0.19 [-0.40, +0.03] \\
++ measured CPCB wind prior & 26.00$\pm$0.45 & -0.04 [-0.24, +0.15] \\
++ wind rotated by 180$^\circ$ (placebo) & 25.95$\pm$0.53 & +0.02 [-0.21, +0.25] \\
+ERA5 wind vs. placebo & -- & -0.21 [-0.43, +0.01] \\
+\hline
+\end{tabular}
